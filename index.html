@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="関東甲信越の37駅をサイコロで巡る鉄道すごろくゲーム">
+<meta name="theme-color" content="#0C8565">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="鉄道すごろく">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>関東甲信越 鉄道すごろく</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
+<style>
+/* Layout: one-screen game — route map (scrollable, zoomable) beside a control column; stacks map-over-controls on phones */
+:root{
+  --bg:#E4EAEE; --panel:#FFFFFF; --ink:#18212B; --muted:#5A6977; --line:#C6D1D9;
+  --land:#F2F5F1; --rail:#2B3540; --plus:#2C6BE0; --minus:#DE3F34; --card:#E5AC12;
+  --accent:#0C8565; --accent-ink:#FFFFFF; --goal:#DE3F34; --pref:#8FA3B3; --yokai:#6B3FA0;
+  --f-display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E141A; --panel:#17212A; --ink:#E6ECF1; --muted:#93A2AF; --line:#2B3946;
+  --land:#131C24; --rail:#AFBECB; --plus:#5A93FF; --minus:#FF6A5C; --card:#F2C443;
+  --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E141A; --panel:#17212A; --ink:#E6ECF1; --muted:#93A2AF; --line:#2B3946;
+  --land:#131C24; --rail:#AFBECB; --plus:#5A93FF; --minus:#FF6A5C; --card:#F2C443;
+  --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; color-scheme:dark}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;display:grid;grid-template-rows:auto minmax(0,1fr);padding-inline:16px;padding-block:10px;gap:10px;box-sizing:border-box;overflow:hidden}
+*{box-sizing:border-box}
+header{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:400;font-size:20px;margin:0;letter-spacing:.02em;text-wrap:balance}
+.when{font-family:var(--f-display);font-size:15px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-variant-numeric:tabular-nums}
+.goal{display:flex;align-items:center;gap:6px;background:var(--goal);color:#fff;border-radius:8px;padding:4px 10px;font-weight:700}
+.goal b{font-family:var(--f-display);font-weight:400;font-size:15px}
+.spacer{flex:1}
+.hbtns{display:flex;gap:6px;flex-wrap:wrap}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:10px;min-height:0}
+#mapWrap{position:relative;overflow:auto;background:var(--land);border:1px solid var(--line);border-radius:12px;min-height:0;-webkit-overflow-scrolling:touch}
+#map{display:block;margin:0 auto}
+.zoom{position:sticky;float:right;top:8px;right:8px;margin:8px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.zoom button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:18px;font-weight:700;cursor:pointer}
+aside{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.label{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700;margin:0 0 8px}
+.pl{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:4px 8px;align-items:center;padding:7px 8px;border-radius:8px}
+.pl.on{background:color-mix(in srgb,var(--accent) 14%,transparent);outline:2px solid var(--accent)}
+.dot{width:14px;height:14px;border-radius:50%}
+.pl .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl .nm small{font-weight:400;color:var(--muted);margin-left:4px}
+.pl .mo{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+.pl .mo.neg{color:var(--minus)}
+.pl .sub{grid-column:2/4;color:var(--muted);font-size:12px}
+.tag{display:inline-block;font-size:11px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:0 6px;margin-left:4px}
+.btn{font:inherit;font-weight:700;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:9px 14px;cursor:pointer}
+.btn.sm{padding:6px 10px;font-size:13px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{border-color:var(--minus);color:var(--minus)}
+.btn.big{width:100%;font-family:var(--f-display);font-weight:400;font-size:20px;padding:14px}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:focus-visible,.zoom button:focus-visible,.chip:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.dice{display:flex;gap:8px;justify-content:center;min-height:56px;align-items:center;margin-bottom:10px}
+.die{width:52px;height:52px;border-radius:12px;background:var(--ink);color:var(--panel);display:grid;place-items:center;font-family:var(--f-display);font-size:28px}
+.hint{color:var(--muted);margin:0 0 10px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--panel);color:var(--ink);cursor:pointer}
+.chip .sq{width:10px;height:10px;border-radius:50%}
+.chip small{color:var(--muted)}
+.cards{margin-top:12px}
+.cardbtn{font:inherit;text-align:left;width:100%;display:flex;justify-content:space-between;gap:8px;border:1px dashed var(--card);background:color-mix(in srgb,var(--card) 12%,transparent);color:var(--ink);border-radius:10px;padding:8px 10px;cursor:pointer;margin-top:6px}
+.cardbtn small{color:var(--muted)}
+#log ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:13px;line-height:1.5}
+#log li{color:var(--muted)}#log li:first-child{color:var(--ink)}
+#modal{position:fixed;inset:0;background:color-mix(in srgb,#000 45%,transparent);display:grid;place-items:center;padding:16px;z-index:20}
+.sheet{background:var(--panel);color:var(--ink);border-radius:16px;width:min(460px,100%);max-height:calc(100% - 20px);overflow:auto;padding:20px;border:1px solid var(--line)}
+.sheet.wide{width:min(600px,100%)}
+.sheet h2{font-family:var(--f-display);font-weight:400;font-size:22px;margin:0 0 12px;text-wrap:balance}
+.sheet h3{font-size:14px;margin:18px 0 8px}
+.sheet p{line-height:1.7;margin:0 0 10px}
+.btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.row .pn{font-weight:700;min-width:0}
+.row .pp{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+.own{font-size:12px;padding:3px 8px;border-radius:999px;color:#fff;font-weight:700;white-space:nowrap}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{font-weight:700;font-size:13px}
+input,select,textarea{font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);min-width:0}
+textarea{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;resize:vertical}
+.prow{display:grid;grid-template-columns:14px minmax(0,1fr) 108px;gap:8px;align-items:center;margin-bottom:8px}
+.check{display:flex;gap:10px;align-items:flex-start;padding:8px 0;cursor:pointer;line-height:1.5}
+.check input{width:18px;height:18px;margin-top:2px;flex:none}
+.check small{display:block;color:var(--muted)}
+.slot{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.slot b{display:block}
+.slot small{color:var(--muted);font-size:12px}
+.ed-head,.ed-row{display:grid;grid-template-columns:minmax(0,1fr) 92px 64px 38px;gap:6px;align-items:center}
+.ed-head{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.ed-row{margin-bottom:6px}
+.ed-row input{width:100%;padding:7px 8px}
+.ed-row input.bad{border-color:var(--minus);outline:2px solid var(--minus)}
+.ed-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.err{color:var(--minus);font-weight:700;min-height:1.2em;margin:8px 0 0}
+.big-money{font-family:var(--f-display);font-size:30px;color:var(--accent);margin:4px 0 8px}
+.vol{display:flex;gap:10px;align-items:center;padding:8px 0}
+.vol input{flex:1;padding:0}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right}
+td:first-child,th:first-child{text-align:left}
+th{font-size:12px;color:var(--muted)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:10px;font-weight:700;z-index:30;max-width:calc(100% - 32px);text-align:center}
+/* svg */
+.rail{fill:none;stroke:var(--rail);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.ferry{fill:none;stroke:var(--plus);stroke-width:4;stroke-dasharray:10 9}
+.sq-plus{fill:var(--plus)}.sq-minus{fill:var(--minus)}.sq-card{fill:var(--card)}
+.sqo{stroke:var(--land);stroke-width:3}
+.st{fill:var(--panel);stroke:var(--rail);stroke-width:4}
+.stl{font-family:var(--f-body);font-weight:700;font-size:17px;fill:var(--ink);paint-order:stroke;stroke:var(--land);stroke-width:5px;stroke-linejoin:round}
+.pref{font-family:var(--f-display);font-size:58px;fill:var(--pref);opacity:.35}
+.odot{stroke:none}
+.goalring{fill:none;stroke:var(--goal);stroke-width:5;animation:pulse 1.4s ease-in-out infinite}
+.goalflag{fill:var(--goal)}
+@keyframes pulse{50%{stroke-width:9;opacity:.55}}
+.cand{fill:color-mix(in srgb,var(--accent) 30%,transparent);stroke:var(--accent);stroke-width:4;cursor:pointer}
+.tok{transition:transform .13s linear}
+.tokc{stroke:var(--panel);stroke-width:3}
+.tokt{font-family:var(--f-display);font-size:13px;fill:#fff;text-anchor:middle;pointer-events:none}
+.yok{fill:var(--yokai);stroke:var(--panel);stroke-width:2.5}
+.yokt{font-size:11px}
+.tag.yk{color:var(--yokai);border-color:var(--yokai)}
+@media (max-width:820px){
+  .layout{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,44%)}
+  h1{font-size:16px}
+  .hbtns .btn{padding:6px 9px;font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){.tok{transition:none}.goalring{animation:none}}
+</style>
+
+</head>
+<body>
+<header>
+  <h1>関東甲信越 鉄道すごろく</h1>
+  <span class="when" id="when">1年目 4月</span>
+  <span class="goal" id="goalChip">目的地 <b id="goalName">—</b></span>
+  <span class="spacer"></span>
+  <div class="hbtns">
+    <button class="btn sm primary" id="sndBtn">音を出す</button>
+    <button class="btn sm" id="saveBtn">セーブ</button>
+    <button class="btn sm" id="editBtn">物件編集</button>
+    <button class="btn sm" id="setBtn">設定・音</button>
+    <button class="btn sm" id="newBtn">新しいゲーム</button>
+  </div>
+</header>
+<div class="layout">
+  <div id="mapWrap">
+    <div class="zoom"><button id="zin" aria-label="拡大">＋</button><button id="zout" aria-label="縮小">－</button><button id="zme" aria-label="現在地へ">◎</button></div>
+    <svg id="map" viewBox="0 0 1060 1120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="関東甲信越の路線図"></svg>
+  </div>
+  <aside>
+    <section class="box"><p class="label">社長一覧</p><div id="players"></div></section>
+    <section class="box" id="action"><p class="hint">読み込み中…</p></section>
+    <section class="box" id="log"><p class="label">できごと</p><ol></ol></section>
+  </aside>
+</div>
+<div id="modal" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"><div id="modalBody"></div><div class="btns" id="modalBtns"></div></div></div>
+<div id="toast" hidden></div>
+
+<script>
+const VW=1060,VH=1120;
+// [駅名, x, y, ラベル位置, 初期物件[名前, 価格(万円), 収益率%]]
+const STATIONS=[
+["佐渡",560,40,"r",[["金山跡の資料館",10000,4],["たらい舟の渡し",1000,10],["寒ぶりの網元",3000,7]]],
+["新潟",560,170,"r",[["魚沼産コシヒカリの田",3000,8],["酒蔵",8000,5],["バスセンターのカレー屋",800,12]]],
+["長岡",480,260,"r",[["花火工房",5000,5],["米菓工場",8000,5],["生姜醤油ラーメン屋",700,13]]],
+["直江津",320,250,"a",[["笹団子屋",600,14],["雁木通りの商店",2000,7],["港の倉庫",10000,3]]],
+["越後湯沢",470,370,"r",[["スキーリゾート",35000,3],["地酒の試飲館",3000,7]]],
+["長野",290,390,"l",[["おやき屋",600,14],["門前の七味屋",1000,10],["信州そば屋",1500,9]]],
+["白馬",170,320,"a",[["スキー場",30000,3],["ペンション",4000,6]]],
+["松本",170,490,"l",[["民芸家具工房",5000,5],["城下町の土産店",1000,10],["そば屋",1500,9]]],
+["軽井沢",350,510,"l",[["高級別荘",40000,2],["ジャム屋",1200,9],["アウトレット",25000,4]]],
+["草津",420,450,"a",[["湯畑の温泉宿",15000,5],["温泉たまご屋",500,16],["湯もみ劇場",3000,6]]],
+["高崎",520,570,"b",[["だるま工房",1000,12],["パスタ店",1200,10],["音楽ホール",20000,2]]],
+["前橋",610,510,"a",[["焼きまんじゅう屋",500,15],["生糸問屋",4000,5]]],
+["宇都宮",760,510,"r",[["餃子屋",600,15],["餃子屋",600,15],["カクテルバー",2000,8],["大谷石の採石場",8000,4]]],
+["日光",680,420,"a",[["湯葉料理屋",1500,9],["水ようかん屋",700,12],["鬼怒川の温泉ホテル",25000,3]]],
+["那須塩原",810,400,"a",[["牧場のチーズ工房",2500,7],["高原の別荘地",15000,3],["土産物店",1000,9]]],
+["日立",950,450,"a",[["電機工場",50000,2],["海の見える駅カフェ",1200,9]]],
+["水戸",910,560,"r",[["納豆工場",1500,10],["梅林の茶屋",800,12],["あんこう鍋の料亭",5000,5]]],
+["つくば",840,660,"b",[["研究所ベンチャー",10000,5],["筑波山のがまの油屋",600,14]]],
+["大宮",640,650,"r",[["盆栽園",2500,7],["鉄道グッズ店",1500,9],["駅ビル",30000,3]]],
+["川越",550,690,"l",[["さつまいも菓子屋",700,14],["蔵造りの和菓子屋",2000,8],["小江戸の料亭",6000,5]]],
+["秩父",440,640,"l",[["銘仙の織物工房",1500,7],["わらじかつ丼屋",800,12],["夜祭りの屋台",3000,6]]],
+["八王子",470,780,"b",[["織物工場",3000,6],["玉ねぎラーメン屋",800,12],["高尾山の茶屋",1500,8]]],
+["甲府",280,720,"l",[["ぶどう園",2000,8],["ワイナリー",10000,5],["宝石研磨工房",8000,4],["ほうとう屋",800,12]]],
+["諏訪",210,610,"l",[["精密機械工場",20000,3],["酒蔵",6000,5],["寒天工場",3000,6]]],
+["河口湖",360,830,"b",[["富士見のホテル",20000,4],["吉田うどん屋",600,14],["遊覧船",6000,5]]],
+["新宿",600,770,"a",[["ラーメン横丁",1500,10],["高層ホテル",40000,3],["家電量販店",20000,4]]],
+["上野",700,740,"r",[["アメ横の干物屋",600,15],["動物園前の売店",1200,8],["美術館カフェ",3000,5]]],
+["東京",700,830,"l",[["駅弁屋",800,12],["老舗デパート",30000,3],["丸の内オフィスビル",80000,2]]],
+["品川",640,880,"l",[["水族館",15000,4],["新幹線ホームの弁当屋",1000,10],["本社ビル",60000,2]]],
+["横浜",600,960,"r",[["中華街の肉まん屋",1000,12],["港のホテル",35000,3],["赤レンガの雑貨店",4000,6]]],
+["鎌倉",560,1040,"r",[["しらす丼屋",800,12],["大仏前の土産店",1500,8],["古民家カフェ",3000,6]]],
+["小田原",450,1010,"b",[["かまぼこ店",1200,10],["干物店",700,14],["城下町の宿",8000,4]]],
+["箱根湯本",380,1060,"l",[["温泉まんじゅう屋",600,15],["寄木細工工房",2000,6],["老舗旅館",20000,4]]],
+["千葉",820,850,"r",[["落花生問屋",1000,10],["モノレール売店",600,12],["臨海の倉庫",25000,3]]],
+["成田",900,770,"a",[["参道のうなぎ屋",1500,10],["羊羹屋",800,12],["空港ホテル",30000,3]]],
+["銚子",990,730,"b",[["醤油蔵",8000,5],["ぬれせんべい屋",600,15],["漁港の市場",4000,6]]],
+["木更津",780,960,"r",[["あさりの漁場",1000,10],["アウトレット",20000,4]]],
+["館山",760,1080,"r",[["房州うちわ工房",800,10],["びわ農園",1500,8],["海辺の民宿",3000,6]]]
+];
+const EDGES=[["新潟","佐渡",1],["新潟","長岡"],["長岡","直江津"],["長岡","越後湯沢"],["直江津","長野"],["長野","白馬"],["白馬","松本"],["長野","松本"],["長野","軽井沢"],["軽井沢","高崎"],["越後湯沢","高崎"],["高崎","草津"],["高崎","前橋"],["前橋","宇都宮"],["宇都宮","日光"],["宇都宮","那須塩原"],["宇都宮","水戸"],["水戸","日立"],["水戸","つくば"],["つくば","上野"],["大宮","宇都宮"],["大宮","高崎"],["大宮","川越"],["大宮","上野"],["川越","秩父"],["秩父","高崎"],["川越","八王子"],["松本","諏訪"],["諏訪","甲府"],["甲府","河口湖"],["河口湖","八王子"],["八王子","新宿"],["八王子","横浜"],["新宿","東京"],["新宿","品川"],["上野","東京"],["東京","品川"],["東京","千葉"],["品川","横浜"],["横浜","鎌倉"],["鎌倉","小田原"],["小田原","箱根湯本"],["千葉","成田"],["成田","銚子"],["千葉","木更津"],["木更津","館山"]];
+const PREFS=[["新潟",680,300],["長野",70,700],["山梨",170,880],["群馬",540,440],["栃木",850,330],["茨城",950,640],["埼玉",350,590],["神奈川",400,930],["千葉",900,960]];
+const COLORS=["#D8392F","#2B62D6","#159A5C","#E0860F"];
+const DEFAULT_SEATS=[["あなた","human"],["あさま社長","cpu"],["とき社長","cpu"],["なすの社長","none"]];
+const MONTHS=["4月","5月","6月","7月","8月","9月","10月","11月","12月","1月","2月","3月"];
+const CARDS={kyuko:{n:"急行カード",d:"サイコロ2個で進む"},tokkyu:{n:"特急カード",d:"サイコロ3個で進む"},buttobi:{n:"ぶっとびカード",d:"どこかの駅へワープ"},rinji:{n:"臨時収入カード",d:"すぐにお金が入る"},oharai:{n:"お祓いカード",d:"取り憑いた妖怪を追い払う"}};
+const YOKAI=[{n:"たかり狸",s:"狸"},{n:"大だぬき",s:"大"}];
+const PLUS_MSG=["沿線のお祭りで臨時収入","観光客が増えて売上アップ","株の配当が入った","駅前の宝くじが当たった","ふるさと納税の返礼品が好評"];
+const MINUS_MSG=["車両の修理費","台風で線路が被害","接待費がかさんだ","落とし物をした","駅舎の改装費"];
+const DEFAULT_PROPS=Object.fromEntries(STATIONS.map(s=>[s[0],s[4]]));
+
+/* ---------- graph ---------- */
+const N={},ADJ={},RAILS=[];
+function addNode(id,o){N[id]=o;ADJ[id]=[]}
+function link(a,b){ADJ[a].push(b);ADJ[b].push(a)}
+STATIONS.forEach(([n,x,y,lp])=>addNode(n,{id:n,type:"st",x,y,lp}));
+let seed=20261010;const srand=()=>(seed=(seed*16807)%2147483647)/2147483647;
+EDGES.forEach(([a,b,ferry],ei)=>{
+  const A=N[a],B=N[b],d=Math.hypot(A.x-B.x,A.y-B.y),k=Math.max(1,Math.round(d/66));
+  let prev=a;const pts=[a];
+  for(let i=1;i<=k;i++){const t=i/(k+1),r=srand(),id="m"+ei+"_"+i;
+    const type=ferry?(r<.5?"plus":"card"):(r<.5?"plus":r<.78?"minus":"card");
+    addNode(id,{id,type,x:A.x+(B.x-A.x)*t,y:A.y+(B.y-A.y)*t});link(prev,id);prev=id;pts.push(id)}
+  link(prev,b);pts.push(b);RAILS.push({pts,ferry:!!ferry});
+});
+function bfs(src){const d={[src]:0},q=[src];while(q.length){const u=q.shift();for(const v of ADJ[u])if(d[v]==null){d[v]=d[u]+1;q.push(v)}}return d}
+const distCache={};const distTo=id=>distCache[id]||(distCache[id]=bfs(id));
+function reach(start,steps,dest,exact){
+  const res=new Map(),seen=new Set();
+  (function go(u,p,left,path){
+    const key=u+"|"+p+"|"+left;if(seen.has(key))return;seen.add(key);
+    if(!exact&&u===dest&&path.length>1){if(!res.has(u))res.set(u,path.slice());return}
+    if(left===0){if(!res.has(u))res.set(u,path.slice());return}
+    let nb=ADJ[u].filter(v=>v!==p);if(!nb.length)nb=ADJ[u];
+    for(const v of nb){path.push(v);go(v,u,left-1,path);path.pop()}
+  })(start,null,steps,[start]);
+  return res;
+}
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const r100=v=>Math.round(v/100)*100;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+function yen(m){const neg=m<0;m=Math.abs(Math.round(m));const oku=Math.floor(m/10000),man=m%10000;let s="";if(oku)s+=oku.toLocaleString()+"億";if(man||!oku)s+=man.toLocaleString()+"万";return(neg?"−":"")+s+"円"}
+const sqName=id=>{const n=N[id];return n.type==="st"?n.id+"駅":{plus:"青マス",minus:"赤マス",card:"カードマス"}[n.type]};
+const yf=()=>1+.35*(S.year-1);
+let S=null,CAND=null,zoom=1,tokEls=[],CUSTOM={};
+const cp=()=>S.players[S.cur];
+const P=st=>S.props[st];
+const master=st=>CUSTOM[st]||DEFAULT_PROPS[st];
+function log(t){S.log.unshift(t);S.log.length=Math.min(S.log.length,40);renderLog()}
+let toastT;function toast(t,ms=1800){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,ms)}
+
+/* ---------- storage: browser + (signed-in) account ---------- */
+const Store={cloud:null,q:Promise.resolve(),
+  async init(){if(!window.claude||!window.claude.use)return;
+    try{const[db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+      if(!db||!user)return;const id=await user.id();if(id)this.cloud=db.collection("data/users/"+id)}catch(e){this.cloud=null}},
+  local(k){try{return JSON.parse(localStorage.getItem("kks2-"+k))}catch(e){return null}},
+  async get(k){let best=this.local(k);
+    if(this.cloud){try{const s=await this.cloud.doc(k).get();if(s.exists){const d=s.data();if(!best||(d.t||0)>(best.t||0))best={t:d.t,v:JSON.parse(d.json)}}}catch(e){}}
+    return best?best.v:null},
+  set(k,v){const t=Date.now(),json=JSON.stringify(v);
+    try{localStorage.setItem("kks2-"+k,JSON.stringify({t,v}))}catch(e){}
+    if(this.cloud){const ref=this.cloud.doc(k);this.q=this.q.then(()=>ref.set({json,t})).catch(()=>{})}
+    return this.q}
+};
+function autosave(){if(S)Store.set("auto",S)}
+async function encodeState(o){const bytes=new TextEncoder().encode(JSON.stringify(o));let out=bytes,tag="KKS2:";
+  if(window.CompressionStream){try{out=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer());tag="KKS2Z:"}catch(e){out=bytes}}
+  let s="";for(let i=0;i<out.length;i+=0x8000)s+=String.fromCharCode.apply(null,out.subarray(i,i+0x8000));return tag+btoa(s)}
+async function decodeState(code){code=code.replace(/\s+/g,"");let z=false;
+  if(code.startsWith("KKS2Z:")){z=true;code=code.slice(6)}else if(code.startsWith("KKS2:"))code=code.slice(5);else throw new Error("format");
+  let bytes=Uint8Array.from(atob(code),c=>c.charCodeAt(0));
+  if(z)bytes=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer());
+  const o=JSON.parse(new TextDecoder().decode(bytes));if(!validState(o))throw new Error("state");return o}
+function validState(o){return o&&Array.isArray(o.players)&&o.players.length>=2&&o.owners&&o.players.every(p=>N[p.pos])&&N[o.dest]}
+
+/* ---------- sound (synthesized, original) ---------- */
+const NOTE={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+const midi=n=>12*(+n.slice(-1)+1)+NOTE[n[0]];
+const hz=m=>440*Math.pow(2,(m-69)/12);
+const MEL_BARS=["C5:1 E5:1 G5:2 A5:1 G5:1 E5:2","F5:1 E5:1 D5:2 E5:1 D5:1 C5:2","D5:1 E5:1 F5:2 A5:1 G5:1 F5:2","E5:2 G5:2 G5:4",
+ "C5:1 E5:1 G5:2 C6:1 B5:1 A5:2","A5:1 B5:1 C6:2 G5:1 E5:1 C5:2","D5:1 F5:1 A5:2 G5:1 F5:1 D5:2","C5:2 E5:1 D5:1 C5:4"];
+const ROOTS=[["C3","G3"],["F2","C3"],["D3","A3"],["G2","D3"],["C3","G3"],["A2","E3"],["G2","D3"],["C3","G3"]];
+const MEL=[],BASS=[];
+MEL_BARS.forEach((bar,bi)=>{let pos=bi*8;bar.split(" ").forEach(tk=>{const[n,l]=tk.split(":");MEL[pos]=[midi(n),+l];pos+=+l});
+  const[r,f]=ROOTS[bi];for(let i=0;i<8;i++)BASS[bi*8+i]=i%4===2?midi(r)+12:i%2?midi(f):midi(r)});
+function silentWav(){const n=4000,b=new Uint8Array(44+n),v=new DataView(b.buffer);const w=(o,s)=>[...s].forEach((c,i)=>b[o+i]=c.charCodeAt(0));
+  w(0,"RIFF");v.setUint32(4,36+n,true);w(8,"WAVEfmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,8000,true);v.setUint32(28,8000,true);v.setUint16(32,1,true);v.setUint16(34,8,true);w(36,"data");v.setUint32(40,n,true);b.fill(128,44);
+  let s="";b.forEach(x=>s+=String.fromCharCode(x));return "data:audio/wav;base64,"+btoa(s)}
+const Snd={ctx:null,master:null,bgmG:null,seG:null,prefs:{on:true,bgm:true,se:true,vol:.6},timer:null,step:0,next:0,nb:null,el:null,armed:false,
+  loadPrefs(){try{Object.assign(this.prefs,JSON.parse(localStorage.getItem("kks-sound"))||{})}catch(e){}},
+  savePrefs(){try{localStorage.setItem("kks-sound",JSON.stringify(this.prefs))}catch(e){}},
+  running(){return !!this.ctx&&this.ctx.state==="running"},
+  unlock(){
+    // iPhone/iPad: play through the silent switch, and only unlock inside a real tap (touchend/click)
+    try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+    if(!this.el){try{this.el=new Audio(silentWav());this.el.loop=true;this.el.setAttribute("playsinline","");this.el.play().catch(()=>{this.el=null})}catch(e){this.el=null}}
+    else if(this.el.paused)this.el.play().catch(()=>{});
+    if(!this.ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+      try{this.ctx=new AC()}catch(e){return}
+      const c=this.ctx;this.master=c.createGain();this.master.connect(c.destination);
+      this.bgmG=c.createGain();this.bgmG.connect(this.master);this.seG=c.createGain();this.seG.connect(this.master);
+      this.master.gain.value=0;this.bgmG.gain.value=0;this.seG.gain.value=.7;
+      const len=c.sampleRate*.2;this.nb=c.createBuffer(1,len,c.sampleRate);const ch=this.nb.getChannelData(0);for(let i=0;i<len;i++)ch[i]=Math.random()*2-1;
+      c.onstatechange=()=>{if(c.state==="running"){this.armed=true;this.apply()}updSndBtn()}}
+    try{const b=this.ctx.createBuffer(1,1,22050),s=this.ctx.createBufferSource();s.buffer=b;s.connect(this.ctx.destination);s.start(0)}catch(e){}
+    if(this.ctx.state!=="running")this.ctx.resume().then(()=>{this.armed=true;this.apply();updSndBtn()}).catch(()=>{});
+    else{this.armed=true;this.apply()}
+    updSndBtn()},
+  apply(){if(!this.ctx)return;const t=this.ctx.currentTime;this.master.gain.setTargetAtTime(this.prefs.on?this.prefs.vol:0,t,.02);this.seG.gain.setTargetAtTime(this.prefs.se?.7:0,t,.02);
+    if(this.prefs.on&&this.prefs.bgm&&this.running())this.startBgm();else this.stopBgm()},
+  tone(f,start,dur,type,vol,dest,slide){const c=this.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,start);
+    if(slide)o.frequency.exponentialRampToValueAtTime(slide,start+dur);
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(vol,start+.008);g.gain.exponentialRampToValueAtTime(.0001,start+dur);
+    o.connect(g);g.connect(dest);o.start(start);o.stop(start+dur+.03)},
+  hat(start,vol){const c=this.ctx,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=this.nb;f.type="highpass";f.frequency.value=7000;
+    g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(.0001,start+.05);s.connect(f);f.connect(g);g.connect(this.bgmG);s.start(start);s.stop(start+.06)},
+  startBgm(){if(!this.ctx||this.timer)return;this.bgmG.gain.setTargetAtTime(.3,this.ctx.currentTime,.1);this.next=this.ctx.currentTime+.1;this.step=0;this.timer=setInterval(()=>this.sched(),25)},
+  stopBgm(){if(this.timer){clearInterval(this.timer);this.timer=null}if(this.ctx)this.bgmG.gain.setTargetAtTime(0,this.ctx.currentTime,.05)},
+  sched(){const c=this.ctx,E=60/138/2;if(this.next<c.currentTime-.2)this.next=c.currentTime+.05;
+    while(this.next<c.currentTime+.12){const i=this.step%64,m=MEL[i];
+      if(m)this.tone(hz(m[0]),this.next,m[1]*E*.9,"square",.12,this.bgmG);
+      this.tone(hz(BASS[i]),this.next,E*.85,"triangle",.32,this.bgmG);
+      if(i%2)this.hat(this.next,.05);
+      this.step++;this.next+=E}},
+  duck(sec){if(!this.ctx||!this.timer)return;const t=this.ctx.currentTime;this.bgmG.gain.setTargetAtTime(.06,t,.03);this.bgmG.gain.setTargetAtTime(.3,t+sec,.2)},
+  seq(notes,type,vol,gap,len){const t=this.ctx.currentTime+.01;notes.forEach((n,i)=>this.tone(hz(midi(n)),t+i*gap,len||gap*1.4,type,vol,this.seG))},
+  sfx(name){if(!this.running()||!this.prefs.se||!this.prefs.on)return;const t=this.ctx.currentTime+.005,d=this.seG;
+    switch(name){
+      case"dice":this.tone(700+Math.random()*500,t,.035,"square",.12,d);break;
+      case"step":this.tone(520,t,.07,"triangle",.3,d);break;
+      case"turn":this.seq(["E5","A5"],"triangle",.25,.08);break;
+      case"plus":this.seq(["C6","E6","G6","C7"],"square",.13,.07);break;
+      case"minus":this.tone(440,t,.4,"square",.14,d,140);this.tone(330,t+.12,.4,"square",.1,d,110);break;
+      case"card":this.seq(["E6","B6","E7"],"triangle",.25,.06,.25);break;
+      case"buy":this.tone(hz(midi("B5")),t,.07,"square",.13,d);this.tone(hz(midi("E6")),t+.07,.3,"square",.13,d);break;
+      case"warp":this.tone(250,t,.5,"sine",.3,d,1800);break;
+      case"arrive":this.duck(2.4);this.seq(["G5","C6","E6","G6"],"square",.14,.11);
+        this.tone(hz(midi("E6")),t+.5,.35,"square",.14,d);this.tone(hz(midi("G6")),t+.85,.9,"square",.14,d);this.tone(hz(midi("C4")),t+.85,.9,"triangle",.35,d);break;
+      case"settle":this.duck(1.6);this.seq(["C6","G6","C7"],"sine",.3,.16,.8);break;
+      case"over":this.duck(3.5);this.seq(["C5","E5","G5","C6","G5","C6","E6","G6"],"square",.13,.13);this.tone(hz(midi("C7")),t+1.1,1.4,"square",.13,d);this.tone(hz(midi("C4")),t+1.1,1.4,"triangle",.35,d);break;
+      case"click":this.tone(880,t,.04,"triangle",.15,d);break;
+      case"yokai":this.tone(300,t,.25,"sawtooth",.1,d,200);this.tone(240,t+.22,.4,"sawtooth",.1,d,120);break;
+      case"pass":this.seq(["C6","A5","F5","D6"],"square",.12,.07);break;
+    }}
+};
+function updSndBtn(){const b=$("#sndBtn");if(!b)return;b.textContent=!Snd.running()?"音を出す":Snd.prefs.on?"音 ON":"音 OFF";b.classList.toggle("primary",!Snd.running())}
+["touchend","click","keydown"].forEach(ev=>addEventListener(ev,()=>{Snd.wasRunning=Snd.running();Snd.unlock()},{capture:true}));
+
+/* ---------- map ---------- */
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;parent&&parent.appendChild(e);return e}
+let gDyn,gTok,gOwn;
+function initMap(){
+  const svg=$("#map");svg.innerHTML="";
+  const gP=el("g",{},svg);PREFS.forEach(([n,x,y])=>el("text",{x,y,class:"pref","text-anchor":"middle"},gP,n));
+  const gR=el("g",{},svg);
+  RAILS.forEach(r=>{const d="M"+r.pts.map(id=>N[id].x+" "+N[id].y).join(" L");el("path",{d,class:r.ferry?"ferry":"rail"},gR)});
+  const gS=el("g",{},svg);
+  Object.values(N).forEach(n=>{if(n.type!=="st")el("circle",{cx:n.x,cy:n.y,r:11,class:"sqo sq-"+n.type},gS)});
+  gDyn=el("g",{},svg);
+  const gL=el("g",{},svg);
+  STATIONS.forEach(([n,x,y,lp])=>{
+    el("rect",{x:x-17,y:y-17,width:34,height:34,rx:7,class:"st"},gL);
+    const pos={b:[x,y+40,"middle"],a:[x,y-26,"middle"],r:[x+24,y+6,"start"],l:[x-24,y+6,"end"]}[lp];
+    el("text",{x:pos[0],y:pos[1],"text-anchor":pos[2],class:"stl"},gL,n);
+  });
+  gOwn=el("g",{},svg);gTok=el("g",{},svg);
+}
+function renderDyn(){
+  if(!S)return;gDyn.innerHTML="";gOwn.innerHTML="";
+  STATIONS.forEach(([n,x,y])=>{const own=S.owners[n],c=own.length,sp=8,x0=x-(c-1)*sp/2;
+    own.forEach((o,i)=>el("circle",{cx:x0+i*sp,cy:y+7,r:3.4,class:"odot",fill:o==null?"var(--line)":COLORS[o]},gOwn));
+    if(own.every(o=>o!=null&&o===own[0]))el("rect",{x:x-11,y:y-11,width:22,height:10,rx:2,fill:COLORS[own[0]]},gOwn);
+  });
+  const g=N[S.dest];el("circle",{cx:g.x,cy:g.y,r:30,class:"goalring"},gDyn);
+  el("path",{d:`M${g.x+20} ${g.y-24} v-30 l20 8 l-20 8`,class:"goalflag"},gDyn);
+  if(CAND)for(const id of CAND.keys()){const n=N[id];const c=el("circle",{cx:n.x,cy:n.y,r:21,class:"cand",tabindex:0,role:"button","aria-label":sqName(id)},gDyn);
+    c.addEventListener("click",()=>choose(id));c.addEventListener("keydown",e=>{if(e.key==="Enter")choose(id)})}
+}
+let yokEl=null;
+function buildTokens(){gTok.innerHTML="";tokEls=S.players.map((p,i)=>{const g=el("g",{class:"tok"},gTok);el("circle",{r:13,class:"tokc",fill:COLORS[p.color??i]},g);el("text",{y:5,class:"tokt"},g,p.name.slice(0,1));return g});
+  yokEl=el("g",{class:"tok"},gTok);el("circle",{r:11,class:"yok"},yokEl);el("text",{y:4,class:"tokt yokt"},yokEl,"狸");placeTokens()}
+function placeTokens(){if(!S)return;const pts=[];S.players.forEach((p,i)=>{const n=N[p.pos],same=S.players.filter(q=>q.pos===p.pos).length>1;const o=same?[[-9,-9],[9,-9],[-9,9],[9,9]][i]:[0,0];pts[i]=[n.x+o[0],n.y+o[1]];tokEls[i].style.transform=`translate(${pts[i][0]}px,${pts[i][1]}px)`;if(i===S.cur)gTok.appendChild(tokEls[i])});
+  if(yokEl){const y=S.yokai,on=S.rules&&S.rules.yokai&&y&&y.owner!=null;yokEl.style.display=on?"":"none";
+    if(on){yokEl.lastChild.textContent=YOKAI[y.form].s;yokEl.style.transform=`translate(${pts[y.owner][0]+15}px,${pts[y.owner][1]-15}px)`;gTok.appendChild(yokEl)}}}
+function baseW(){const w=$("#mapWrap");return Math.min(w.clientWidth,w.clientHeight*VW/VH)}
+function applyZoom(){const svg=$("#map"),W=baseW()*zoom;svg.style.width=W+"px";svg.style.height=W*VH/VW+"px"}
+function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
+
+/* ---------- side panel ---------- */
+const pcol=i=>COLORS[S.players[i].color??i];
+function render(){if(!S)return;
+  $("#when").textContent=`${S.year}年目 ${MONTHS[S.month]}　(全${S.years}年)`;
+  $("#goalName").textContent=S.dest;
+  renderPlayers();renderAction();renderLog();renderDyn();placeTokens();
+}
+function assets(i){let v=0;for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)v+=P(s)[k][1]});return v}
+function lastPlace(){if(!S.assist)return -1;const t=S.players.map((p,i)=>p.money+assets(i)),mn=Math.min(...t);return t.filter(x=>x===mn).length===1?t.indexOf(mn):-1}
+function renderPlayers(){const d=distTo(S.dest),lp=lastPlace();
+  $("#players").innerHTML=S.players.map((p,i)=>{const cnt=Object.values(S.owners).flat().filter(o=>o===i).length;
+    return `<div class="pl ${i===S.cur?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><span class="nm">${esc(p.name)}<small>${p.cpu?"CPU":"人"}</small>${i===lp?'<span class="tag">追い上げ中</span>':""}${S.rules.yokai&&S.yokai.owner===i?`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`:""}</span><span class="mo ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sub">${sqName(p.pos)}・目的地まで${d[p.pos]}マス・物件${cnt}件・カード${p.cards.length}枚</span></div>`}).join("")}
+function diceHTML(v){return `<div class="dice" id="dice">${(v||[]).map(x=>`<span class="die">${x}</span>`).join("")}</div>`}
+function renderAction(){const a=$("#action"),p=cp();const d=distTo(S.dest)[p.pos];
+  if(S.phase==="over"){a.innerHTML=`<p class="label">ゲーム終了</p><button class="btn primary big" data-act="new">もう一度あそぶ</button>`;return}
+  if(S.phase==="roll"&&!p.cpu){
+    a.innerHTML=`<p class="label">${esc(p.name)}の番</p>${diceHTML(S.lastDice)}<p class="hint">目的地「${S.dest}」まであと${d}マス${S.rules.exact?"（ぴったり止まると到着）":""}。${S.cur===lastPlace()?"<br>追い上げサポートで大きい目が出やすくなっています。":""}${possessed()?`<br>${YOKAI[S.yokai.form].n}が取り憑いています。ほかの社長のいるマスを通れば押し付けられます。`:""}</p>
+    <button class="btn primary big" data-act="roll">サイコロを振る${S.dice>1?`（${S.dice}個）`:""}</button>
+    ${p.cards.length?`<div class="cards"><p class="label" style="margin-top:6px">カードを使う</p>${p.cards.map((c,i)=>`<button class="cardbtn" data-card="${i}" ${(S.dice>1&&(c==="kyuko"||c==="tokkyu"))||(c==="oharai"&&!possessed())?"disabled":""}><span><b>${CARDS[c].n}</b></span><small>${CARDS[c].d}</small></button>`).join("")}</div>`:""}`;return}
+  if(S.phase==="choose"&&CAND){const dd=distTo(S.dest);const list=[...CAND.keys()].sort((x,y)=>dd[x]-dd[y]);
+    a.innerHTML=`<p class="label">${esc(p.name)}の番</p>${diceHTML(S.lastDice)}<p class="hint">止まるマスを地図か下から選んでください。</p><div class="chips">${list.map(id=>{const n=N[id],c=n.type==="st"?"var(--ink)":`var(--${n.type})`;return `<button class="chip" data-go="${id}"><span class="sq" style="background:${c}"></span>${sqName(id)}<small>${id===S.dest?"目的地！":"あと"+dd[id]}${possessed()&&passes(CAND.get(id))?"・押し付け":""}</small></button>`}).join("")}</div>`;return}
+  a.innerHTML=`<p class="label">${esc(p.name)}の番</p>${diceHTML(S.lastDice)}<p class="hint">${p.cpu?"考え中です…":"移動中…"}</p>`;
+}
+function renderLog(){if(!S)return;$("#log ol").innerHTML=S.log.slice(0,7).map(t=>`<li>${esc(t)}</li>`).join("")}
+function showDice(v){S.lastDice=v;const d=$("#dice");if(d)d.outerHTML=diceHTML(v)}
+
+/* ---------- modal ---------- */
+function modal(html,buttons,wide){return new Promise(res=>{const m=$("#modal"),body=$("#modalBody");
+  body.onclick=null;body.oninput=null;body.onchange=null;$("#sheet").className="sheet"+(wide?" wide":"");
+  body.innerHTML=html;const bb=$("#modalBtns");bb.innerHTML="";
+  buttons.forEach(([label,val,cls,before])=>{const b=document.createElement("button");b.textContent=label;b.className="btn "+(cls||"");
+    b.onclick=async()=>{if(before&&(await before())===false)return;m.hidden=true;res(val)};bb.appendChild(b)});
+  m.hidden=false;$("#sheet").scrollTop=0;bb.lastChild&&bb.lastChild.focus()})}
+const modalOpen=()=>!$("#modal").hidden;
+
+/* ---------- game ---------- */
+function pickDest(from){const d=distTo(from);const c=STATIONS.map(s=>s[0]).filter(n=>n!==from&&d[n]>=14);return c[rnd(0,c.length-1)]}
+const possessed=()=>S.rules.yokai&&S.yokai.owner===S.cur;
+const passes=path=>path.slice(1).some(id=>S.players.some((q,j)=>j!==S.cur&&q.pos===id));
+function newGame(seats,years,assist,rules){
+  const props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(master(s[0]))]));
+  S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"]})),cur:0,year:1,month:0,years,assist,rules,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"roll",dice:1,lastDice:null};
+  STATIONS.forEach(([n])=>S.owners[n]=props[n].map(()=>null));
+  S.destFrom="東京";S.dest=pickDest("東京");
+  buildTokens();log(`${years}年間の旅が東京駅から始まりました。最初の目的地は${S.dest}駅です。`);
+  startTurn();
+}
+async function startTurn(){CAND=null;S.dice=1;const p=cp();
+  if(p.cpu){S.phase="busy";render();autosave();focus(p.pos);await sleep(600);await cpuTurn()}
+  else{S.phase="roll";render();autosave();focus(p.pos);
+    if(S.players.filter(q=>!q.cpu).length>1){toast(`${p.name}の番です`);Snd.sfx("turn")}}
+}
+async function rollDice(){const n=S.dice,boost=S.cur===lastPlace();let v;
+  for(let i=0;i<9;i++){v=Array.from({length:n},()=>rnd(1,6));showDice(v);Snd.sfx("dice");await sleep(55)}
+  if(boost)v=v.map(x=>Math.random()<.5?Math.max(x,rnd(1,6)):x);
+  showDice(v);return v.reduce((a,b)=>a+b,0)}
+async function humanRoll(){S.phase="busy";renderAction();const t=await rollDice();const p=cp();log(`${p.name}は${t}マス進める。`);
+  CAND=reach(p.pos,t,S.dest,S.rules.exact);
+  if(CAND.size===1){const id=[...CAND.keys()][0];return choose(id)}
+  S.phase="choose";render();const ids=[...CAND.keys()];focus(ids[0])}
+async function choose(id){if(!CAND||!CAND.has(id))return;const path=CAND.get(id);CAND=null;S.phase="busy";render();await moveAlong(path);await land();await endTurn()}
+async function moveAlong(path){const p=cp();for(let i=1;i<path.length;i++){p.pos=path[i];placeTokens();Snd.sfx("step");if(i%3===1)focus(p.pos);
+    if(possessed()){const j=S.players.findIndex((q,k)=>k!==S.cur&&q.pos===path[i]);if(j>=0)await passYokai(j)}
+    await sleep(reduce?40:150)}focus(p.pos);renderPlayers()}
+async function passYokai(j){const y=S.yokai,from=cp(),to=S.players[j];y.owner=j;y.turns=0;
+  log(`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`);Snd.sfx("pass");toast(`${YOKAI[y.form].n}を${to.name}に押し付けた！`,2000);placeTokens();renderPlayers();await sleep(600)}
+function ownedList(i){const a=[];for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)a.push([s,k,P(s)[k][1]])});return a}
+function sellHalf(p,s,k){const pr=P(s)[k],v=r100(pr[1]/2);S.owners[s][k]=null;p.money+=v;return `${s}の「${pr[0]}」`}
+async function mischief(p){const y=S.yokai;y.turns++;let pre="";
+  if(y.form===0&&y.turns>=6){y.form=1;y.turns=0;pre=`${YOKAI[0].n}が${YOKAI[1].n}に化けた！ `}
+  const f=y.form,nm=YOKAI[f].n,r=Math.random(),mine=ownedList(p.idx);let msg;
+  if(f===0){
+    if(r<.25)msg=`${nm}は昼寝している。今回は何もしなかった。`;
+    else if(r<.5){const a=r100(rnd(800,2500)*yf());p.money-=a;msg=`${nm}が勝手に宴会を開いた。${yen(a)}の出費。`}
+    else if(r<.65&&p.cards.length){const c=p.cards.splice(rnd(0,p.cards.length-1),1)[0];msg=`${nm}が${CARDS[c].n}を食べてしまった。`}
+    else if(r<.8&&mine.length){mine.sort((a,b)=>a[2]-b[2]);msg=`${nm}が${sellHalf(p,mine[0][0],mine[0][1])}を半値で売り払った。`}
+    else{const a=r100(2000*yf());p.money-=a;msg=`${nm}が狸の置物を大量に買い込んだ。${yen(a)}の出費。`}
+  }else{
+    if(r<.1)msg=`${nm}は腹鼓を打っている。今回は何もしなかった。`;
+    else if(r<.45){const a=r100(rnd(4000,10000)*yf());p.money-=a;msg=`${nm}が温泉街で豪遊した。${yen(a)}の出費。`}
+    else if(r<.7&&mine.length){const sold=[];for(let i=0;i<2&&mine.length;i++){const[s,k]=mine.splice(rnd(0,mine.length-1),1)[0];sold.push(sellHalf(p,s,k))}msg=`${nm}が${sold.join("と")}を半値で売り払った。`}
+    else if(r<.85&&p.cards.length){p.cards=[];msg=`${nm}がカードをすべて食べてしまった。`}
+    else{const a=r100(rnd(3000,6000)*yf());p.money-=a;msg=`${nm}が駅前で大騒ぎした。後始末に${yen(a)}かかった。`}
+  }
+  msg=pre+msg;log(`${p.name}：${msg}`);Snd.sfx("yokai");render();
+  if(p.cpu){toast(`${p.name}　${msg}`,2600);await sleep(1500)}
+  else await modal(`<h2>${nm}のしわざ</h2><p>${esc(msg)}</p><p class="hint">ほかの社長のいるマスを通るか同じマスに止まると、${nm}を押し付けられます。お祓いカードでも追い払えます。</p>`,[["つづける",1,"primary"]])}
+async function land(){const p=cp(),n=N[p.pos];
+  if(p.pos===S.dest)await arrive(p);
+  if(n.type==="st"){if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");toast(`${p.name}が${n.id}駅で${b.length}件購入`);await sleep(900)}}else await shopModal(p,n.id)}
+  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");toast(`青マス　${m}　＋${yen(amt)}`);await sleep(p.cpu?900:500)}
+  else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10&&n.y<600;let amt=r100(rnd(600,2000)*yf()*(winter?2:1));const m=winter?"大雪で除雪費がかかった":MINUS_MSG[rnd(0,MINUS_MSG.length-1)];p.money-=amt;log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");toast(`赤マス　${m}　−${yen(amt)}`);await sleep(p.cpu?900:500)}
+  else if(n.type==="card"){if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);toast("カードがいっぱいです")}else{const r=Math.random(),c=r<.32?"kyuko":r<.5?"tokkyu":r<.68?"buttobi":r<.86||!S.rules.yokai?"rinji":"oharai";p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");toast(`カードマス　${CARDS[c].n}を手に入れた`)}await sleep(p.cpu?900:500)}
+  render();
+}
+async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r100((4000+dist*260)*yf());p.money+=amt;
+  const old=S.dest;S.destFrom=old;S.dest=pickDest(old);log(`${p.name}が${old}駅に一番乗り！援助金${yen(amt)}。次の目的地は${S.dest}駅。`);
+  let yk="";
+  if(S.rules.yokai){const dd=distTo(old);let far=-1,c=[];S.players.forEach((q,i)=>{if(i===S.cur)return;const d=dd[q.pos];if(d>far){far=d;c=[i]}else if(d===far)c.push(i)});
+    const t=c[rnd(0,c.length-1)],y=S.yokai;
+    if(y.owner!==t){S.yokai={owner:t,form:0,turns:0};yk=`${old}駅からいちばん遠い${S.players[t].name}に${YOKAI[0].n}が取り憑いた！`}
+    else yk=`${S.players[t].name}には${YOKAI[y.form].n}が取り憑いたままです。`;
+    log(yk)}
+  render();Snd.sfx("arrive");
+  await modal(`<h2>${esc(old)}駅に到着！</h2><p>${esc(p.name)}が一番乗りしました。</p><div class="big-money">＋${yen(amt)}</div><p>次の目的地は<b>${esc(S.dest)}駅</b>です。</p>${yk?`<p style="color:var(--yokai);font-weight:700">${esc(yk)}</p>`:""}`,[["つづける",1,"primary"]]);
+}
+function isMono(st,i){return S.owners[st].every(x=>x===i)}
+function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
+function cpuBuy(p,st){const own=S.owners[st],props=P(st),got=[];for(;;){let best=-1,sc=-1;props.forEach((pr,i)=>{if(own[i]!=null||p.money-pr[1]<2000)return;const s=pr[2]+(own.some(o=>o===p.idx)?4:0)+(own.every((o,k)=>k===i||o===p.idx)?6:0);if(s>sc){sc=s;best=i}});if(best<0)break;buy(p,st,best);got.push(best)}return got}
+function shopModal(p,st){return new Promise(res=>{const m=$("#modal"),body=$("#modalBody");
+  const draw=()=>{const own=S.owners[st];body.innerHTML=`<h2>${esc(st)}駅の物件</h2><p>所持金 <b>${yen(p.money)}</b></p>`+P(st).map((pr,i)=>{const o=own[i];
+    const right=o==null?`<button class="btn primary" data-buy="${i}" ${p.money<pr[1]?"disabled":""}>買う</button>`:`<span class="own" style="background:${pcol(o)}">${esc(S.players[o].name)}</span>`;
+    return `<div class="row"><span class="pn">${esc(pr[0])}</span><span class="pp">${yen(pr[1])}・${pr[2]}%</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">駅の物件をすべて持つと独占になり、決算での収益が2倍になります。</p>`;renderPlayers();renderDyn()};
+  modal("",[["購入を終える",1]]).then(()=>{body.onclick=null;res()});
+  draw();body.onclick=e=>{const b=e.target.closest("[data-buy]");if(!b)return;if(buy(p,st,+b.dataset.buy))Snd.sfx("buy");draw()};
+})}
+async function useCard(p,i){const c=p.cards[i];p.cards.splice(i,1);log(`${p.name}が${CARDS[c].n}を使った。`);Snd.sfx("card");
+  if(c==="kyuko")S.dice=2;else if(c==="tokkyu")S.dice=3;
+  else if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");toast(`臨時収入　＋${yen(amt)}`);log(`${p.name}に${yen(amt)}の臨時収入。`)}
+  else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");toast(`お祓い成功！${nm}が去っていった`);log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`)}else toast("取り憑いている妖怪がいませんでした")}
+  else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");toast(`${p.name}は${to}駅へぶっとんだ！`);log(`${p.name}が${to}駅へワープ。`);await sleep(1000);return "warp"}
+  render();return null}
+async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];
+  let ri=p.cards.indexOf("rinji");while(ri>=0){await useCard(p,ri);await sleep(500);ri=p.cards.indexOf("rinji")}
+  const oi=p.cards.indexOf("oharai");if(oi>=0&&possessed()){await useCard(p,oi);await sleep(700)}
+  const bi=p.cards.indexOf("buttobi");if(bi>=0&&d>=24&&Math.random()<.6){await useCard(p,bi);S.phase="busy";await land();return endTurn()}
+  const ti=p.cards.indexOf("tokkyu"),ki=p.cards.indexOf("kyuko");
+  if(ti>=0&&d>=10)await useCard(p,ti);else if(ki>=0&&d>=6)await useCard(p,ki);
+  renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);
+  const r=reach(p.pos,t,S.dest,S.rules.exact),dd=distTo(S.dest),pref={plus:0,card:1,st:2,minus:3},ps=possessed();
+  const key=id=>[id===S.dest?0:1,ps&&passes(r.get(id))?0:1,dd[id],pref[N[id].type]];
+  const best=[...r.keys()].sort((a,b)=>{const A=key(a),B=key(b);for(let i=0;i<4;i++)if(A[i]!==B[i])return A[i]-B[i];return 0})[0];
+  await sleep(350);await moveAlong(r.get(best));await land();return endTurn()}
+function forceSell(p){const mine=[];for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===p.idx)mine.push([s,k,P(s)[k][1]])});mine.sort((a,b)=>a[2]-b[2]);
+  let sold=0;while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が借金返済のため${s}の「${P(s)[k][0]}」を売却。`)}if(sold)toast(`${p.name}は物件を${sold}件売却しました`)}
+async function endTurn(){const p=cp();if(possessed())await mischief(p);if(p.money<0)forceSell(p);
+  S.cur=(S.cur+1)%S.players.length;
+  if(S.cur===0){S.month++;if(S.month>=12){await settle();S.month=0;S.year++;if(S.year>S.years)return gameOver()}}
+  startTurn()}
+async function settle(){render();const rows=S.players.map((p,i)=>{let inc=0,mono=0;for(const s in S.owners){const m=isMono(s,i);if(m)mono++;S.owners[s].forEach((o,k)=>{if(o===i){const[,pr,rt]=P(s)[k];inc+=pr*rt/100*(m?2:1)}})}inc=r100(inc);p.money+=inc;return{p,inc,mono}});
+  log(`${S.year}年目の決算が終わりました。`);render();Snd.sfx("settle");
+  await modal(`<h2>${S.year}年目 決算</h2><p>物件の収益が入りました。独占した駅は収益2倍です。</p><table><tr><th>社長</th><th>独占駅</th><th>収益</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}</td><td>${r.mono}</td><td>＋${yen(r.inc)}</td></tr>`).join("")}</table>`,[["つづける",1,"primary"]])}
+async function gameOver(){S.year=S.years;S.month=11;S.phase="over";render();autosave();Snd.sfx("over");
+  const rank=S.players.map((p,i)=>({p,t:p.money+assets(i)})).sort((a,b)=>b.t-a.t);
+  const r=await modal(`<h2>${esc(rank[0].p.name)}の優勝！</h2><p>${S.years}年間の総資産ランキングです。</p><table><tr><th>順位</th><th>社長</th><th>総資産</th></tr>${rank.map((x,i)=>`<tr><td>${i+1}位</td><td>${esc(x.p.name)}</td><td>${yen(x.t)}</td></tr>`).join("")}</table>`,[["地図を見る",0],["もう一度あそぶ",1,"primary"]]);
+  if(r)setup(false)}
+
+/* ---------- setup ---------- */
+async function setup(allowResume){const saved=allowResume?await Store.get("auto"):null;const canResume=saved&&saved.phase!=="over"&&validState(saved);
+  const r=await modal(`<h2>出発の準備</h2><p>関東甲信越の駅をサイコロで巡り、目的地への一番乗りと物件の独占で総資産トップを目指します。</p>
+  <h3>参加する社長</h3><p class="hint">1台の端末を交代で使えば、人間同士でも遊べます。</p>
+  ${DEFAULT_SEATS.map(([nm,ty],i)=>`<div class="prow"><span class="dot" style="background:${COLORS[i]}"></span><input id="seatN${i}" maxlength="8" value="${esc(nm)}" aria-label="${i+1}人目の名前"><select id="seatT${i}" aria-label="${i+1}人目の種類"><option value="human" ${ty==="human"?"selected":""}>人間</option><option value="cpu" ${ty==="cpu"?"selected":""}>CPU</option><option value="none" ${ty==="none"?"selected":""}>参加しない</option></select></div>`).join("")}
+  <div class="field" style="margin-top:12px"><label for="fYears">プレイ年数</label><select id="fYears"><option value="1">1年（約15分）</option><option value="3" selected>3年</option><option value="5">5年</option><option value="10">10年</option></select></div>
+  <h3>ルール</h3>
+  <label class="check"><input type="checkbox" id="fExact" checked><span>ぴったり到着<small>目的地には、出た目とちょうど同じマス数で止まったときだけ到着できます。オフにすると通過する目でも到着できます。</small></span></label>
+  <label class="check"><input type="checkbox" id="fYokai" checked><span>妖怪「${YOKAI[0].n}」<small>誰かが目的地に着くたびに、いちばん遠い社長へ取り憑いて毎ターン悪さをします。ほかの社長のいるマスを通ると押し付けられます。</small></span></label>
+  <label class="check"><input type="checkbox" id="fAssist"><span>追い上げサポート<small>総資産が最下位の社長は、大きい目が少し出やすくなります。CPUにも同じように働きます。</small></span></label>
+  <p class="err" id="setupErr"></p>
+  ${canResume?`<p class="hint">前回のゲーム（${saved.year}年目 ${MONTHS[saved.month]}）が残っています。</p>`:""}`,
+  [...(canResume?[["続きから",2]]:[]),["出発する",1,"primary",()=>{const n=DEFAULT_SEATS.filter((_,i)=>$("#seatT"+i).value!=="none").length;if(n<2){$("#setupErr").textContent="2人以上の社長を参加させてください。";return false}}]]);
+  if(r===2){resume(saved);return}
+  const seats=[];DEFAULT_SEATS.forEach(([nm],i)=>{const t=$("#seatT"+i).value;if(t!=="none")seats.push({name:$("#seatN"+i).value.trim()||nm,cpu:t==="cpu",color:i})});
+  newGame(seats,+$("#fYears").value,$("#fAssist").checked,{exact:$("#fExact").checked,yokai:$("#fYokai").checked})}
+function resume(state){S=state;CAND=null;
+  if(!S.rules)S.rules={exact:false,yokai:false};if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
+  if(!S.props){S.props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(DEFAULT_PROPS[s[0]])]))}
+  S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i});
+  buildTokens();render();startTurn()}
+
+/* ---------- save slots ---------- */
+const busy=()=>S&&S.phase==="busy";
+async function openSaves(){
+  const canSave=S&&S.phase==="roll"&&!cp().cpu;
+  const p=modal(`<h2>セーブとロード</h2><p class="hint">読み込み中…</p>`,[["閉じる",0]]);
+  const slots=await Promise.all([1,2,3].map(i=>Store.get("slot"+i)));
+  const body=$("#modalBody");let armed=null,codeOut="";
+  const draw=()=>{body.innerHTML=`<h2>セーブとロード</h2>
+    <p class="hint">${Store.cloud?"セーブはこの端末とあなたのアカウントに保存され、ほかの端末からも続きができます。":"セーブはこの端末のブラウザに保存されます。別の端末で続けるときはセーブコードを使ってください。"}${canSave?"":"<br>セーブは人間の社長がサイコロを振る前にできます。"}</p>
+    ${[1,2,3].map(i=>{const s=slots[i-1];const info=s?`${s.year}年目 ${MONTHS[s.month]}・${s.players.map(x=>esc(x.name)).join("、")}`:"空き";const when=s&&s.savedAt?new Date(s.savedAt).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+      return `<div class="slot"><span><b>スロット${i}</b><small>${info}${when?"・"+when:""}</small></span><button class="btn sm ${armed===i?"danger":""}" data-save="${i}" ${canSave?"":"disabled"}>${armed===i?"上書きする":"セーブ"}</button><button class="btn sm" data-load="${i}" ${s&&validState(s)?"":"disabled"}>ロード</button></div>`}).join("")}
+    <h3>セーブコード</h3><p class="hint">コードをメモ帳などに保存しておけば、別の端末やブラウザでも続きができます。</p>
+    <div class="btns" style="justify-content:flex-start;margin:0 0 8px"><button class="btn sm" data-code ${canSave?"":"disabled"}>今の状態をコードにする</button>${codeOut?`<button class="btn sm" data-copy>コピー</button>`:""}</div>
+    ${codeOut?`<textarea id="codeOut" rows="3" readonly>${codeOut}</textarea>`:""}
+    <div class="field" style="margin-top:12px"><label for="codeIn">コードから再開</label><textarea id="codeIn" rows="3" placeholder="KKS2Z: から始まるコードを貼り付け"></textarea></div>
+    <button class="btn sm primary" data-fromcode>このコードで再開</button><p class="err" id="codeErr"></p>`};
+  draw();
+  body.onclick=async e=>{const t=e.target.closest("button");if(!t)return;
+    if(t.dataset.save){const i=+t.dataset.save;if(slots[i-1]&&armed!==i){armed=i;draw();return}
+      const snap=clone(S);snap.savedAt=Date.now();slots[i-1]=snap;armed=null;await Store.set("slot"+i,snap);Snd.sfx("buy");draw();toast(`スロット${i}にセーブしました`)}
+    else if(t.dataset.load){const s=slots[+t.dataset.load-1];$("#modal").hidden=true;toast(`スロット${t.dataset.load}をロードしました`);resume(clone(s))}
+    else if("code"in t.dataset){codeOut=await encodeState(S);draw()}
+    else if("copy"in t.dataset){const ta=$("#codeOut");try{await navigator.clipboard.writeText(codeOut);toast("コピーしました")}catch(err){ta.focus();ta.select();toast("選択しました。コピーしてください")}}
+    else if("fromcode"in t.dataset){try{const st=await decodeState($("#codeIn").value);$("#modal").hidden=true;toast("コードから再開しました");resume(st)}catch(err){$("#codeErr").textContent="コードを読み取れませんでした。最初から最後まで欠けずに貼り付けてあるか確認してください。"}}
+  };
+  await p;
+}
+
+/* ---------- property editor ---------- */
+async function openEditor(){
+  const draft=Object.fromEntries(STATIONS.map(s=>[s[0],clone(master(s[0])).map(p=>p.map(String))]));
+  let cur=S&&N[cp().pos].type==="st"?cp().pos:"東京",armAll=false;const body=$("#modalBody");
+  const validate=()=>{for(const s of STATIONS){const st=s[0];for(let i=0;i<draft[st].length;i++){const[n,pr,rt]=draft[st][i];
+    const bad=!n.trim()?[0,"物件名を入力してください。"]:!(Number.isInteger(+pr)&&+pr>=10&&+pr<=9999990)?[1,"価格は10〜9,999,990万円の整数で入力してください。"]:!(Number.isInteger(+rt)&&+rt>=1&&+rt<=50)?[2,"収益率は1〜50%の整数で入力してください。"]:null;
+    if(bad)return{st,i,k:bad[0],msg:`${st}駅の${i+1}件目：${bad[1]}`}}}return null};
+  const save=async()=>{const v=validate();if(v){cur=v.st;draw();const id=["edN","edP","edR"][v.k]+v.i;const elx=$("#"+id);if(elx){elx.classList.add("bad");elx.focus()}$("#edErr").textContent=v.msg;return false}
+    const out={};for(const s of STATIONS){const st=s[0],arr=draft[st].map(([n,p,r])=>[n.trim().slice(0,16),+p,+r]);if(JSON.stringify(arr)!==JSON.stringify(DEFAULT_PROPS[st]))out[st]=arr}
+    CUSTOM=out;await Store.set("props",out);toast("物件を保存しました。次のゲームから反映されます");return true};
+  const p=modal("",[["キャンセル",0],["保存する",1,"primary",save]],true);
+  const draw=()=>{const list=draft[cur];const changed=Object.keys(CUSTOM).length;
+    body.innerHTML=`<h2>物件の編集</h2><p class="hint">変更は次に始めるゲームから反映されます。進行中のゲームとセーブデータはそのままです。${changed?`現在${changed}駅をカスタマイズ中です。`:""}</p>
+    <div class="field"><label for="edSt">駅を選ぶ</label><select id="edSt">${STATIONS.map(s=>`<option value="${s[0]}" ${s[0]===cur?"selected":""}>${s[0]}${JSON.stringify(draft[s[0]].map(([n,p,r])=>[n,+p,+r]))!==JSON.stringify(DEFAULT_PROPS[s[0]])?"（変更あり）":""}</option>`).join("")}</select></div>
+    <div class="ed-head"><span>物件名</span><span>価格（万円）</span><span>収益率%</span><span></span></div>
+    ${list.map((pr,i)=>`<div class="ed-row"><input id="edN${i}" data-i="${i}" data-k="0" value="${esc(pr[0])}" maxlength="16" aria-label="${i+1}件目の物件名"><input id="edP${i}" data-i="${i}" data-k="1" type="number" inputmode="numeric" min="10" step="10" value="${esc(pr[1])}" aria-label="${i+1}件目の価格"><input id="edR${i}" data-i="${i}" data-k="2" type="number" inputmode="numeric" min="1" max="50" value="${esc(pr[2])}" aria-label="${i+1}件目の収益率"><button class="btn sm" data-del="${i}" ${list.length<=1?"disabled":""} aria-label="${i+1}件目を削除">✕</button></div>`).join("")}
+    <div class="ed-tools"><button class="btn sm" data-add ${list.length>=6?"disabled":""}>＋ 物件を追加</button><button class="btn sm" data-reset>この駅を初期値に戻す</button><button class="btn sm ${armAll?"danger":""}" data-resetall>${armAll?"本当に全駅を戻す":"全駅を初期値に戻す"}</button></div>
+    <p class="hint" style="margin-top:10px">1駅に最大6件まで。収益率は毎年3月の決算で入る額の割合で、駅を独占すると2倍になります。</p><p class="err" id="edErr"></p>`};
+  draw();
+  body.oninput=e=>{const t=e.target;if(t.dataset.k!=null){draft[cur][+t.dataset.i][+t.dataset.k]=t.value;t.classList.remove("bad")}};
+  body.onchange=e=>{if(e.target.id==="edSt"){cur=e.target.value;armAll=false;draw()}};
+  body.onclick=e=>{const t=e.target.closest("button");if(!t)return;
+    if(t.dataset.del!=null){draft[cur].splice(+t.dataset.del,1);draw()}
+    else if("add"in t.dataset){draft[cur].push(["新しい物件","1000","8"]);draw();const i=draft[cur].length-1;const x=$("#edN"+i);x&&(x.focus(),x.select())}
+    else if("reset"in t.dataset){draft[cur]=clone(DEFAULT_PROPS[cur]).map(p=>p.map(String));draw()}
+    else if("resetall"in t.dataset){if(!armAll){armAll=true;draw();return}STATIONS.forEach(s=>draft[s[0]]=clone(DEFAULT_PROPS[s[0]]).map(p=>p.map(String)));armAll=false;draw();$("#edErr").textContent="";toast("全駅を初期値に戻しました。保存すると確定します")}};
+  await p;
+}
+
+/* ---------- settings ---------- */
+async function openSettings(){Snd.unlock();const body=$("#modalBody");
+  const p=modal(`<h2>設定</h2>
+  <h3>サウンド</h3>
+  <label class="check"><input type="checkbox" id="sOn" ${Snd.prefs.on?"checked":""}><span>音を出す<small>オフにするとBGMも効果音も止まります。iPhoneでは消音モードでも鳴るようにしています。</small></span></label>
+  <label class="check"><input type="checkbox" id="sBgm" ${Snd.prefs.bgm?"checked":""}><span>BGM<small>ゲームのために作ったオリジナル曲です。</small></span></label>
+  <label class="check"><input type="checkbox" id="sSe" ${Snd.prefs.se?"checked":""}><span>効果音<small>サイコロ、移動、マス、購入、到着、決算の音です。</small></span></label>
+  <div class="vol"><label for="sVol">音量</label><input type="range" id="sVol" min="0" max="1" step="0.05" value="${Snd.prefs.vol}"></div>
+  ${S&&S.phase!=="over"?`<h3>このゲームのルール</h3><label class="check"><input type="checkbox" id="sAssist" ${S.assist?"checked":""}><span>追い上げサポート<small>総資産が最下位の社長は、大きい目が少し出やすくなります。オフのときサイコロは完全にランダムです。</small></span></label>
+  <label class="check"><input type="checkbox" id="sExact" ${S.rules.exact?"checked":""}><span>ぴったり到着<small>目的地にはちょうどの目で止まったときだけ到着できます。</small></span></label>
+  <label class="check"><input type="checkbox" id="sYokai" ${S.rules.yokai?"checked":""}><span>妖怪「${YOKAI[0].n}」<small>オフにすると、取り憑いている妖怪もいなくなります。</small></span></label>`:""}`,[["閉じる",0,"primary"]]);
+  body.onchange=body.oninput=e=>{const t=e.target;if(t.type==="checkbox"&&e.type!=="change")return;
+    if(t.id==="sOn"){Snd.prefs.on=t.checked;Snd.armed=true}else if(t.id==="sBgm")Snd.prefs.bgm=t.checked;else if(t.id==="sSe"){Snd.prefs.se=t.checked;Snd.sfx("click")}else if(t.id==="sVol")Snd.prefs.vol=+t.value;
+    else if(t.id==="sAssist"&&e.type==="change"){S.assist=t.checked;log(`追い上げサポートを${S.assist?"オン":"オフ"}にしました。`);render();autosave()}
+    else if(t.id==="sExact"&&e.type==="change"){S.rules.exact=t.checked;log(`ぴったり到着を${t.checked?"オン":"オフ"}にしました。`);render();autosave()}
+    else if(t.id==="sYokai"&&e.type==="change"){S.rules.yokai=t.checked;if(!t.checked)S.yokai={owner:null,form:0,turns:0};log(`妖怪を${t.checked?"オン":"オフ"}にしました。`);render();autosave()}
+    Snd.savePrefs();Snd.apply();updSndBtn()};
+  await p}
+
+/* ---------- events ---------- */
+$("#action").addEventListener("click",async e=>{if(!S)return;const p=cp();
+  const a=e.target.closest("[data-act]"),c=e.target.closest("[data-card]"),g=e.target.closest("[data-go]");
+  if(a&&a.dataset.act==="roll"&&S.phase==="roll")humanRoll();
+  else if(a&&a.dataset.act==="new")setup(false);
+  else if(c&&S.phase==="roll"){const res=await useCard(p,+c.dataset.card);if(res==="warp"){S.phase="busy";await land();await endTurn()}else renderAction()}
+  else if(g)choose(g.dataset.go)});
+const guard=fn=>()=>{if(modalOpen())return;if(busy()){toast("手番が終わるまでお待ちください");return}fn()};
+$("#newBtn").onclick=guard(()=>setup(false));
+$("#saveBtn").onclick=guard(openSaves);
+$("#editBtn").onclick=guard(openEditor);
+$("#sndBtn").onclick=()=>{if(!Snd.wasRunning)Snd.prefs.on=true;else Snd.prefs.on=!Snd.prefs.on;Snd.savePrefs();Snd.apply();Snd.sfx("click");updSndBtn()};
+$("#setBtn").onclick=()=>{if(!modalOpen())openSettings()};
+$("#zin").onclick=()=>{zoom=Math.min(4,zoom*1.3);applyZoom();S&&focus(cp().pos,false)};
+$("#zout").onclick=()=>{zoom=Math.max(1,zoom/1.3);applyZoom();S&&focus(cp().pos,false)};
+$("#zme").onclick=()=>S&&focus(cp().pos);
+addEventListener("resize",()=>{applyZoom()});
+
+/* ---------- boot ---------- */
+async function boot(data){initMap();zoom=Math.max(1,Math.min(3,760/baseW()));applyZoom();Snd.loadPrefs();
+  if(data&&data.S&&validState(data.S)){resume(data.S);Store.init().then(async()=>{CUSTOM=(await Store.get("props"))||{}});return}
+  focus("東京",false);
+  await Promise.race([Store.init(),sleep(4000)]);
+  try{CUSTOM=(await Store.get("props"))||{}}catch(e){CUSTOM={}}
+  setup(true)}
+window.claude?.hot?.snapshot?.(()=>({S:S&&S.phase!=="over"?S:null}));
+window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
+</script>
+
+</body>
+</html>
