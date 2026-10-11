@@ -19,18 +19,18 @@
 :root{
   --bg:#E4EAEE; --panel:#FFFFFF; --ink:#18212B; --muted:#5A6977; --line:#C6D1D9;
   --land:#F2F5F1; --rail:#2B3540; --plus:#2C6BE0; --minus:#DE3F34; --card:#E5AC12;
-  --accent:#0C8565; --accent-ink:#FFFFFF; --goal:#DE3F34; --pref:#8FA3B3; --yokai:#6B3FA0;
+  --accent:#0C8565; --accent-ink:#FFFFFF; --goal:#DE3F34; --pref:#8FA3B3; --yokai:#6B3FA0; --shop:#C2418F;
   --f-display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
   --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0E141A; --panel:#17212A; --ink:#E6ECF1; --muted:#93A2AF; --line:#2B3946;
   --land:#131C24; --rail:#AFBECB; --plus:#5A93FF; --minus:#FF6A5C; --card:#F2C443;
-  --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; color-scheme:dark}}
+  --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; --shop:#F07CC0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0E141A; --panel:#17212A; --ink:#E6ECF1; --muted:#93A2AF; --line:#2B3946;
   --land:#131C24; --rail:#AFBECB; --plus:#5A93FF; --minus:#FF6A5C; --card:#F2C443;
-  --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; color-scheme:dark}
+  --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; --shop:#F07CC0; color-scheme:dark}
 [hidden]{display:none!important}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;display:grid;grid-template-rows:auto minmax(0,1fr);padding-inline:16px;padding-block:10px;gap:10px;box-sizing:border-box;overflow:hidden}
@@ -114,6 +114,21 @@ table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right}
 td:first-child,th:first-child{text-align:left}
 th{font-size:12px;color:var(--muted)}
+#msgLayer{position:fixed;inset:0;z-index:15;cursor:pointer}
+#msg{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(560px,calc(100% - 32px));background:var(--panel);color:var(--ink);border:2px solid var(--ink);border-radius:14px;padding:14px 16px 10px;z-index:16;box-shadow:0 8px 28px color-mix(in srgb,#000 25%,transparent);cursor:pointer}
+#msg .mt{margin:0;font-size:16px;line-height:1.65;font-weight:700}
+#msg .mh{margin:6px 0 0;text-align:right;font-size:12px;color:var(--muted)}
+#msg .mh.tap::after{content:" ▼";display:inline-block;animation:bob 1s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(3px)}}
+.qgenre{display:inline-block;font-size:12px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;margin-bottom:8px}
+.qreward{font-size:13px;color:var(--muted);margin:0 0 12px}
+.qopts{display:grid;gap:8px}
+.qopt{font:inherit;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;line-height:1.5}
+.qopt.ok{border:2px solid var(--accent);background:color-mix(in srgb,var(--accent) 15%,transparent);font-weight:700}
+.qopt.ng{border:2px solid var(--minus);background:color-mix(in srgb,var(--minus) 12%,transparent)}
+.qopt:disabled{cursor:default;opacity:1}
+.qres{font-weight:700;margin:12px 0 0;font-size:16px}
+.sq-shop{fill:var(--shop)}
 #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:10px;font-weight:700;z-index:30;max-width:calc(100% - 32px);text-align:center}
 /* svg */
 .rail{fill:none;stroke:var(--rail);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
@@ -139,7 +154,7 @@ th{font-size:12px;color:var(--muted)}
   h1{font-size:16px}
   .hbtns .btn{padding:6px 9px;font-size:12px}
 }
-@media (prefers-reduced-motion:reduce){.tok{transition:none}.goalring{animation:none}}
+@media (prefers-reduced-motion:reduce){.tok{transition:none}.goalring{animation:none}#msg .mh.tap::after{animation:none}}
 </style>
 
 </head>
@@ -169,6 +184,8 @@ th{font-size:12px;color:var(--muted)}
   </aside>
 </div>
 <div id="modal" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"><div id="modalBody"></div><div class="btns" id="modalBtns"></div></div></div>
+<div id="msgLayer" hidden></div>
+<div id="msg" hidden role="status" aria-live="polite"><p class="mt"></p><p class="mh"></p></div>
 <div id="toast" hidden></div>
 
 <script>
@@ -223,6 +240,185 @@ const CARDS={kyuko:{n:"急行カード",d:"サイコロ2個で進む"},tokkyu:{n
 const YOKAI=[{n:"たかり狸",s:"狸"},{n:"大だぬき",s:"大"}];
 const PLUS_MSG=["沿線のお祭りで臨時収入","観光客が増えて売上アップ","株の配当が入った","駅前の宝くじが当たった","ふるさと納税の返礼品が好評"];
 const MINUS_MSG=["車両の修理費","台風で線路が被害","接待費がかさんだ","落とし物をした","駅舎の改装費"];
+// [ジャンル, 問題, 正解, 誤答1, 誤答2, 誤答3]
+const QUIZ=[
+["日本史","1232年に「御成敗式目」を制定した鎌倉幕府の執権は？","北条泰時","北条時宗","北条義時","北条時頼"],
+["日本史","「改新の詔」が出されたとされる年は？","646年","645年","672年","701年"],
+["日本史","日米修好通商条約が結ばれたときの江戸幕府の大老は？","井伊直弼","阿部正弘","堀田正睦","安藤信正"],
+["日本史","源頼朝が征夷大将軍に任じられた年は？","1192年","1185年","1180年","1221年"],
+["日本史","足利義満が京都・北山に建てた寺は？","鹿苑寺","慈照寺","天龍寺","相国寺"],
+["日本史","894年に遣唐使の停止を建議した人物は？","菅原道真","藤原道長","吉備真備","空海"],
+["日本史","1274年、最初の元寇は何と呼ばれる？","文永の役","弘安の役","白村江の戦い","刀伊の入寇"],
+["日本史","「享保の改革」を行った江戸幕府の将軍は？","徳川吉宗","徳川綱吉","徳川家斉","徳川家光"],
+["日本史","「寛政の改革」を主導した老中は？","松平定信","水野忠邦","田沼意次","新井白石"],
+["日本史","明治政府が地租改正に着手した年は？","1873年","1868年","1871年","1889年"],
+["日本史","「天は人の上に人を造らず」の一節で知られる福沢諭吉の著作は？","学問のすゝめ","西洋事情","文明論之概略","福翁自伝"],
+["日本史","日本銀行が設立された年は？","1882年","1868年","1871年","1897年"],
+["日本史","ポツダム宣言を当初発した3か国に含まれないのは？","ソ連","アメリカ","イギリス","中華民国"],
+["日本史","日本国憲法が施行された日は？","1947年5月3日","1946年11月3日","1945年8月15日","1952年4月28日"],
+["日本史","群馬県の富岡製糸場が操業を開始した年は？","1872年","1868年","1889年","1900年"],
+["世界史","三十年戦争を終結させた1648年の条約は？","ウェストファリア条約","ユトレヒト条約","アウクスブルクの和議","ナントの勅令"],
+["世界史","コンスタンティノープルが陥落し、ビザンツ帝国が滅亡した年は？","1453年","1492年","1204年","1517年"],
+["世界史","ハンムラビ法典を制定した王が治めた国は？","バビロニア","アッシリア","ヒッタイト","アケメネス朝ペルシア"],
+["世界史","アメリカ独立宣言の主な起草者は？","トマス・ジェファーソン","ジョージ・ワシントン","ベンジャミン・フランクリン","アレクサンダー・ハミルトン"],
+["世界史","1215年にマグナ・カルタが制定された国は？","イングランド","フランス","神聖ローマ帝国","カスティーリャ"],
+["世界史","第一次世界大戦のきっかけとなったサラエボ事件が起きた年は？","1914年","1912年","1917年","1918年"],
+["世界史","ベルリンの壁が崩壊した年は？","1989年","1987年","1990年","1991年"],
+["世界史","フランス人権宣言が採択された年は？","1789年","1776年","1799年","1815年"],
+["地理","日本で2番目に面積の広い湖は？","霞ヶ浦","サロマ湖","猪苗代湖","中海"],
+["地理","日本で最も流域面積の広い川は？","利根川","信濃川","石狩川","北上川"],
+["地理","日本の最南端の島は？","沖ノ鳥島","南鳥島","波照間島","与那国島"],
+["地理","面積が世界で2番目に大きい国は？","カナダ","アメリカ合衆国","中国","ブラジル"],
+["地理","アフリカ最高峰キリマンジャロがある国は？","タンザニア","ケニア","ウガンダ","エチオピア"],
+["地理","ニュージーランドの首都は？","ウェリントン","オークランド","クライストチャーチ","ダニーデン"],
+["地理","世界で最も深い湖は？","バイカル湖","タンガニーカ湖","カスピ海","スペリオル湖"],
+["地理","スエズ運河が地中海と結んでいる海は？","紅海","アラビア海","黒海","ペルシア湾"],
+["地理","南米大陸の最高峰は？","アコンカグア","チンボラソ","ワスカラン","コトパクシ"],
+["地理","極地を除いて世界最大の砂漠は？","サハラ砂漠","ゴビ砂漠","アラビア砂漠","カラハリ砂漠"],
+["地理","「北アルプス」の正式な山脈名は？","飛騨山脈","木曽山脈","赤石山脈","越後山脈"],
+["地理","長野県と県境を接していないのは？","栃木県","富山県","静岡県","埼玉県"],
+["地理","海に面していない県でないのは？","三重県","岐阜県","滋賀県","奈良県"],
+["地理","日本の標準時子午線は東経何度？","135度","130度","139度","140度"],
+["地理","信濃川の本流が日本海に注ぐ河口がある市は？","新潟市","上越市","村上市","柏崎市"],
+["地理","関東地方の最東端とされる岬は？","犬吠埼","野島崎","洲崎","大洗岬"],
+["地理","富士五湖に含まれないのは？","芦ノ湖","本栖湖","精進湖","西湖"],
+["文学","『舞姫』の作者は？","森鷗外","夏目漱石","二葉亭四迷","坪内逍遥"],
+["文学","川端康成の『雪国』の舞台となった温泉地がある県は？","新潟県","群馬県","長野県","山形県"],
+["文学","『方丈記』の作者は？","鴨長明","吉田兼好","清少納言","西行"],
+["文学","松尾芭蕉が『おくのほそ道』の旅を終えた地は？","大垣","平泉","象潟","金沢"],
+["文学","芥川龍之介の作品でないのは？","山椒大夫","羅生門","鼻","河童"],
+["文学","日本人として初めてノーベル文学賞を受賞したのは？","川端康成","大江健三郎","三島由紀夫","井上靖"],
+["文学","夏目漱石の『吾輩は猫である』が連載された雑誌は？","ホトトギス","明星","白樺","文藝春秋"],
+["文学","『たけくらべ』の作者は？","樋口一葉","与謝野晶子","林芙美子","宮本百合子"],
+["文学","『古今和歌集』の撰者でないのは？","柿本人麻呂","紀貫之","紀友則","凡河内躬恒"],
+["文学","『罪と罰』の作者は？","ドストエフスキー","トルストイ","チェーホフ","ツルゲーネフ"],
+["文学","シェイクスピアの四大悲劇に含まれないのは？","ロミオとジュリエット","ハムレット","マクベス","リア王"],
+["文学","『百年の孤独』の作者は？","ガルシア＝マルケス","ボルヘス","バルガス＝リョサ","ネルーダ"],
+["文学","『失われた時を求めて』の作者は？","プルースト","ジョイス","カフカ","トーマス・マン"],
+["文学","『神曲』の作者は？","ダンテ","ペトラルカ","ボッカッチョ","ウェルギリウス"],
+["文学","『銀河鉄道の夜』の作者は？","宮沢賢治","中原中也","石川啄木","新美南吉"],
+["美術","レオナルド・ダ・ヴィンチの壁画『最後の晩餐』がある都市は？","ミラノ","フィレンツェ","ローマ","ヴェネツィア"],
+["美術","「印象派」の名の由来となった『印象・日の出』を描いたのは？","モネ","マネ","ルノワール","ドガ"],
+["美術","建仁寺所蔵の国宝『風神雷神図屏風』の作者は？","俵屋宗達","尾形光琳","狩野永徳","長谷川等伯"],
+["美術","システィーナ礼拝堂の天井画を描いたのは？","ミケランジェロ","ラファエロ","レオナルド・ダ・ヴィンチ","ボッティチェリ"],
+["美術","『真珠の耳飾りの少女』を描いた画家は？","フェルメール","レンブラント","ルーベンス","フランス・ハルス"],
+["美術","『夜警』を描いた画家は？","レンブラント","フェルメール","ベラスケス","ブリューゲル"],
+["美術","上野の国立西洋美術館本館を設計した建築家は？","ル・コルビュジエ","丹下健三","フランク・ロイド・ライト","ミース・ファン・デル・ローエ"],
+["美術","ロダンの『考える人』は、もともと何という作品の一部として構想された？","地獄の門","カレーの市民","接吻","バルザック像"],
+["美術","『見返り美人図』の作者は？","菱川師宣","鈴木春信","喜多川歌麿","葛飾北斎"],
+["美術","『グランド・ジャット島の日曜日の午後』で点描の技法を示した画家は？","スーラ","シニャック","ゴッホ","セザンヌ"],
+["美術","国宝「阿修羅像」を所蔵する寺は？","興福寺","東大寺","唐招提寺","薬師寺"],
+["美術","雪舟が大成した絵画の分野は？","水墨画","大和絵","浮世絵","障壁画の金碧画"],
+["美術","サグラダ・ファミリアがある都市は？","バルセロナ","マドリード","セビリア","バレンシア"],
+["美術","『叫び』を描いた画家は？","ムンク","クリムト","シーレ","カンディンスキー"],
+["音楽","交響曲第9番の終楽章で「歓喜の歌」を用いた作曲家は？","ベートーヴェン","ブラームス","マーラー","シューベルト"],
+["音楽","『ボレロ』の作曲者は？","ラヴェル","ドビュッシー","サティ","ビゼー"],
+["音楽","『平均律クラヴィーア曲集』の作曲者は？","J.S.バッハ","ヘンデル","ハイドン","テレマン"],
+["音楽","滝廉太郎の作品は？","荒城の月","赤とんぼ","故郷","浜辺の歌"],
+["音楽","バレエ音楽『春の祭典』の作曲者は？","ストラヴィンスキー","ラフマニノフ","プロコフィエフ","ショスタコーヴィチ"],
+["音楽","「交響曲の父」と呼ばれる作曲家は？","ハイドン","モーツァルト","ベートーヴェン","バッハ"],
+["音楽","「ピアノの詩人」と呼ばれる作曲家は？","ショパン","リスト","シューマン","メンデルスゾーン"],
+["音楽","速度記号「アンダンテ」の意味は？","歩くような速さで","速く","きわめて遅く","中くらいの速さで"],
+["音楽","雅楽で使われない楽器は？","三味線","笙","篳篥","龍笛"],
+["音楽","オペラ『カルメン』の作曲者は？","ビゼー","ヴェルディ","プッチーニ","グノー"],
+["音楽","オーケストラの弦楽器で最も低い音域を受け持つのは？","コントラバス","チェロ","ヴィオラ","ヴァイオリン"],
+["物理","1オクターブ高い音の周波数は元の音の何倍？","2倍","1.5倍","3倍","4倍"],
+["物理","絶対零度は摂氏で約何度？","−273.15℃","−237.15℃","−173.15℃","−459.67℃"],
+["物理","力の単位ニュートンをSI基本単位で表すと？","kg·m/s²","kg·m²/s²","kg·m/s","kg/(m·s²)"],
+["物理","一般に、音が最も速く伝わるのは？","鉄","水","空気","二酸化炭素"],
+["物理","アインシュタインがノーベル物理学賞を受けた業績は？","光電効果の理論","特殊相対性理論","一般相対性理論","ブラウン運動の理論"],
+["物理","1気圧はおよそ何ヘクトパスカル？","1013hPa","760hPa","101.3hPa","1000万hPa"],
+["物理","電流による発熱量（ジュール熱）は、電流の何乗に比例する？","2乗","1乗","3乗","2分の1乗"],
+["物理","主虹（ふつうの虹）で一番外側に見える色は？","赤","紫","青","緑"],
+["物理","ケプラーの第3法則で、公転周期の2乗は軌道長半径の何乗に比例する？","3乗","2乗","1乗","4乗"],
+["物理","マグニチュードが2大きくなると、地震のエネルギーは約何倍？","約1000倍","約100倍","約32倍","約4倍"],
+["物理","水の密度が最も大きくなる温度は？","約4℃","0℃","約−4℃","約10℃"],
+["化学","原子番号79の元素は？","金","銀","白金","水銀"],
+["化学","電気陰性度が最も大きい元素は？","フッ素","酸素","塩素","窒素"],
+["化学","乾燥空気の成分で、体積比が2番目に多いのは？","酸素","窒素","アルゴン","二酸化炭素"],
+["化学","アボガドロ定数はおよそ？","6.02×10²³ /mol","3.00×10⁸ /mol","1.60×10⁻¹⁹ /mol","6.63×10⁻³⁴ /mol"],
+["化学","25℃・1気圧で液体の金属は？","水銀","ガリウム","セシウム","ナトリウム"],
+["化学","ダイヤモンドと黒鉛の関係を何という？","同素体","同位体","異性体","同族体"],
+["化学","タングステンの元素記号は？","W","Tu","Tn","Ts"],
+["化学","1869年に元素の周期表を発表したのは？","メンデレーエフ","ラヴォアジエ","ドルトン","ボイル"],
+["化学","放射性炭素年代測定に使われる、半減期約5730年の同位体は？","炭素14","炭素12","ウラン238","カリウム40"],
+["化学","半導体の材料として最も広く使われている元素は？","ケイ素","ゲルマニウム","ガリウム","炭素"],
+["生物","1953年にDNAの二重らせん構造を発表したのは？","ワトソンとクリック","ダーウィンとウォレス","パスツールとコッホ","メンデルとモルガン"],
+["生物","ヒトの体細胞の染色体の数は？","46本","23本","44本","48本"],
+["生物","光合成が行われる細胞小器官は？","葉緑体","ミトコンドリア","リボソーム","ゴルジ体"],
+["生物","赤血球の中で酸素を運ぶタンパク質は？","ヘモグロビン","ミオグロビン","アルブミン","フィブリノーゲン"],
+["生物","インスリンを分泌する器官は？","膵臓","肝臓","腎臓","甲状腺"],
+["生物","メンデルが遺伝の法則を見いだした実験で使った植物は？","エンドウ","トウモロコシ","ソラマメ","シロイヌナズナ"],
+["生物","iPS細胞の作製でノーベル生理学・医学賞を受けたのは？","山中伸弥","本庶佑","大隅良典","利根川進"],
+["生物","ABO式血液型を発見したのは？","ランドシュタイナー","パスツール","コッホ","ジェンナー"],
+["生物","ヒトの内臓のうち最も重いのは？","肝臓","肺","腎臓","心臓"],
+["生物","既知の種の数が最も多い動物の分類群（綱）は？","昆虫綱","鳥綱","哺乳綱","硬骨魚綱"],
+["地学","恐竜（鳥類を除く）が絶滅したのはどの時代の終わり？","白亜紀","ジュラ紀","三畳紀","ペルム紀"],
+["地学","地球の大気で最も地表に近い層は？","対流圏","成層圏","中間圏","熱圏"],
+["天文","太陽系の惑星で自転周期が最も長いのは？","金星","水星","木星","海王星"],
+["天文","夏の大三角を構成しない星は？","シリウス","ベガ","アルタイル","デネブ"],
+["天文","探査機「はやぶさ」が試料を持ち帰った小惑星は？","イトカワ","リュウグウ","ベンヌ","ケレス"],
+["天文","地球と太陽の平均距離はおよそ？","1億5000万km","1500万km","15億km","3億8000万km"],
+["数学","100以下の素数はいくつある？","25個","24個","26個","30個"],
+["数学","次のうち素数でないのは？","91","89","97","83"],
+["数学","正二十面体の頂点の数は？","12","20","30","60"],
+["数学","サイコロを2個振って、目の合計が7になる確率は？","1/6","1/12","7/36","5/36"],
+["数学","eの iπ 乗（オイラーの等式）の値は？","−1","1","0","i"],
+["数学","1995年にフェルマーの最終定理の証明を発表した数学者は？","ワイルズ","ペレルマン","ガウス","オイラー"],
+["数学","三角形の内角の和が必ず180度になる幾何学は？","ユークリッド幾何学","球面幾何学","双曲幾何学","楕円幾何学"],
+["数学","次のうちピタゴラス数（直角三角形の3辺）でない組は？","6, 9, 12","5, 12, 13","8, 15, 17","7, 24, 25"],
+["数学","0.999…（9が無限に続く）と等しいのは？","1","0.9","1より小さい最大の数","定義できない"],
+["数学","黄金比の値はおよそ？","1.618","1.414","1.732","2.718"],
+["数学","2進数の 1010 を10進数で表すと？","10","8","12","1010"],
+["経済","『国富論』で「見えざる手」を説いたのは？","アダム・スミス","ケインズ","リカード","マルクス"],
+["経済","国際貿易の「比較優位」の理論を示したのは？","リカード","アダム・スミス","マルサス","ミル"],
+["経済","「悪貨は良貨を駆逐する」という法則の名は？","グレシャムの法則","セイの法則","ペティの法則","エンゲルの法則"],
+["経済","日本で消費税が初めて導入された年は？","1989年","1979年","1997年","2014年"],
+["経済","GDPの「D」が表す語は？","Domestic","Development","Demand","Distribution"],
+["経済","2024年発行の新しい一万円札の肖像は？","渋沢栄一","福沢諭吉","北里柴三郎","津田梅子"],
+["政治","『法の精神』で三権分立を説いたのは？","モンテスキュー","ルソー","ロック","ホッブズ"],
+["政治","衆議院議員の任期は？","4年","6年","3年","5年"],
+["政治","国連安全保障理事会の常任理事国でないのは？","ドイツ","フランス","中国","ロシア"],
+["政治","予算について先に審議する権限（先議権）を持つのは？","衆議院","参議院","内閣","最高裁判所"],
+["思想","「我思う、ゆえに我あり」と述べた哲学者は？","デカルト","パスカル","スピノザ","ライプニッツ"],
+["思想","『純粋理性批判』の著者は？","カント","ヘーゲル","ヒューム","フィヒテ"],
+["思想","『善の研究』の著者は？","西田幾多郎","和辻哲郎","九鬼周造","三木清"],
+["ことば","「推敲」の故事に登場する唐の詩人は？","賈島","李白","杜甫","白居易"],
+["ことば","「蛇足」の故事の出典は？","戦国策","論語","史記","孟子"],
+["ことば","「破天荒」の本来の意味は？","誰も成し得なかったことを初めて行うこと","豪快で大胆なこと","めちゃくちゃなこと","型にはまらないこと"],
+["ことば","「役不足」の本来の意味は？","力量に比べて役目が軽すぎること","役目に対して力量が足りないこと","役者の数が足りないこと","役目を果たせないこと"],
+["ことば","「檄を飛ばす」の本来の意味は？","自分の主張を広く知らせ同意を求める","元気のない者を叱って励ます","大声で指示を出す","急いで知らせを送る"],
+["ことば","「おもむろに」の本来の意味は？","ゆっくりと","不意に","いきなり","こっそりと"],
+["ことば","「情けは人の為ならず」の本来の意味は？","人に親切にすればいずれ自分に返ってくる","親切にするのは相手のためにならない","情けをかけても報われない","人のためでなく自分のためにやれ"],
+["ことば","「独擅場」の正しい読みは？","どくせんじょう","どくだんじょう","どくせんば","どくだんば"],
+["ことば","「米寿」は何歳の祝い？","88歳","77歳","80歳","99歳"],
+["ことば","英語の alphabet の語源は？","ギリシャ文字の最初の2文字","ラテン語の「文字」","フェニキアの王の名","アラビア語の「書く」"],
+["芸能","能を大成した親子は？","観阿弥・世阿弥","竹田出雲・竹田小出雲","近松門左衛門・近松半二","千利休・千少庵"],
+["芸能","歌舞伎の始祖とされる人物は？","出雲阿国","世阿弥","市川團十郎","坂田藤十郎"],
+["文化","「和食」がユネスコ無形文化遺産に登録された年は？","2013年","2008年","2010年","2016年"],
+["文化","1グロスはいくつ？","144","100","120","1728"],
+["文化","二十四節気で、秋に昼と夜の長さがほぼ等しくなる日は？","秋分","白露","寒露","霜降"],
+["文化","将棋で「竜王」に成る駒は？","飛車","角行","香車","銀将"],
+["文化","正式な囲碁盤の路数は？","19路","13路","17路","21路"],
+["情報","コンピュータの1バイトは何ビット？","8ビット","4ビット","16ビット","10ビット"],
+["情報","HTTP の「HT」が表す語は？","HyperText","High Technology","Host Terminal","Hybrid Transfer"],
+["スポーツ","1964年の東京オリンピックの開会式が行われた日は？","10月10日","10月1日","9月10日","8月1日"],
+["スポーツ","近代オリンピックの第1回大会が開かれた都市は？","アテネ","パリ","ロンドン","ストックホルム"],
+["スポーツ","テニスの四大大会で、クレーコートで行われるのは？","全仏オープン","ウィンブルドン","全米オープン","全豪オープン"],
+["スポーツ","ゴルフで規定打数より2打少ないスコアは？","イーグル","バーディー","アルバトロス","ボギー"],
+["スポーツ","野球の「サイクルヒット」に含まれないのは？","犠牲フライ","単打","三塁打","本塁打"],
+["スポーツ","大相撲の本場所は1場所何日間？","15日間","13日間","14日間","10日間"],
+["スポーツ","箱根駅伝で往路のゴール・復路のスタート地点がある湖は？","芦ノ湖","河口湖","山中湖","相模湖"],
+["鉄道","新橋―横浜間で日本初の鉄道が正式開業した年は？","1872年","1868年","1877年","1889年"],
+["鉄道","東海道新幹線が開業した年は？","1964年","1959年","1970年","1972年"],
+["鉄道","世界で最も乗降客数の多い駅としてギネス世界記録に認定されている駅は？","新宿駅","東京駅","渋谷駅","池袋駅"],
+["鉄道","東京駅丸の内駅舎を設計した建築家は？","辰野金吾","片山東熊","ジョサイア・コンドル","丹下健三"],
+["鉄道","旧信越本線の横川―軽井沢間（碓氷峠）で1963年まで使われていた方式は？","アプト式","スイッチバック","ループ線","ケーブルカー"],
+["鉄道","成田空港（新東京国際空港）が開港した年は？","1978年","1966年","1972年","1985年"],
+["関東甲信越","日光東照宮に祀られている人物は？","徳川家康","徳川家光","徳川秀忠","徳川綱吉"],
+["関東甲信越","「信濃の国」を県歌とする県は？","長野県","新潟県","山梨県","群馬県"],
+["関東甲信越","鎌倉大仏がある寺は？","高徳院","長谷寺","建長寺","円覚寺"]
+];
 const DEFAULT_PROPS=Object.fromEntries(STATIONS.map(s=>[s[0],s[4]]));
 
 /* ---------- graph ---------- */
@@ -239,6 +435,8 @@ EDGES.forEach(([a,b,ferry],ei)=>{
     addNode(id,{id,type,x:A.x+(B.x-A.x)*t,y:A.y+(B.y-A.y)*t});link(prev,id);prev=id;pts.push(id)}
   link(prev,b);pts.push(b);RAILS.push({pts,ferry:!!ferry});
 });
+// card shops: the middle square of four lines
+[["大宮","高崎"],["東京","千葉"],["諏訪","甲府"],["長岡","越後湯沢"]].forEach(([a,b])=>{const r=RAILS.find(r=>(r.pts[0]===a&&r.pts.at(-1)===b)||(r.pts[0]===b&&r.pts.at(-1)===a));if(r)N[r.pts[Math.floor(r.pts.length/2)]].type="shop"});
 function bfs(src){const d={[src]:0},q=[src];while(q.length){const u=q.shift();for(const v of ADJ[u])if(d[v]==null){d[v]=d[u]+1;q.push(v)}}return d}
 const distCache={};const distTo=id=>distCache[id]||(distCache[id]=bfs(id));
 function reach(start,steps,dest,exact){
@@ -262,7 +460,7 @@ const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const clone=o=>JSON.parse(JSON.stringify(o));
 function yen(m){const neg=m<0;m=Math.abs(Math.round(m));const oku=Math.floor(m/10000),man=m%10000;let s="";if(oku)s+=oku.toLocaleString()+"億";if(man||!oku)s+=man.toLocaleString()+"万";return(neg?"−":"")+s+"円"}
-const sqName=id=>{const n=N[id];return n.type==="st"?n.id+"駅":{plus:"青マス",minus:"赤マス",card:"カードマス"}[n.type]};
+const sqName=id=>{const n=N[id];return n.type==="st"?n.id+"駅":{plus:"青マス",minus:"赤マス",card:"カードマス",shop:"カード売り場"}[n.type]};
 const yf=()=>1+.35*(S.year-1);
 let S=null,CAND=null,zoom=1,tokEls=[],CUSTOM={};
 const cp=()=>S.players[S.cur];
@@ -270,6 +468,19 @@ const P=st=>S.props[st];
 const master=st=>CUSTOM[st]||DEFAULT_PROPS[st];
 function log(t){S.log.unshift(t);S.log.length=Math.min(S.log.length,40);renderLog()}
 let toastT;function toast(t,ms=1800){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,ms)}
+/* message pacing: tap-to-advance or timed (slow / normal / fast) */
+const GP={speed:"normal"};
+try{Object.assign(GP,JSON.parse(localStorage.getItem("kks-game"))||{})}catch(e){}
+const saveGP=()=>{try{localStorage.setItem("kks-game",JSON.stringify(GP))}catch(e){}};
+const SPEEDS={tap:{n:"タップで進む",k:1},slow:{n:"ゆっくり",k:1.6,base:1500,per:110},normal:{n:"ふつう",k:1,base:1000,per:65},fast:{n:"はやい",k:.6,base:550,per:32}};
+const wait=ms=>sleep(ms*(SPEEDS[GP.speed]||SPEEDS.normal).k);
+function say(text){return new Promise(res=>{const box=$("#msg"),layer=$("#msgLayer"),h=box.querySelector(".mh");
+  box.querySelector(".mt").textContent=text;box.hidden=false;let t=null;
+  const done=()=>{clearTimeout(t);box.hidden=true;layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",key);res()};
+  const key=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();done()}};
+  addEventListener("keydown",key);box.onclick=done;
+  if(GP.speed==="tap"){h.textContent="タップで次へ";h.className="mh tap";layer.hidden=false;layer.onclick=done}
+  else{const sp=SPEEDS[GP.speed]||SPEEDS.normal;h.textContent="タップで早送り";h.className="mh";t=setTimeout(done,sp.base+sp.per*text.length)}})}
 
 /* ---------- storage: browser + (signed-in) account ---------- */
 const Store={cloud:null,q:Promise.resolve(),
@@ -379,7 +590,7 @@ function initMap(){
   const gR=el("g",{},svg);
   RAILS.forEach(r=>{const d="M"+r.pts.map(id=>N[id].x+" "+N[id].y).join(" L");el("path",{d,class:r.ferry?"ferry":"rail"},gR)});
   const gS=el("g",{},svg);
-  Object.values(N).forEach(n=>{if(n.type!=="st")el("circle",{cx:n.x,cy:n.y,r:11,class:"sqo sq-"+n.type},gS)});
+  Object.values(N).forEach(n=>{if(n.type==="shop")el("rect",{x:n.x-11,y:n.y-11,width:22,height:22,rx:3,transform:`rotate(45 ${n.x} ${n.y})`,class:"sqo sq-shop"},gS);else if(n.type!=="st")el("circle",{cx:n.x,cy:n.y,r:11,class:"sqo sq-"+n.type},gS)});
   gDyn=el("g",{},svg);
   const gL=el("g",{},svg);
   STATIONS.forEach(([n,x,y,lp])=>{
@@ -439,7 +650,7 @@ function showDice(v){S.lastDice=v;const d=$("#dice");if(d)d.outerHTML=diceHTML(v
 /* ---------- modal ---------- */
 function modal(html,buttons,wide){return new Promise(res=>{const m=$("#modal"),body=$("#modalBody");
   body.onclick=null;body.oninput=null;body.onchange=null;$("#sheet").className="sheet"+(wide?" wide":"");
-  body.innerHTML=html;const bb=$("#modalBtns");bb.innerHTML="";
+  body.innerHTML=html;const bb=$("#modalBtns");bb.innerHTML="";bb.hidden=false;
   buttons.forEach(([label,val,cls,before])=>{const b=document.createElement("button");b.textContent=label;b.className="btn "+(cls||"");
     b.onclick=async()=>{if(before&&(await before())===false)return;m.hidden=true;res(val)};bb.appendChild(b)});
   m.hidden=false;$("#sheet").scrollTop=0;bb.lastChild&&bb.lastChild.focus()})}
@@ -458,7 +669,7 @@ function newGame(seats,years,assist,rules){
   startTurn();
 }
 async function startTurn(){CAND=null;S.dice=1;const p=cp();
-  if(p.cpu){S.phase="busy";render();autosave();focus(p.pos);await sleep(600);await cpuTurn()}
+  if(p.cpu){S.phase="busy";render();autosave();focus(p.pos);await wait(500);await cpuTurn()}
   else{S.phase="roll";render();autosave();focus(p.pos);
     if(S.players.filter(q=>!q.cpu).length>1){toast(`${p.name}の番です`);Snd.sfx("turn")}}
 }
@@ -475,7 +686,7 @@ async function moveAlong(path){const p=cp();for(let i=1;i<path.length;i++){p.pos
     if(possessed()){const j=S.players.findIndex((q,k)=>k!==S.cur&&q.pos===path[i]);if(j>=0)await passYokai(j)}
     await sleep(reduce?40:150)}focus(p.pos);renderPlayers()}
 async function passYokai(j){const y=S.yokai,from=cp(),to=S.players[j];y.owner=j;y.turns=0;
-  log(`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`);Snd.sfx("pass");toast(`${YOKAI[y.form].n}を${to.name}に押し付けた！`,2000);placeTokens();renderPlayers();await sleep(600)}
+  const m=`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`;log(m);Snd.sfx("pass");placeTokens();renderPlayers();await say(m)}
 function ownedList(i){const a=[];for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)a.push([s,k,P(s)[k][1]])});return a}
 function sellHalf(p,s,k){const pr=P(s)[k],v=r100(pr[1]/2);S.owners[s][k]=null;p.money+=v;return `${s}の「${pr[0]}」`}
 async function mischief(p){const y=S.yokai;y.turns++;let pre="";
@@ -495,14 +706,17 @@ async function mischief(p){const y=S.yokai;y.turns++;let pre="";
     else{const a=r100(rnd(3000,6000)*yf());p.money-=a;msg=`${nm}が駅前で大騒ぎした。後始末に${yen(a)}かかった。`}
   }
   msg=pre+msg;log(`${p.name}：${msg}`);Snd.sfx("yokai");render();
-  if(p.cpu){toast(`${p.name}　${msg}`,2600);await sleep(1500)}
+  if(p.cpu)await say(`${p.name}　${msg}`);
   else await modal(`<h2>${nm}のしわざ</h2><p>${esc(msg)}</p><p class="hint">ほかの社長のいるマスを通るか同じマスに止まると、${nm}を押し付けられます。お祓いカードでも追い払えます。</p>`,[["つづける",1,"primary"]])}
+function randomCard(){const r=Math.random();return r<.32?"kyuko":r<.5?"tokkyu":r<.68?"buttobi":r<.86||!S.rules.yokai?"rinji":"oharai"}
 async function land(){const p=cp(),n=N[p.pos];
   if(p.pos===S.dest)await arrive(p);
-  if(n.type==="st"){if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");toast(`${p.name}が${n.id}駅で${b.length}件購入`);await sleep(900)}}else await shopModal(p,n.id)}
-  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");toast(`青マス　${m}　＋${yen(amt)}`);await sleep(p.cpu?900:500)}
-  else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10&&n.y<600;let amt=r100(rnd(600,2000)*yf()*(winter?2:1));const m=winter?"大雪で除雪費がかかった":MINUS_MSG[rnd(0,MINUS_MSG.length-1)];p.money-=amt;log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");toast(`赤マス　${m}　−${yen(amt)}`);await sleep(p.cpu?900:500)}
-  else if(n.type==="card"){if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);toast("カードがいっぱいです")}else{const r=Math.random(),c=r<.32?"kyuko":r<.5?"tokkyu":r<.68?"buttobi":r<.86||!S.rules.yokai?"rinji":"oharai";p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");toast(`カードマス　${CARDS[c].n}を手に入れた`)}await sleep(p.cpu?900:500)}
+  if(n.type==="st"){await quiz(p);
+    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");await say(`${p.name}が${n.id}駅で物件を${b.length}件買いました。`)}}else await shopModal(p,n.id)}
+  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(`青マス　${p.name}：${m}。${yen(amt)}の収入！`)}
+  else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10&&n.y<600;let amt=r100(rnd(600,2000)*yf()*(winter?2:1));const m=winter?"大雪で除雪費がかかった":MINUS_MSG[rnd(0,MINUS_MSG.length-1)];p.money-=amt;log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(`赤マス　${p.name}：${m}。${yen(amt)}の出費。`)}
+  else if(n.type==="card"){if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);await say(`カードマス　${p.name}はカードがいっぱいで受け取れませんでした。`)}else{const c=randomCard();p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");render();await say(`カードマス　${p.name}が${CARDS[c].n}を手に入れた！`)}}
+  else if(n.type==="shop")await cardShop(p);
   render();
 }
 async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r100((4000+dist*260)*yf());p.money+=amt;
@@ -519,33 +733,84 @@ async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r10
 function isMono(st,i){return S.owners[st].every(x=>x===i)}
 function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
 function cpuBuy(p,st){const own=S.owners[st],props=P(st),got=[];for(;;){let best=-1,sc=-1;props.forEach((pr,i)=>{if(own[i]!=null||p.money-pr[1]<2000)return;const s=pr[2]+(own.some(o=>o===p.idx)?4:0)+(own.every((o,k)=>k===i||o===p.idx)?6:0);if(s>sc){sc=s;best=i}});if(best<0)break;buy(p,st,best);got.push(best)}return got}
-function shopModal(p,st){return new Promise(res=>{const m=$("#modal"),body=$("#modalBody");
+function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),mine=new Set();
   const draw=()=>{const own=S.owners[st];body.innerHTML=`<h2>${esc(st)}駅の物件</h2><p>所持金 <b>${yen(p.money)}</b></p>`+P(st).map((pr,i)=>{const o=own[i];
-    const right=o==null?`<button class="btn primary" data-buy="${i}" ${p.money<pr[1]?"disabled":""}>買う</button>`:`<span class="own" style="background:${pcol(o)}">${esc(S.players[o].name)}</span>`;
-    return `<div class="row"><span class="pn">${esc(pr[0])}</span><span class="pp">${yen(pr[1])}・${pr[2]}%</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">駅の物件をすべて持つと独占になり、決算での収益が2倍になります。</p>`;renderPlayers();renderDyn()};
-  modal("",[["購入を終える",1]]).then(()=>{body.onclick=null;res()});
-  draw();body.onclick=e=>{const b=e.target.closest("[data-buy]");if(!b)return;if(buy(p,st,+b.dataset.buy))Snd.sfx("buy");draw()};
+    const right=o==null?`<button class="btn primary" data-buy="${i}" ${p.money<pr[1]?"disabled":""}>買う</button>`:mine.has(i)?`<button class="btn danger" data-undo="${i}">取り消す</button>`:`<span class="own" style="background:${pcol(o)}">${esc(S.players[o].name)}</span>`;
+    return `<div class="row"><span class="pn">${esc(pr[0])}</span><span class="pp">${yen(pr[1])}・${pr[2]}%</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">駅の物件をすべて持つと独占になり、決算での収益が2倍になります。この画面にいる間は、買った物件を取り消して代金を戻せます。</p>`;renderPlayers();renderDyn()};
+  modal("",[["購入を終える",1,"primary"]]).then(()=>{body.onclick=null;res()});
+  draw();body.onclick=e=>{const b=e.target.closest("[data-buy]"),u=e.target.closest("[data-undo]");
+    if(b){const i=+b.dataset.buy;if(buy(p,st,i)){mine.add(i);Snd.sfx("buy")}}
+    else if(u){const i=+u.dataset.undo,pr=P(st)[i];if(S.owners[st][i]===p.idx){S.owners[st][i]=null;p.money+=pr[1];mine.delete(i);log(`${p.name}が「${pr[0]}」の購入を取り消した。`);Snd.sfx("click")}}
+    draw()};
 })}
+/* card shop */
+const CARD_PRICE={kyuko:1000,tokkyu:3000,buttobi:2500,rinji:2500,oharai:3000};
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+async function cardShop(p){Snd.sfx("card");
+  const kinds=shuffle(Object.keys(CARDS).filter(k=>k!=="oharai"||S.rules.yokai)).slice(0,4);
+  const offer=kinds.map(k=>({k,price:r100(CARD_PRICE[k]*yf()),got:false}));
+  if(p.cpu){const got=[];for(const o of offer){if(p.cards.length>=5)break;const want=o.k==="oharai"?possessed():true;if(want&&p.money-o.price>=6000){p.money-=o.price;p.cards.push(o.k);got.push(CARDS[o.k].n)}}
+    if(got.length){log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render();await say(`カード売り場　${p.name}が${got.join("・")}を買いました。`)}
+    else await say(`カード売り場　${p.name}は何も買いませんでした。`);return}
+  const body=$("#modalBody");
+  const draw=()=>{body.innerHTML=`<h2>カード売り場</h2><p>所持金 <b>${yen(p.money)}</b>・カード ${p.cards.length}/6枚</p>`+offer.map((o,i)=>{
+    const right=o.got?`<button class="btn danger" data-cundo="${i}">取り消す</button>`:`<button class="btn primary" data-cbuy="${i}" ${p.money<o.price||p.cards.length>=6?"disabled":""}>買う</button>`;
+    return `<div class="row"><span class="pn">${CARDS[o.k].n}<br><small style="font-weight:400;color:var(--muted)">${CARDS[o.k].d}</small></span><span class="pp">${yen(o.price)}</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">今日の品ぞろえは4種類です。この画面にいる間は取り消せます。</p>`;renderPlayers()};
+  const pr=modal("",[["売り場を出る",1,"primary"]]);draw();
+  body.onclick=e=>{const b=e.target.closest("[data-cbuy]"),u=e.target.closest("[data-cundo]");
+    if(b){const o=offer[+b.dataset.cbuy];if(!o.got&&p.money>=o.price&&p.cards.length<6){p.money-=o.price;p.cards.push(o.k);o.got=true;Snd.sfx("buy")}}
+    else if(u){const o=offer[+u.dataset.cundo],k=p.cards.lastIndexOf(o.k);if(o.got&&k>=0){p.cards.splice(k,1);p.money+=o.price;o.got=false;Snd.sfx("click")}}
+    draw()};
+  await pr;body.onclick=null;const got=offer.filter(o=>o.got).map(o=>CARDS[o.k].n);if(got.length)log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render()}
+/* quiz */
+const REWARDS=[["again","もう一度サイコロを振れる"],["card","カードを1枚もらえる"],["yield","持っている物件すべての収益率が1%上がる"],["money","賞金がもらえる"]];
+const CPU_QUIZ_RATE=.45;
+function pickQuestion(){if(!S.quizUsed||S.quizUsed.length>=QUIZ.length)S.quizUsed=[];let i;do{i=rnd(0,QUIZ.length-1)}while(S.quizUsed.includes(i));S.quizUsed.push(i);return QUIZ[i]}
+async function quiz(p){if(!S.rules.quiz||Math.random()>=1/3)return;
+  const q=pickQuestion(),[genre,text,ans]=q,opts=shuffle(q.slice(2,6)),rw=REWARDS[rnd(0,REWARDS.length-1)];
+  let ok;
+  if(p.cpu){Snd.sfx("turn");await say(`クイズ（${genre}）　${p.name}が挑戦中…`);ok=Math.random()<CPU_QUIZ_RATE;
+    await say(`${p.name}は${ok?"正解！":"不正解。"}　問題「${text}」の答えは「${ans}」でした。`)}
+  else ok=await new Promise(res=>{const body=$("#modalBody");Snd.sfx("turn");
+    modal(`<span class="qgenre">${esc(genre)}</span><h2>クイズ</h2><p style="font-size:16px;font-weight:700">${esc(text)}</p><p class="qreward">正解すると：${rw[1]}</p><div class="qopts">${opts.map((o,i)=>`<button class="qopt" data-q="${i}">${esc(o)}</button>`).join("")}</div><p class="qres" id="qres"></p>`,[["つづける",1,"primary"]]).then(()=>{body.onclick=null;res(result)});
+    $("#modalBtns").hidden=true;let result=false;
+    body.onclick=e=>{const b=e.target.closest("[data-q]");if(!b||b.disabled)return;result=opts[+b.dataset.q]===ans;
+      body.querySelectorAll(".qopt").forEach((x,i)=>{x.disabled=true;if(opts[i]===ans)x.classList.add("ok");else if(x===b)x.classList.add("ng")});
+      $("#qres").textContent=result?"正解です！":`残念、正解は「${ans}」でした。`;Snd.sfx(result?"plus":"minus");$("#modalBtns").hidden=false;$("#modalBtns button").focus()}});
+  log(`${p.name}がクイズ（${genre}）に${ok?"正解":"不正解"}。`);
+  if(ok)await award(p,rw[0])}
+async function award(p,k){let m;
+  if(k==="yield"&&!ownedList(p.idx).length)k="money";
+  if(k==="card"&&p.cards.length>=6)k="money";
+  if(k==="again"){S.extraRoll=true;m=`特典：${p.name}はこのあと、もう一度サイコロを振れます。`}
+  else if(k==="card"){const c=randomCard();p.cards.push(c);m=`特典：${p.name}が${CARDS[c].n}をもらいました。`}
+  else if(k==="yield"){const l=ownedList(p.idx);l.forEach(([s,i])=>P(s)[i][2]+=1);m=`特典：${p.name}の物件${l.length}件の収益率が1%上がりました。`}
+  else{const a=r100(3000*yf());p.money+=a;m=`特典：${p.name}に賞金${yen(a)}！`}
+  log(m);Snd.sfx("card");render();await say(m)}
 async function useCard(p,i){const c=p.cards[i];p.cards.splice(i,1);log(`${p.name}が${CARDS[c].n}を使った。`);Snd.sfx("card");
   if(c==="kyuko")S.dice=2;else if(c==="tokkyu")S.dice=3;
-  else if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");toast(`臨時収入　＋${yen(amt)}`);log(`${p.name}に${yen(amt)}の臨時収入。`)}
-  else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");toast(`お祓い成功！${nm}が去っていった`);log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`)}else toast("取り憑いている妖怪がいませんでした")}
-  else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");toast(`${p.name}は${to}駅へぶっとんだ！`);log(`${p.name}が${to}駅へワープ。`);await sleep(1000);return "warp"}
+  else if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");log(`${p.name}に${yen(amt)}の臨時収入。`);render();await say(`臨時収入カード　${p.name}に${yen(amt)}の臨時収入！`)}
+  else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`);render();await say(`お祓い成功！${nm}が${p.name}のもとから去っていきました。`)}else toast("取り憑いている妖怪がいませんでした")}
+  else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");log(`${p.name}が${to}駅へワープ。`);await say(`ぶっとびカード　${p.name}は${to}駅へぶっとんだ！`);return "warp"}
+  else if(c==="kyuko"||c==="tokkyu")await say(`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みます。`);
   render();return null}
 async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];
-  let ri=p.cards.indexOf("rinji");while(ri>=0){await useCard(p,ri);await sleep(500);ri=p.cards.indexOf("rinji")}
-  const oi=p.cards.indexOf("oharai");if(oi>=0&&possessed()){await useCard(p,oi);await sleep(700)}
+  let ri=p.cards.indexOf("rinji");while(ri>=0){await useCard(p,ri);ri=p.cards.indexOf("rinji")}
+  const oi=p.cards.indexOf("oharai");if(oi>=0&&possessed())await useCard(p,oi);
   const bi=p.cards.indexOf("buttobi");if(bi>=0&&d>=24&&Math.random()<.6){await useCard(p,bi);S.phase="busy";await land();return endTurn()}
   const ti=p.cards.indexOf("tokkyu"),ki=p.cards.indexOf("kyuko");
   if(ti>=0&&d>=10)await useCard(p,ti);else if(ki>=0&&d>=6)await useCard(p,ki);
   renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);
-  const r=reach(p.pos,t,S.dest,S.rules.exact),dd=distTo(S.dest),pref={plus:0,card:1,st:2,minus:3},ps=possessed();
+  const r=reach(p.pos,t,S.dest,S.rules.exact),dd=distTo(S.dest),pref={plus:0,card:1,shop:1,st:2,minus:3},ps=possessed();
   const key=id=>[id===S.dest?0:1,ps&&passes(r.get(id))?0:1,dd[id],pref[N[id].type]];
   const best=[...r.keys()].sort((a,b)=>{const A=key(a),B=key(b);for(let i=0;i<4;i++)if(A[i]!==B[i])return A[i]-B[i];return 0})[0];
-  await sleep(350);await moveAlong(r.get(best));await land();return endTurn()}
-function forceSell(p){const mine=[];for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===p.idx)mine.push([s,k,P(s)[k][1]])});mine.sort((a,b)=>a[2]-b[2]);
-  let sold=0;while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が借金返済のため${s}の「${P(s)[k][0]}」を売却。`)}if(sold)toast(`${p.name}は物件を${sold}件売却しました`)}
-async function endTurn(){const p=cp();if(possessed())await mischief(p);if(p.money<0)forceSell(p);
+  await wait(400);await moveAlong(r.get(best));await land();return endTurn()}
+async function forceSell(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);
+  let sold=0;while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が借金返済のため${s}の「${P(s)[k][0]}」を売却。`)}
+  if(sold){render();await say(`${p.name}は借金返済のため物件を${sold}件売却しました。`)}}
+async function endTurn(){const p=cp();
+  if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await say(`${p.name}がもう一度サイコロを振ります。`);return startTurn()}
+  if(possessed())await mischief(p);if(p.money<0)await forceSell(p);
   S.cur=(S.cur+1)%S.players.length;
   if(S.cur===0){S.month++;if(S.month>=12){await settle();S.month=0;S.year++;if(S.year>S.years)return gameOver()}}
   startTurn()}
@@ -562,19 +827,22 @@ async function setup(allowResume){const saved=allowResume?await Store.get("auto"
   const r=await modal(`<h2>出発の準備</h2><p>関東甲信越の駅をサイコロで巡り、目的地への一番乗りと物件の独占で総資産トップを目指します。</p>
   <h3>参加する社長</h3><p class="hint">1台の端末を交代で使えば、人間同士でも遊べます。</p>
   ${DEFAULT_SEATS.map(([nm,ty],i)=>`<div class="prow"><span class="dot" style="background:${COLORS[i]}"></span><input id="seatN${i}" maxlength="8" value="${esc(nm)}" aria-label="${i+1}人目の名前"><select id="seatT${i}" aria-label="${i+1}人目の種類"><option value="human" ${ty==="human"?"selected":""}>人間</option><option value="cpu" ${ty==="cpu"?"selected":""}>CPU</option><option value="none" ${ty==="none"?"selected":""}>参加しない</option></select></div>`).join("")}
-  <div class="field" style="margin-top:12px"><label for="fYears">プレイ年数</label><select id="fYears"><option value="1">1年（約15分）</option><option value="3" selected>3年</option><option value="5">5年</option><option value="10">10年</option></select></div>
+  <div class="field" style="margin-top:12px"><label for="fYears">プレイ年数</label><select id="fYears"><option value="1">1年</option><option value="3" selected>3年</option><option value="5">5年</option><option value="10">10年</option></select></div>
+  <div class="field"><label for="fSpeed">メッセージの速さ</label><select id="fSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
   <h3>ルール</h3>
   <label class="check"><input type="checkbox" id="fExact" checked><span>ぴったり到着<small>目的地には、出た目とちょうど同じマス数で止まったときだけ到着できます。オフにすると通過する目でも到着できます。</small></span></label>
   <label class="check"><input type="checkbox" id="fYokai" checked><span>妖怪「${YOKAI[0].n}」<small>誰かが目的地に着くたびに、いちばん遠い社長へ取り憑いて毎ターン悪さをします。ほかの社長のいるマスを通ると押し付けられます。</small></span></label>
+  <label class="check"><input type="checkbox" id="fQuiz" checked><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。全ジャンル・難しめ。正解すると特典があります。CPUは約45%の確率で正解します。</small></span></label>
   <label class="check"><input type="checkbox" id="fAssist"><span>追い上げサポート<small>総資産が最下位の社長は、大きい目が少し出やすくなります。CPUにも同じように働きます。</small></span></label>
   <p class="err" id="setupErr"></p>
   ${canResume?`<p class="hint">前回のゲーム（${saved.year}年目 ${MONTHS[saved.month]}）が残っています。</p>`:""}`,
   [...(canResume?[["続きから",2]]:[]),["出発する",1,"primary",()=>{const n=DEFAULT_SEATS.filter((_,i)=>$("#seatT"+i).value!=="none").length;if(n<2){$("#setupErr").textContent="2人以上の社長を参加させてください。";return false}}]]);
   if(r===2){resume(saved);return}
   const seats=[];DEFAULT_SEATS.forEach(([nm],i)=>{const t=$("#seatT"+i).value;if(t!=="none")seats.push({name:$("#seatN"+i).value.trim()||nm,cpu:t==="cpu",color:i})});
-  newGame(seats,+$("#fYears").value,$("#fAssist").checked,{exact:$("#fExact").checked,yokai:$("#fYokai").checked})}
+  GP.speed=$("#fSpeed").value;saveGP();
+  newGame(seats,+$("#fYears").value,$("#fAssist").checked,{exact:$("#fExact").checked,yokai:$("#fYokai").checked,quiz:$("#fQuiz").checked})}
 function resume(state){S=state;CAND=null;
-  if(!S.rules)S.rules={exact:false,yokai:false};if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
+  if(!S.rules)S.rules={exact:false,yokai:false};if(S.rules.quiz==null)S.rules.quiz=true;if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
   if(!S.props){S.props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(DEFAULT_PROPS[s[0]])]))}
   S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i});
   buildTokens();render();startTurn()}
@@ -639,6 +907,9 @@ async function openEditor(){
 /* ---------- settings ---------- */
 async function openSettings(){Snd.unlock();const body=$("#modalBody");
   const p=modal(`<h2>設定</h2>
+  <h3>メッセージの進み方</h3>
+  <div class="field"><label for="sSpeed">表示の速さ</label><select id="sSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
+  <p class="hint">「タップで進む」にすると、CPUの番も含めてメッセージはタップするまで止まります。ほかの速さでも、メッセージをタップすれば早送りできます。</p>
   <h3>サウンド</h3>
   <label class="check"><input type="checkbox" id="sOn" ${Snd.prefs.on?"checked":""}><span>音を出す<small>オフにするとBGMも効果音も止まります。iPhoneでは消音モードでも鳴るようにしています。</small></span></label>
   <label class="check"><input type="checkbox" id="sBgm" ${Snd.prefs.bgm?"checked":""}><span>BGM<small>ゲームのために作ったオリジナル曲です。</small></span></label>
@@ -646,11 +917,14 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
   <div class="vol"><label for="sVol">音量</label><input type="range" id="sVol" min="0" max="1" step="0.05" value="${Snd.prefs.vol}"></div>
   ${S&&S.phase!=="over"?`<h3>このゲームのルール</h3><label class="check"><input type="checkbox" id="sAssist" ${S.assist?"checked":""}><span>追い上げサポート<small>総資産が最下位の社長は、大きい目が少し出やすくなります。オフのときサイコロは完全にランダムです。</small></span></label>
   <label class="check"><input type="checkbox" id="sExact" ${S.rules.exact?"checked":""}><span>ぴったり到着<small>目的地にはちょうどの目で止まったときだけ到着できます。</small></span></label>
-  <label class="check"><input type="checkbox" id="sYokai" ${S.rules.yokai?"checked":""}><span>妖怪「${YOKAI[0].n}」<small>オフにすると、取り憑いている妖怪もいなくなります。</small></span></label>`:""}`,[["閉じる",0,"primary"]]);
+  <label class="check"><input type="checkbox" id="sYokai" ${S.rules.yokai?"checked":""}><span>妖怪「${YOKAI[0].n}」<small>オフにすると、取り憑いている妖怪もいなくなります。</small></span></label>
+  <label class="check"><input type="checkbox" id="sQuiz" ${S.rules.quiz?"checked":""}><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。</small></span></label>`:""}`,[["閉じる",0,"primary"]]);
   body.onchange=body.oninput=e=>{const t=e.target;if(t.type==="checkbox"&&e.type!=="change")return;
     if(t.id==="sOn"){Snd.prefs.on=t.checked;Snd.armed=true}else if(t.id==="sBgm")Snd.prefs.bgm=t.checked;else if(t.id==="sSe"){Snd.prefs.se=t.checked;Snd.sfx("click")}else if(t.id==="sVol")Snd.prefs.vol=+t.value;
     else if(t.id==="sAssist"&&e.type==="change"){S.assist=t.checked;log(`追い上げサポートを${S.assist?"オン":"オフ"}にしました。`);render();autosave()}
     else if(t.id==="sExact"&&e.type==="change"){S.rules.exact=t.checked;log(`ぴったり到着を${t.checked?"オン":"オフ"}にしました。`);render();autosave()}
+    else if(t.id==="sSpeed"){GP.speed=t.value;saveGP()}
+    else if(t.id==="sQuiz"&&e.type==="change"){S.rules.quiz=t.checked;log(`クイズを${t.checked?"オン":"オフ"}にしました。`);autosave()}
     else if(t.id==="sYokai"&&e.type==="change"){S.rules.yokai=t.checked;if(!t.checked)S.yokai={owner:null,form:0,turns:0};log(`妖怪を${t.checked?"オン":"オフ"}にしました。`);render();autosave()}
     Snd.savePrefs();Snd.apply();updSndBtn()};
   await p}
