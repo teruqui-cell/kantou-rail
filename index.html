@@ -128,6 +128,10 @@ th{font-size:12px;color:var(--muted)}
 .qopt.ng{border:2px solid var(--minus);background:color-mix(in srgb,var(--minus) 12%,transparent)}
 .qopt:disabled{cursor:default;opacity:1}
 .qres{font-weight:700;margin:12px 0 0;font-size:16px}
+.qex{margin:8px 0 0;padding:10px 12px;border-radius:10px;background:var(--bg);line-height:1.7;font-size:14px}
+.roulette{font-family:var(--f-display);font-size:clamp(28px,8vw,44px);text-align:center;padding:18px 8px;border:3px dashed var(--goal);border-radius:14px;margin:4px 0 12px}
+.roulette.hit{color:var(--goal);border-style:solid;animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.85)}70%{transform:scale(1.06)}100%{transform:scale(1)}}
 .sq-shop{fill:var(--shop)}
 #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:10px;font-weight:700;z-index:30;max-width:calc(100% - 32px);text-align:center}
 /* svg */
@@ -419,6 +423,7 @@ const QUIZ=[
 ["関東甲信越","「信濃の国」を県歌とする県は？","長野県","新潟県","山梨県","群馬県"],
 ["関東甲信越","鎌倉大仏がある寺は？","高徳院","長谷寺","建長寺","円覚寺"]
 ];
+const QUIZ_EXPL=["北条泰時が定めた武家初の体系的な法典で、「貞永式目」とも呼ばれます。", "645年の乙巳の変の翌年、646年に出されたと『日本書紀』に記されています。", "大老井伊直弼が勅許を得ないまま調印を進め、のちの安政の大獄につながりました。", "1185年に守護・地頭の設置を認められ、1192年に征夷大将軍に任じられました。", "義満の北山山荘を死後に禅寺としたもので、舎利殿が通称「金閣」です。銀閣（慈照寺）は足利義政の山荘です。", "894年に遣唐大使に任じられた道真が、唐の衰退などを理由に派遣の停止を建議しました。", "1274年が文永の役、1281年の2度目の襲来が弘安の役です。", "8代将軍吉宗が、目安箱の設置や公事方御定書の編纂などを行いました。", "吉宗の孫で、田沼時代のあとに倹約令や棄捐令などの改革を進めました。", "1873年の地租改正条例で、地価の3%を現金で納める制度に改めました。", "1872年から刊行され、学問による自立を説いてベストセラーになりました。", "1882年、松方正義の建議により中央銀行として設立されました。", "1945年7月に米・英・中の名で発表され、ソ連は8月の対日参戦後に加わりました。", "1946年11月3日に公布され、半年後の1947年5月3日に施行されました。", "1872年に官営模範工場として操業を始め、2014年に世界遺産に登録されました。", "主権国家体制の出発点とされる条約で、オランダとスイスの独立も認められました。", "オスマン帝国のメフメト2世が攻略し、都はのちにイスタンブールと呼ばれるようになりました。", "古バビロニア王国の王ハンムラビが制定し、「目には目を」の同害復讐で知られます。", "独立宣言の草案を書いたジェファーソンは、のちに第3代大統領となりました。", "イングランドのジョン王に貴族たちが認めさせた文書で、王権を制限する先駆けとされます。", "オーストリアの皇位継承者夫妻が、ボスニアのサラエボで暗殺された事件です。", "1989年11月に壁が開放され、翌1990年に東西ドイツが統一されました。", "フランス革命の年に国民議会が採択し、自由・平等・国民主権などをうたいました。", "琵琶湖に次ぐ面積で、茨城県にあります。3位はサロマ湖です。", "流域面積は利根川が日本一です。長さでは信濃川が日本一です。", "東京都小笠原村に属する日本最南端の島です。南鳥島は日本最東端です。", "1位はロシアです。カナダは総面積でアメリカや中国をわずかに上回ります。", "標高約5895mで、ケニアとの国境近く、タンザニア北東部にあります。", "北島の南端にある首都です。国内最大の都市はオークランドです。", "ロシア・シベリアにあり、最大水深は約1640mです。", "スエズ運河はエジプトにあり、地中海と紅海を結んでいます。", "アルゼンチンにある標高約6960mの山で、南北アメリカ大陸の最高峰です。", "アフリカ北部に広がる砂漠です。南極などの寒冷な地域を含めると、南極が最大の砂漠になります。", "北アルプスは飛騨山脈、中央アルプスは木曽山脈、南アルプスは赤石山脈です。", "長野県は8県と接し、接する県の数は日本最多ですが、栃木県とは接していません。", "海に面していない県は栃木・群馬・埼玉・山梨・長野・岐阜・滋賀・奈良の8県です。", "兵庫県明石市などを通る東経135度の子午線が、日本の標準時の基準です。", "信濃川の本流は新潟市で日本海に注ぎます。なお、大河津分水からも日本海へ流れ出ています。", "千葉県銚子市にあり、関東地方の最東端とされます。灯台でも知られます。", "芦ノ湖は神奈川県の箱根にあります。富士五湖は山中湖・河口湖・西湖・精進湖・本栖湖です。", "1890年に発表された、ドイツ留学の経験をもとにした鷗外初期の小説です。", "越後湯沢温泉が舞台とされ、川端は湯沢の旅館に滞在して執筆しました。", "1212年ごろ成立の随筆で、日本三大随筆の一つです。", "江戸を出て奥羽・北陸を巡り、美濃の大垣で旅を終えました。", "『山椒大夫』は森鷗外の作品です。『羅生門』『鼻』『河童』は芥川の作品です。", "1968年に受賞しました。日本人で2人目は1994年の大江健三郎です。", "正岡子規ゆかりの俳句雑誌で、高浜虚子の勧めで漱石が連載しました。", "吉原近くの子どもたちを描いた作品です。一葉は2004年発行の五千円札の肖像にもなりました。", "撰者は紀友則・紀貫之・凡河内躬恒・壬生忠岑の4人です。柿本人麻呂は万葉集の歌人です。", "1866年発表。貧しい元大学生ラスコーリニコフの犯罪と良心を描いた長編です。", "四大悲劇は『ハムレット』『オセロー』『リア王』『マクベス』の4作です。", "コロンビアの作家で、1982年にノーベル文学賞を受けました。", "フランスの作家の長編で、紅茶に浸したマドレーヌの場面がよく知られています。", "イタリアのダンテの作で、地獄篇・煉獄篇・天国篇の3部からなります。", "岩手出身の宮沢賢治の童話で、作者の死後に発表されました。", "ミラノのサンタ・マリア・デッレ・グラツィエ修道院の食堂に描かれています。", "1874年の展覧会に出品され、批評家が揶揄して「印象派」と呼んだのが名前の由来です。", "江戸初期の俵屋宗達の作で、のちに尾形光琳や酒井抱一が写しを描きました。", "天井画『天地創造』のほか、のちに祭壇の壁に『最後の審判』も描きました。", "オランダ・デルフトの画家で、作品はハーグのマウリッツハイス美術館にあります。", "アムステルダム国立美術館の所蔵で、光と影の劇的な表現で知られます。", "2016年に「ル・コルビュジエの建築作品」の一つとして世界遺産に登録されました。", "ダンテの『神曲』地獄篇を主題にした門の、上部に置かれた人物像が原型です。", "浮世絵の祖とされる江戸前期の絵師で、作品は東京国立博物館が所蔵しています。", "色を混ぜずに小さな点を並べる点描で描かれた、新印象派を代表する作品です。", "奈良・興福寺の八部衆の一体で、天平時代の乾漆像です。", "室町時代の禅僧で、明に渡って学び、日本の水墨画を大成しました。", "アントニ・ガウディの設計で、1882年に着工した教会です。", "ノルウェーの画家で、『叫び』は複数のバージョンが描かれています。", "シラーの詩「歓喜に寄す」をもとにした合唱が終楽章で歌われます。", "同じリズムと旋律を繰り返しながら、少しずつ盛り上げていく管弦楽曲です。", "24のすべての長調・短調を使った、前奏曲とフーガの曲集です。", "土井晩翠作詞・滝廉太郎作曲です。『赤とんぼ』は山田耕筰、『故郷』は岡野貞一、『浜辺の歌』は成田為三の作曲です。", "1913年のパリ初演では、その斬新さから客席が大騒ぎになりました。", "100曲以上の交響曲を書き、古典派の交響曲の形式を確立しました。", "ポーランド出身で、作品の大半がピアノ曲です。", "イタリア語の「歩く」が語源です。「中くらいの速さで」はモデラートです。", "雅楽は笙・篳篥・龍笛などの管楽器と、琵琶・箏・打楽器で演奏します。三味線は近世に広まった楽器です。", "1875年初演のフランスのオペラで、「ハバネラ」などが有名です。", "ダブルベースとも呼ばれ、弦楽器の中で最も低い音域を担います。", "周波数が2倍になると1オクターブ上の音になります。ラ（440Hz）の1オクターブ上は880Hzです。", "0ケルビンにあたる温度で、これより低い温度は存在しません。", "1Nは、質量1kgの物体に1m/s²の加速度を生じさせる力です。", "音は一般に固体＞液体＞気体の順に速く伝わり、鉄の中では秒速約5900mです。", "1921年の受賞理由は光電効果の法則の発見で、相対性理論は受賞理由になっていません。", "1気圧＝1013.25hPa＝760mmHgです。", "発熱量はQ＝I²Rtで表され、電流が2倍になると発熱量は4倍になります。", "主虹は外側が赤、内側が紫です。外側に出る副虹では色の並びが逆になります。", "T²∝a³。惑星の公転周期と太陽からの距離の関係を示す法則です。", "マグニチュードが1増えるとエネルギーは約32倍、2増えると約1000倍になります。", "水は約4℃で密度が最大になるため、冬の湖は底のほうが凍りにくくなります。", "金の元素記号Auは、ラテン語のaurumに由来します。", "ポーリングの値で約4.0と、全元素の中で最大です。", "窒素が約78%、酸素が約21%、アルゴンが約0.9%です。", "1molに含まれる粒子の数で、約6.02×10²³です。", "ガリウムの融点は約30℃、セシウムは約28℃なので、25℃では固体です。", "同じ元素からなる、性質の異なる単体どうしを同素体といいます。", "ドイツ語名のヴォルフラム（Wolfram）に由来します。", "未発見の元素の存在と性質を予言し、のちにそれが的中しました。", "生物の死後、一定の割合で減っていく性質を利用して年代を測ります。", "シリコンとも呼ばれ、地殻にも酸素に次いで多く含まれます。", "ロザリンド・フランクリンらのX線回折写真が発見の手がかりになりました。", "22対の常染色体と1対の性染色体からなります。", "クロロフィルを含み、光のエネルギーを使って二酸化炭素と水から糖をつくります。", "鉄を含むタンパク質で、肺で酸素と結びつき、全身に運びます。", "膵臓のランゲルハンス島のβ細胞から分泌され、血糖値を下げる働きがあります。", "種子の形や色など、はっきり区別できる形質をもつ品種を使いました。", "2012年に、ジョン・ガードンとともに受賞しました。", "1900年ごろに発見し、1930年にノーベル賞を受けました。", "成人で約1.2〜1.5kgあり、代謝や解毒など多くの働きを担います。", "名前がついている動物の種の過半数を昆虫が占めるとされます。", "約6600万年前、巨大隕石の衝突などによって大量絶滅が起きたとされます。", "地表から高さ10数kmまでの層で、雲や雨などの気象現象が起こります。", "自転周期は約243日で公転周期（約225日）より長く、自転の向きも逆です。", "夏の大三角はベガ・アルタイル・デネブです。シリウスは冬の大三角の星です。", "2010年に試料を持ち帰りました。リュウグウは「はやぶさ2」の目的地です。", "この距離を1天文単位（au）と呼びます。", "2、3、5、7……97までの25個です。", "91＝7×13なので、素数ではありません。", "正二十面体は、面が20、辺が30、頂点が12です。", "36通りの目の出方のうち、合計が7になるのは6通りです。", "e^(iπ)＝−1、つまり e^(iπ)＋1＝0 で、オイラーの等式と呼ばれます。", "アンドリュー・ワイルズが、350年以上未解決だった定理を証明しました。", "平行線公準を前提とする幾何学では、内角の和は180度です。球面上では180度より大きくなります。", "6²＋9²＝117、12²＝144なので成り立ちません（3:4:5の比なら6, 8, 10です）。", "1と0.999…の差はどんな正の数よりも小さいので、両者は等しくなります。", "(1＋√5)÷2≒1.618です。1.414は√2、1.732は√3、2.718はネイピア数eです。", "1010（2進数）＝8＋0＋2＋0＝10です。", "1776年刊の『国富論』で、市場の自律的な調整のはたらきを説きました。", "1817年の『経済学および課税の原理』で示した理論です。", "16世紀イギリスの財政家、トーマス・グレシャムの名に由来します。", "竹下内閣のもと税率3%で導入され、その後5%、8%、10%と引き上げられました。", "Gross Domestic Product（国内総生産）の略です。", "2024年7月から発行されています。五千円札は津田梅子、千円札は北里柴三郎です。", "1748年刊の著作で、立法・行政・司法の分立を説きました。", "衆議院は任期4年で解散があります。参議院は任期6年で、3年ごとに半数を改選します。", "常任理事国はアメリカ・イギリス・フランス・ロシア・中国の5か国です。", "日本国憲法第60条で、予算は先に衆議院に提出すると定められています。", "『方法序説』の一節で、近代哲学の出発点とされます。", "1781年刊で、人間の認識の可能性と限界を問いました。", "1911年刊。京都学派の祖とされる哲学者の主著です。", "「僧は推す月下の門」の「推す」を「敲く」にするか迷った故事から生まれた言葉です。", "蛇の絵を早く描き終えた者が足まで描き足し、酒を飲みそこねた話が由来です。", "「天荒」は未開の地のこと。唐代、科挙の合格者が出なかった地方から合格者が出た故事が由来です。", "「力不足」と混同されやすい言葉で、本来は役目のほうが軽すぎることを指します。", "「檄」は、人々を呼び集めるために主張を記した文書のことです。", "漢字では「徐に」と書き、「落ち着いてゆっくりと」が本来の意味です。", "情けをかけるのは人のためだけでなく、巡り巡って自分のためになる、という意味です。", "「擅（ほしいまま）」を「壇」と書き誤ったことから、「独壇場（どくだんじょう）」が広まりました。", "「米」の字を分解すると「八十八」になることに由来します。", "ギリシャ文字のアルファ（α）とベータ（β）を合わせた言葉です。", "室町時代に足利義満の保護を受けて能を大成しました。世阿弥は『風姿花伝』を著しました。", "江戸時代の初めに、京都で「かぶき踊り」を始めたとされる女性です。", "「和食；日本人の伝統的な食文化」として登録されました。", "1グロスは12ダース（12×12）です。", "9月23日ごろです。春の同じような日は春分です。", "飛車が成ると竜王（龍王）、角行が成ると竜馬（龍馬）になります。", "縦横19本ずつの線が引かれた盤を使います。初心者向けに9路盤や13路盤もあります。", "1ビットは0か1の情報で、8ビットで256通りを表せます。", "HyperText Transfer Protocol の略で、Webページのやりとりに使う通信の取り決めです。", "この日を記念して「体育の日」（現在の「スポーツの日」）が定められました。", "1896年、クーベルタンの提唱により、古代オリンピックの地ギリシャで開かれました。", "赤土のクレーコートで行われます。ウィンブルドンは芝、全米と全豪はハードコートです。", "規定打数より1打少ないとバーディー、2打でイーグル、3打でアルバトロスです。", "1試合で単打・二塁打・三塁打・本塁打をすべて打つことを、サイクルヒットといいます。", "本場所は年6回あり、それぞれ15日間行われます。", "東京・大手町と箱根・芦ノ湖の間を往復する大学駅伝です。", "明治5年（新暦では10月14日）に開業し、この日は「鉄道の日」になっています。", "東京オリンピック開幕直前の10月1日に、東京―新大阪間で開業しました。", "乗り入れる各社の乗降客数を合わせると、世界で最も多いとされます。", "1914年に開業した駅舎で、2012年に創建当時の姿へ復原されました。", "急勾配を登るため、車両の歯車と線路の間に敷いたラックレールをかみ合わせて走りました。", "千葉県成田市にある空港で、2004年に民営化されました。", "2代将軍秀忠が創建し、3代家光が現在の豪華な社殿に造り替えました。", "明治時代に作られた唱歌で、県内では今も広く歌われています。", "鎌倉時代に造られた国宝の阿弥陀如来坐像で、像の高さは約11mです。"];
 const DEFAULT_PROPS=Object.fromEntries(STATIONS.map(s=>[s[0],s[4]]));
 
 /* ---------- graph ---------- */
@@ -664,9 +669,9 @@ function newGame(seats,years,assist,rules){
   const props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(master(s[0]))]));
   S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"]})),cur:0,year:1,month:0,years,assist,rules,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"roll",dice:1,lastDice:null};
   STATIONS.forEach(([n])=>S.owners[n]=props[n].map(()=>null));
-  S.destFrom="東京";S.dest=pickDest("東京");
-  buildTokens();log(`${years}年間の旅が東京駅から始まりました。最初の目的地は${S.dest}駅です。`);
-  startTurn();
+  S.destFrom="東京";S.dest="東京";const first=pickDest("東京");
+  buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);render();
+  revealDest(first,"最初の目的地は……").then(()=>startTurn());
 }
 async function startTurn(){CAND=null;S.dice=1;const p=cp();
   if(p.cpu){S.phase="busy";render();autosave();focus(p.pos);await wait(500);await cpuTurn()}
@@ -720,7 +725,7 @@ async function land(){const p=cp(),n=N[p.pos];
   render();
 }
 async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r100((4000+dist*260)*yf());p.money+=amt;
-  const old=S.dest;S.destFrom=old;S.dest=pickDest(old);log(`${p.name}が${old}駅に一番乗り！援助金${yen(amt)}。次の目的地は${S.dest}駅。`);
+  const old=S.dest,next=pickDest(old);S.destFrom=old;log(`${p.name}が${old}駅に一番乗り！援助金${yen(amt)}。`);
   let yk="";
   if(S.rules.yokai){const dd=distTo(old);let far=-1,c=[];S.players.forEach((q,i)=>{if(i===S.cur)return;const d=dd[q.pos];if(d>far){far=d;c=[i]}else if(d===far)c.push(i)});
     const t=c[rnd(0,c.length-1)],y=S.yokai;
@@ -728,8 +733,17 @@ async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r10
     else yk=`${S.players[t].name}には${YOKAI[y.form].n}が取り憑いたままです。`;
     log(yk)}
   render();Snd.sfx("arrive");
-  await modal(`<h2>${esc(old)}駅に到着！</h2><p>${esc(p.name)}が一番乗りしました。</p><div class="big-money">＋${yen(amt)}</div><p>次の目的地は<b>${esc(S.dest)}駅</b>です。</p>${yk?`<p style="color:var(--yokai);font-weight:700">${esc(yk)}</p>`:""}`,[["つづける",1,"primary"]]);
+  await modal(`<h2>${esc(old)}駅に到着！</h2><p>${esc(p.name)}が一番乗りしました。</p><div class="big-money">＋${yen(amt)}</div><p>援助金を受け取りました。</p>`,[["次の目的地を決める",1,"primary"]]);
+  await revealDest(next);
+  if(yk){render();await say(yk)}
 }
+async function revealDest(next,title){
+  const pr=modal(`<h2>${title||"次の目的地は……"}</h2><div class="roulette" id="roul">？</div><p class="hint" id="roulHint" style="text-align:center">ルーレットを回しています</p>`,[["つづける",1,"primary"]]);
+  $("#modalBtns").hidden=true;const names=STATIONS.map(s=>s[0]).filter(n=>n!==next);let d=45;const steps=reduce?1:18;
+  for(let i=0;i<steps;i++){$("#roul").textContent=names[rnd(0,names.length-1)];Snd.sfx("dice");await sleep(d);d*=1.15}
+  S.dest=next;log(`次の目的地は${next}駅です。`);$("#roul").textContent=next+"駅";$("#roul").classList.add("hit");Snd.sfx("settle");
+  $("#roulHint").textContent=`${title?"最初":"次"}の目的地は「${next}駅」です！地図の赤い旗を目指しましょう。`;render();focus(next);
+  $("#modalBtns").hidden=false;$("#modalBtns button").focus();await pr}
 function isMono(st,i){return S.owners[st].every(x=>x===i)}
 function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
 function cpuBuy(p,st){const own=S.owners[st],props=P(st),got=[];for(;;){let best=-1,sc=-1;props.forEach((pr,i)=>{if(own[i]!=null||p.money-pr[1]<2000)return;const s=pr[2]+(own.some(o=>o===p.idx)?4:0)+(own.every((o,k)=>k===i||o===p.idx)?6:0);if(s>sc){sc=s;best=i}});if(best<0)break;buy(p,st,best);got.push(best)}return got}
@@ -764,19 +778,16 @@ async function cardShop(p){Snd.sfx("card");
   await pr;body.onclick=null;const got=offer.filter(o=>o.got).map(o=>CARDS[o.k].n);if(got.length)log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render()}
 /* quiz */
 const REWARDS=[["again","もう一度サイコロを振れる"],["card","カードを1枚もらえる"],["yield","持っている物件すべての収益率が1%上がる"],["money","賞金がもらえる"]];
-const CPU_QUIZ_RATE=.45;
-function pickQuestion(){if(!S.quizUsed||S.quizUsed.length>=QUIZ.length)S.quizUsed=[];let i;do{i=rnd(0,QUIZ.length-1)}while(S.quizUsed.includes(i));S.quizUsed.push(i);return QUIZ[i]}
-async function quiz(p){if(!S.rules.quiz||Math.random()>=1/3)return;
-  const q=pickQuestion(),[genre,text,ans]=q,opts=shuffle(q.slice(2,6)),rw=REWARDS[rnd(0,REWARDS.length-1)];
+function pickQuestion(){if(!S.quizUsed||S.quizUsed.length>=QUIZ.length)S.quizUsed=[];let i;do{i=rnd(0,QUIZ.length-1)}while(S.quizUsed.includes(i));S.quizUsed.push(i);return [QUIZ[i],QUIZ_EXPL[i]]}
+async function quiz(p){if(p.cpu||!S.rules.quiz||Math.random()>=1/3)return;
+  const[q,ex]=pickQuestion(),[genre,text,ans]=q,opts=shuffle(q.slice(2,6)),rw=REWARDS[rnd(0,REWARDS.length-1)];
   let ok;
-  if(p.cpu){Snd.sfx("turn");await say(`クイズ（${genre}）　${p.name}が挑戦中…`);ok=Math.random()<CPU_QUIZ_RATE;
-    await say(`${p.name}は${ok?"正解！":"不正解。"}　問題「${text}」の答えは「${ans}」でした。`)}
-  else ok=await new Promise(res=>{const body=$("#modalBody");Snd.sfx("turn");
-    modal(`<span class="qgenre">${esc(genre)}</span><h2>クイズ</h2><p style="font-size:16px;font-weight:700">${esc(text)}</p><p class="qreward">正解すると：${rw[1]}</p><div class="qopts">${opts.map((o,i)=>`<button class="qopt" data-q="${i}">${esc(o)}</button>`).join("")}</div><p class="qres" id="qres"></p>`,[["つづける",1,"primary"]]).then(()=>{body.onclick=null;res(result)});
+  ok=await new Promise(res=>{const body=$("#modalBody");Snd.sfx("turn");
+    modal(`<span class="qgenre">${esc(genre)}</span><h2>クイズ</h2><p style="font-size:16px;font-weight:700">${esc(text)}</p><p class="qreward">正解すると：${rw[1]}</p><div class="qopts">${opts.map((o,i)=>`<button class="qopt" data-q="${i}">${esc(o)}</button>`).join("")}</div><p class="qres" id="qres"></p><p class="qex" id="qex" hidden></p>`,[["つづける",1,"primary"]]).then(()=>{body.onclick=null;res(result)});
     $("#modalBtns").hidden=true;let result=false;
     body.onclick=e=>{const b=e.target.closest("[data-q]");if(!b||b.disabled)return;result=opts[+b.dataset.q]===ans;
       body.querySelectorAll(".qopt").forEach((x,i)=>{x.disabled=true;if(opts[i]===ans)x.classList.add("ok");else if(x===b)x.classList.add("ng")});
-      $("#qres").textContent=result?"正解です！":`残念、正解は「${ans}」でした。`;Snd.sfx(result?"plus":"minus");$("#modalBtns").hidden=false;$("#modalBtns button").focus()}});
+      $("#qres").textContent=result?"正解です！":`残念、正解は「${ans}」でした。`;$("#qex").textContent="解説："+ex;$("#qex").hidden=false;Snd.sfx(result?"plus":"minus");$("#modalBtns").hidden=false;$("#modalBtns button").focus()}});
   log(`${p.name}がクイズ（${genre}）に${ok?"正解":"不正解"}。`);
   if(ok)await award(p,rw[0])}
 async function award(p,k){let m;
@@ -832,7 +843,7 @@ async function setup(allowResume){const saved=allowResume?await Store.get("auto"
   <h3>ルール</h3>
   <label class="check"><input type="checkbox" id="fExact" checked><span>ぴったり到着<small>目的地には、出た目とちょうど同じマス数で止まったときだけ到着できます。オフにすると通過する目でも到着できます。</small></span></label>
   <label class="check"><input type="checkbox" id="fYokai" checked><span>妖怪「${YOKAI[0].n}」<small>誰かが目的地に着くたびに、いちばん遠い社長へ取り憑いて毎ターン悪さをします。ほかの社長のいるマスを通ると押し付けられます。</small></span></label>
-  <label class="check"><input type="checkbox" id="fQuiz" checked><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。全ジャンル・難しめ。正解すると特典があります。CPUは約45%の確率で正解します。</small></span></label>
+  <label class="check"><input type="checkbox" id="fQuiz" checked><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。全ジャンル・難しめ。正解すると特典があります。出題は人間の社長だけです。</small></span></label>
   <label class="check"><input type="checkbox" id="fAssist"><span>追い上げサポート<small>総資産が最下位の社長は、大きい目が少し出やすくなります。CPUにも同じように働きます。</small></span></label>
   <p class="err" id="setupErr"></p>
   ${canResume?`<p class="hint">前回のゲーム（${saved.year}年目 ${MONTHS[saved.month]}）が残っています。</p>`:""}`,
