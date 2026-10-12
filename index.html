@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="関東甲信越の37駅をサイコロで巡る鉄道すごろくゲーム">
+<meta name="description" content="駅をサイコロで巡り、目的地への一番乗りと物件の独占を競うオリジナル鉄道すごろく">
 <meta name="theme-color" content="#0C8565">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="鉄道すごろく">
+<meta name="apple-mobile-web-app-title" content="大人の鉄道すごろく">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>関東甲信越 鉄道すごろく</title>
+<title>大人の鉄道すごろく</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
 <style>
@@ -33,7 +33,7 @@
   --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; --shop:#F07CC0; color-scheme:dark}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;display:grid;grid-template-rows:auto minmax(0,1fr);padding-inline:16px;padding-block:10px;gap:10px;box-sizing:border-box;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;display:grid;grid-template-rows:auto auto minmax(0,1fr);grid-template-columns:minmax(0,1fr);padding-inline:16px;padding-block:10px;gap:10px;box-sizing:border-box;overflow:hidden}
 *{box-sizing:border-box}
 header{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 h1{font-family:var(--f-display);font-weight:400;font-size:20px;margin:0;letter-spacing:.02em;text-wrap:balance}
@@ -115,10 +115,6 @@ td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right}
 td:first-child,th:first-child{text-align:left}
 th{font-size:12px;color:var(--muted)}
 #msgLayer{position:fixed;inset:0;z-index:15;cursor:pointer}
-#msg{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(560px,calc(100% - 32px));background:var(--panel);color:var(--ink);border:2px solid var(--ink);border-radius:14px;padding:14px 16px 10px;z-index:16;box-shadow:0 8px 28px color-mix(in srgb,#000 25%,transparent);cursor:pointer}
-#msg .mt{margin:0;font-size:16px;line-height:1.65;font-weight:700}
-#msg .mh{margin:6px 0 0;text-align:right;font-size:12px;color:var(--muted)}
-#msg .mh.tap::after{content:" ▼";display:inline-block;animation:bob 1s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(3px)}}
 .qgenre{display:inline-block;font-size:12px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;margin-bottom:8px}
 .qreward{font-size:13px;color:var(--muted);margin:0 0 12px}
@@ -156,18 +152,79 @@ th{font-size:12px;color:var(--muted)}
 .yok{fill:var(--yokai);stroke:var(--panel);stroke-width:2.5}
 .yokt{font-size:11px}
 .tag.yk{color:var(--yokai);border-color:var(--yokai)}
+.tag.bad{color:var(--minus);border-color:var(--minus)}
+.cardbtn.atk{border-color:var(--minus);background:color-mix(in srgb,var(--minus) 10%,transparent)}
+#statusBar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px;min-height:34px}
+#statusBar:empty{display:none}
+#statusBar .sb-money{font-weight:700;font-variant-numeric:tabular-nums}
+#statusBar .sb-money.neg{color:var(--minus)}
+#statusBar .sb-dist{color:var(--muted)}
+#menuBtn{display:none}
+/* events box with scene art */
+#log{display:flex;flex-direction:column;gap:8px}
+#log.active{outline:3px solid var(--accent);outline-offset:-1px}
+.scene,.scene-pic{border-radius:10px;overflow:hidden;aspect-ratio:16/9;max-width:100%;background:var(--bg)}
+.scene svg,.scene img,.scene-pic svg,.scene-pic img{display:block;width:100%;height:100%;object-fit:cover}
+.scene-pic{margin:-4px 0 12px;max-height:200px;width:100%}
+.scene-text{margin:0;font-size:16px;font-weight:700;line-height:1.6;min-height:1.6em}
+.scene-hint{margin:0;text-align:right;font-size:12px;color:var(--muted);min-height:1em}
+.scene-hint.tap::after{content:" ▼";display:inline-block;animation:bob 1s ease-in-out infinite}
+.loglabel{margin:4px 0 0}
+.menu{display:grid;gap:8px}
+.menu .btn{width:100%;padding:13px;font-size:15px}
+/* title screen */
+#title{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;display:grid;place-items:center;padding:16px}
+.t-inner{width:min(560px,100%);display:flex;flex-direction:column;gap:14px;text-align:center;padding-block:calc(12px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-bottom,0px))}
+.t-visual{border-radius:16px;overflow:hidden;aspect-ratio:16/9;border:3px solid var(--ink)}
+.t-visual svg,.t-visual img{display:block;width:100%;height:100%;object-fit:cover}
+.t-logo{font-family:var(--f-display);font-size:clamp(34px,10vw,56px);line-height:1.15;margin:4px 0 0;letter-spacing:.02em;text-wrap:balance}
+.t-logo span{display:block;font-size:.45em;color:var(--accent);letter-spacing:.3em}
+.t-sub{display:inline-block;margin:0 auto;font-family:var(--f-display);font-size:20px;background:var(--goal);color:#fff;padding:4px 18px;border-radius:999px}
+.t-btns{display:grid;gap:10px}
+.t-btns .btn{width:100%}
+.t-cont small{display:block;font-family:var(--f-body);font-size:12px;opacity:.8;margin-top:2px}
+.t-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.t-note{font-size:12px;color:var(--muted);line-height:1.6;margin:0}
 @media (max-width:820px){
-  .layout{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,44%)}
-  h1{font-size:16px}
+  body{gap:6px;padding-block:6px}
+  header{gap:6px}
+  header h1{display:none}
+  .when{font-size:13px;padding:3px 8px}
+  .goal{padding:3px 8px;font-size:13px}
+  .goal b{font-size:13px}
   .hbtns .btn{padding:6px 9px;font-size:12px}
+  .hbtns .btn:not(#sndBtn):not(#menuBtn){display:none}
+  #menuBtn{display:inline-block}
+  .layout{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0}
+  #mapWrap,#action,#log{min-width:0;width:100%}
+  aside{display:contents}
+  #playersBox{display:none}
+  #mapWrap{flex:1 1 auto;min-height:0}
+  #action,#log{flex:0 0 auto;padding:10px}
+  .btn.big{padding:12px;font-size:19px}
+  body[data-view="roll"] #mapWrap{display:none}
+  body[data-view="roll"] #action{order:1}
+  body[data-view="roll"] #log{order:2;flex:1 1 auto;min-height:0;overflow:auto}
+  body[data-view="roll"] .scene{max-height:24vh;width:100%}
+  body[data-view="map"] #mapWrap{order:1}
+  body[data-view="map"] #log{order:2}
+  body[data-view="map"] #action{order:3;max-height:34vh;overflow:auto}
+  body[data-view="map"]:not([data-phase="choose"]) #action{display:none}
+  body[data-view="cpu"] #log{order:1}
+  body[data-view="cpu"] #mapWrap{order:2}
+  body[data-view="cpu"] #action{display:none}
+  body[data-view="map"] #log,body[data-view="cpu"] #log{display:grid;grid-template-columns:40% 1fr;grid-template-rows:auto auto;gap:4px 10px;align-items:start}
+  body[data-view="map"] #log .scene,body[data-view="cpu"] #log .scene{grid-row:1/3}
+  body[data-view="map"] #log .scene-text,body[data-view="cpu"] #log .scene-text{font-size:14px;align-self:center}
+  body[data-view="map"] #log .loglabel,body[data-view="map"] #log ol,body[data-view="cpu"] #log .loglabel,body[data-view="cpu"] #log ol{display:none}
 }
-@media (prefers-reduced-motion:reduce){.tok{transition:none}.goalring{animation:none}#msg .mh.tap::after{animation:none}}
+@media (prefers-reduced-motion:reduce){.tok{transition:none}.goalring{animation:none}.scene-hint.tap::after,.roulette.hit{animation:none}}
 </style>
 
 </head>
 <body>
 <header>
-  <h1>関東甲信越 鉄道すごろく</h1>
+  <h1>大人の鉄道すごろく 東日本編</h1>
   <span class="when" id="when">1年目 4月</span>
   <span class="goal" id="goalChip">目的地 <b id="goalName">—</b></span>
   <span class="spacer"></span>
@@ -176,23 +233,38 @@ th{font-size:12px;color:var(--muted)}
     <button class="btn sm" id="saveBtn">セーブ</button>
     <button class="btn sm" id="editBtn">物件編集</button>
     <button class="btn sm" id="setBtn">設定・音</button>
-    <button class="btn sm" id="newBtn">新しいゲーム</button>
+    <button class="btn sm" id="howBtn">遊び方</button>
+    <button class="btn sm" id="newBtn">タイトルへ</button>
+    <button class="btn sm" id="menuBtn">メニュー</button>
   </div>
 </header>
+<div id="statusBar"></div>
 <div class="layout">
   <div id="mapWrap">
     <div class="zoom"><button id="zin" aria-label="拡大">＋</button><button id="zout" aria-label="縮小">－</button><button id="zme" aria-label="現在地へ">◎</button></div>
-    <svg id="map" viewBox="0 0 1060 1120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="関東甲信越の路線図"></svg>
+    <svg id="map" viewBox="0 0 1060 1120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="路線図"></svg>
   </div>
   <aside>
-    <section class="box"><p class="label">社長一覧</p><div id="players"></div></section>
+    <section class="box" id="playersBox"><p class="label">社長一覧</p><div id="players"></div></section>
     <section class="box" id="action"><p class="hint">読み込み中…</p></section>
-    <section class="box" id="log"><p class="label">できごと</p><ol></ol></section>
+    <section class="box" id="log" aria-live="polite"><div class="scene" id="scene"></div><p class="scene-text" id="sceneText"></p><p class="scene-hint" id="sceneHint"></p><p class="label loglabel">これまでの出来事</p><ol></ol></section>
   </aside>
+</div>
+<div id="title" hidden>
+  <div class="t-inner">
+    <div class="t-visual" id="tVisual"></div>
+    <div class="t-logo"><span>大人の</span>鉄道すごろく</div>
+    <p class="t-sub">東日本編</p>
+    <div class="t-btns">
+      <button class="btn primary big" id="tNew">はじめから</button>
+      <button class="btn big t-cont" id="tCont">つづきから<small id="tContInfo"></small></button>
+      <div class="t-row"><button class="btn" id="tLoad">セーブ</button><button class="btn" id="tHow">遊び方</button><button class="btn" id="tSet">設定</button></div>
+    </div>
+    <p class="t-note">ver 1.0　物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>
+  </div>
 </div>
 <div id="modal" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"><div id="modalBody"></div><div class="btns" id="modalBtns"></div></div></div>
 <div id="msgLayer" hidden></div>
-<div id="msg" hidden role="status" aria-live="polite"><p class="mt"></p><p class="mh"></p></div>
 <div id="toast" hidden></div>
 
 <script>
@@ -307,24 +379,32 @@ const EAST_EDGES=[
 ["大宮","東京"],["東京","横浜"],["東京","千葉"],["千葉","銚子"],["大宮","高崎"],["高崎","草津"],["高崎","軽井沢"],["軽井沢","長野"],["高崎","越後湯沢"],["越後湯沢","長岡"],["長岡","新潟"],["長岡","直江津"],
 ["新潟","佐渡",1],["直江津","長野"],["長野","松本"],["松本","甲府"],["甲府","八王子"],["八王子","東京"],["横浜","小田原"],["小田原","熱海"],["熱海","静岡"],["静岡","浜松"],["甲府","静岡"],
 ["直江津","糸魚川"],["糸魚川","富山"],["富山","金沢"],["金沢","福井"],["松本","糸魚川"],
-["大洗","苫小牧",2,[[141.5,36.45],[142.4,37.9],[142.8,39.5],[142.6,41.2],[142.0,42.3]]]
+["大洗","苫小牧",2,[[141.5,36.45],[142.4,37.9],[142.8,39.5],[142.6,41.2],[142.0,42.3]],{name:"大洗―苫小牧フェリー航路",sub:"（物件なし・赤マス多め）"}],
+["新潟","小樽",2,[[138.9,38.7],[139.3,39.9],[139.4,41.3],[139.7,42.5],[140.3,43.45]],{name:"新潟―小樽フェリー航路",sub:"（物件なし・冬は大しけ）",winter:1}]
 ];
-const EAST_PREFS=[["北海道",143.55,43.6],["東北",139.0,40.2],["関東",141.4,35.25],["甲信越",137.55,37.75],["北陸",136.55,37.25],["東海",137.2,35.3]];
+const EAST_PREFS=[["北海道",143.55,43.6],["東北",137.8,39.2],["関東",141.4,35.25],["甲信越",137.55,37.75],["北陸",136.55,37.25],["東海",137.2,35.3]];
 const LL=(lon,lat)=>[Math.round((lon-136)*185+60),Math.round((44-lat)*230+60)];
 const MAPS={
-  kanto:{name:"関東甲信越版",title:"関東甲信越 鉄道すごろく",w:1060,h:1120,stations:KANTO_ST,edges:KANTO_EDGES,prefs:KANTO_PREFS,prefSize:58,
+  kanto:{name:"関東甲信越編",title:"大人の鉄道すごろく 関東甲信越編",w:1060,h:1120,stations:KANTO_ST,edges:KANTO_EDGES,prefs:KANTO_PREFS,prefSize:58,
     shops:[["大宮","高崎"],["東京","千葉"],["諏訪","甲府"],["長岡","越後湯沢"]],minDest:14,snowY:600,desc:"38駅。目的地が近く、短時間で遊べます。"},
-  east:{name:"東日本版",title:"東日本 鉄道すごろく",w:1720,h:2300,
+  east:{name:"東日本編",title:"大人の鉄道すごろく 東日本編",w:1720,h:2300,
     stations:EAST_LL.map(([n,lo,la,lp])=>{const[x,y]=LL(lo,la);return[n,x,y,lp,EAST_PROPS[n]||KANTO_ST.find(s=>s[0]===n)[4]]}),
     edges:EAST_EDGES,prefs:EAST_PREFS.map(([n,lo,la])=>[n,...LL(lo,la)]),prefSize:96,
     shops:[["郡山","福島"],["盛岡","八戸"],["富山","金沢"],["札幌","旭川"],["大宮","高崎"],["秋田","酒田"]],minDest:22,snowY:LL(0,36.8)[1],
-    desc:"北海道から静岡・北陸までの62駅。青函トンネルと大洗―苫小牧フェリー航路があります。"}
+    desc:"北海道から静岡・北陸までの62駅。青函トンネルと、大洗―苫小牧・新潟―小樽の2つのフェリー航路があります。"}
 };
 const ALL_ST=[...KANTO_ST,...MAPS.east.stations.filter(s=>!KANTO_ST.some(k=>k[0]===s[0]))];
 const COLORS=["#D8392F","#2B62D6","#159A5C","#E0860F"];
 const DEFAULT_SEATS=[["あなた","human"],["あさま社長","cpu"],["とき社長","cpu"],["なすの社長","none"]];
 const MONTHS=["4月","5月","6月","7月","8月","9月","10月","11月","12月","1月","2月","3月"];
-const CARDS={kyuko:{n:"急行カード",d:"サイコロ2個で進む"},tokkyu:{n:"特急カード",d:"サイコロ3個で進む"},buttobi:{n:"ぶっとびカード",d:"どこかの駅へワープ"},rinji:{n:"臨時収入カード",d:"すぐにお金が入る"},oharai:{n:"お祓いカード",d:"取り憑いた妖怪を追い払う"}};
+const CARDS={
+  kyuko:{n:"急行カード",d:"サイコロ2個で進む",t:"move"},tokkyu:{n:"特急カード",d:"サイコロ3個で進む",t:"move"},buttobi:{n:"ぶっとびカード",d:"どこかの駅へワープ",t:"move"},
+  rinji:{n:"臨時収入カード",d:"すぐにお金が入る",t:"money"},oharai:{n:"お祓いカード",d:"取り憑いた妖怪を追い払う",t:"yokai",yokai:1},
+  ashidome:{n:"足止めカード",d:"相手1人を1回休みにする",t:"attack"},donko:{n:"鈍行押し付けカード",d:"相手のサイコロを2回分、半分にする",t:"attack"},
+  goudatsu:{n:"カード強奪カード",d:"相手のカードを1枚奪う",t:"attack"},buttobashi:{n:"ぶっとばしカード",d:"相手をどこかの駅へ飛ばす",t:"attack"},
+  nasuri:{n:"妖怪なすりつけカード",d:"取り憑いた妖怪を相手に移す",t:"attack",yokai:1},omamori:{n:"お守りカード",d:"邪魔カードを1回防ぐ",t:"guard"}};
+const BAD={slow:{n:"鈍行カード"},rest:{n:"運休カード"},fine:{n:"罰金カード"},lose:{n:"紛失カード"}};
+const SEA_MSG=["船酔いで寝込み、商談を逃した","燃料費が値上がりした","荷物の積み替え費用がかかった","欠航で足止めされ、宿代がかさんだ"];
 const YOKAI=[{n:"たかり狸",s:"狸"},{n:"大だぬき",s:"大"}];
 const PLUS_MSG=["沿線のお祭りで臨時収入","観光客が増えて売上アップ","株の配当が入った","駅前の宝くじが当たった","ふるさと納税の返礼品が好評"];
 const MINUS_MSG=["車両の修理費","台風で線路が被害","接待費がかさんだ","落とし物をした","駅舎の改装費"];
@@ -538,14 +618,14 @@ const DEFAULT_PROPS=Object.fromEntries(ALL_ST.map(s=>[s[0],s[4]]));
 let MAP=null,CUR_MAP=null,STATIONS=[],N={},ADJ={},RAILS=[],distCache={};
 function addNode(id,o){N[id]=o;ADJ[id]=[]}
 function link(a,b){ADJ[a].push(b);ADJ[b].push(a)}
-function addChain(a,b,poly,k,ei,kind,srand){
+function addChain(a,b,poly,k,ei,kind,srand,meta){
   const seg=[];let tot=0;for(let i=1;i<poly.length;i++){const l=Math.hypot(poly[i][0]-poly[i-1][0],poly[i][1]-poly[i-1][1]);seg.push(l);tot+=l}
   const at=t=>{let d=t*tot;for(let i=0;i<seg.length;i++){if(d<=seg[i]){const f=seg[i]?d/seg[i]:0;return[poly[i][0]+(poly[i+1][0]-poly[i][0])*f,poly[i][1]+(poly[i+1][1]-poly[i][1])*f]}d-=seg[i]}return poly.at(-1)};
   let prev=a;const pts=[a];
   for(let i=1;i<=k;i++){const r=srand(),id="m"+ei+"_"+i,[x,y]=at(i/(k+1));
     const type=kind===1?(r<.5?"plus":"card"):kind===2?(r<.6?"minus":r<.8?"card":"plus"):(r<.5?"plus":r<.78?"minus":"card");
-    addNode(id,{id,type,x,y});link(prev,id);prev=id;pts.push(id)}
-  link(prev,b);pts.push(b);RAILS.push({pts,kind});
+    addNode(id,{id,type,x,y,sea:kind===2?(meta&&meta.winter?"js":"pac"):null});link(prev,id);prev=id;pts.push(id)}
+  link(prev,b);pts.push(b);RAILS.push({pts,kind,meta});
 }
 function buildGraph(id){CUR_MAP=id;MAP=MAPS[id];STATIONS=MAP.stations;VW=MAP.w;VH=MAP.h;
   N={};ADJ={};RAILS=[];distCache={};let seed=20261010;const srand=()=>(seed=(seed*16807)%2147483647)/2147483647;
@@ -554,11 +634,12 @@ function buildGraph(id){CUR_MAP=id;MAP=MAPS[id];STATIONS=MAP.stations;VW=MAP.w;V
   MAP.edges.forEach((e,ei)=>{const[a,b,kind=0]=e;if(kind===2){later.push([e,ei]);return}
     const A=N[a],B=N[b],d=Math.hypot(A.x-B.x,A.y-B.y);addChain(a,b,[[A.x,A.y],[B.x,B.y]],Math.max(1,Math.round(d/66)),ei,kind,srand)});
   // long ferry: about 75% of the land route's squares, mostly red
-  later.forEach(([[a,b,kind,wp],ei])=>{const land=bfs(a)[b]||20;const pts=[[N[a].x,N[a].y],...(wp||[]).map(([lo,la])=>LL(lo,la)),[N[b].x,N[b].y]];
-    addChain(a,b,pts,Math.max(4,Math.round(land*.75)),ei,kind,srand)});
+  const lands=later.map(([[a,b]])=>bfs(a)[b]||20);
+  later.forEach(([[a,b,kind,wp,meta],ei],li)=>{const pts=[[N[a].x,N[a].y],...(wp||[]).map(([lo,la])=>LL(lo,la)),[N[b].x,N[b].y]];
+    addChain(a,b,pts,Math.max(4,Math.round(lands[li]*.75)),ei,kind,srand,meta)});
   MAP.shops.forEach(([a,b])=>{const r=RAILS.find(r=>(r.pts[0]===a&&r.pts.at(-1)===b)||(r.pts[0]===b&&r.pts.at(-1)===a));if(r)N[r.pts[Math.floor(r.pts.length/2)]].type="shop"});
 }
-function useMap(id){id=MAPS[id]?id:"kanto";if(CUR_MAP!==id){buildGraph(id);initMap();zoom=Math.max(1,Math.min(6,VW*.72/baseW()));applyZoom()}$("h1").textContent=MAP.title}
+function useMap(id){id=MAPS[id]?id:"east";if(CUR_MAP!==id){buildGraph(id);initMap();scale=innerWidth<=820?.62:.72;applyZoom()}$("h1").textContent=MAP.title}
 function bfs(src){const d={[src]:0},q=[src];while(q.length){const u=q.shift();for(const v of ADJ[u])if(d[v]==null){d[v]=d[u]+1;q.push(v)}}return d}
 const distTo=id=>distCache[id]||(distCache[id]=bfs(id));
 function reach(start,steps,dest,exact){
@@ -584,7 +665,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 function yen(m){const neg=m<0;m=Math.abs(Math.round(m));const oku=Math.floor(m/10000),man=m%10000;let s="";if(oku)s+=oku.toLocaleString()+"億";if(man||!oku)s+=man.toLocaleString()+"万";return(neg?"−":"")+s+"円"}
 const sqName=id=>{const n=N[id];return n.type==="st"?n.id+"駅":{plus:"青マス",minus:"赤マス",card:"カードマス",shop:"カード売り場"}[n.type]};
 const yf=()=>1+.35*(S.year-1);
-let S=null,CAND=null,zoom=1,tokEls=[],CUSTOM={};
+let S=null,CAND=null,scale=.72,tokEls=[],CUSTOM={},curScene=null;
 const cp=()=>S.players[S.cur];
 const P=st=>S.props[st];
 const master=st=>CUSTOM[st]||DEFAULT_PROPS[st];
@@ -596,13 +677,13 @@ try{Object.assign(GP,JSON.parse(localStorage.getItem("kks-game"))||{})}catch(e){
 const saveGP=()=>{try{localStorage.setItem("kks-game",JSON.stringify(GP))}catch(e){}};
 const SPEEDS={tap:{n:"タップで進む",k:1},slow:{n:"ゆっくり",k:1.6,base:1500,per:110},normal:{n:"ふつう",k:1,base:1000,per:65},fast:{n:"はやい",k:.6,base:550,per:32}};
 const wait=ms=>sleep(ms*(SPEEDS[GP.speed]||SPEEDS.normal).k);
-function say(text){return new Promise(res=>{const box=$("#msg"),layer=$("#msgLayer"),h=box.querySelector(".mh");
-  box.querySelector(".mt").textContent=text;box.hidden=false;let t=null;
-  const done=()=>{clearTimeout(t);box.hidden=true;layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",key);res()};
-  const key=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();done()}};
-  addEventListener("keydown",key);box.onclick=done;
-  if(GP.speed==="tap"){h.textContent="タップで次へ";h.className="mh tap";layer.hidden=false;layer.onclick=done}
-  else{const sp=SPEEDS[GP.speed]||SPEEDS.normal;h.textContent="タップで早送り";h.className="mh";t=setTimeout(done,sp.base+sp.per*text.length)}})}
+function setScene(key,text){if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}if(text!=null)$("#sceneText").textContent=text}
+function say(text,key){return new Promise(res=>{setScene(key||curScene||"move",text);const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
+  const done=()=>{clearTimeout(t);box.classList.remove("active");h.textContent="";h.className="scene-hint";layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",kd);res()};
+  const kd=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();done()}};
+  addEventListener("keydown",kd);box.onclick=done;
+  if(GP.speed==="tap"){h.textContent="タップで次へ";h.className="scene-hint tap";layer.hidden=false;layer.onclick=done}
+  else{const sp=SPEEDS[GP.speed]||SPEEDS.normal;h.textContent="タップで早送り";t=setTimeout(done,sp.base+sp.per*text.length)}})}
 
 /* ---------- storage: browser + (signed-in) account ---------- */
 const Store={cloud:null,q:Promise.resolve(),
@@ -711,7 +792,7 @@ function initMap(){
   const gP=el("g",{},svg);MAP.prefs.forEach(([n,x,y])=>el("text",{x,y,class:"pref","text-anchor":"middle","font-size":MAP.prefSize},gP,n));
   const gR=el("g",{},svg);
   RAILS.forEach(r=>{const d="M"+r.pts.map(id=>N[id].x+" "+N[id].y).join(" L");el("path",{d,class:["rail","ferry","ferry long","tunnel"][r.kind]},gR);
-    if(r.kind>=2){const m=N[r.pts[Math.floor(r.pts.length/2)]];r.kind===2?(el("text",{x:m.x-22,y:m.y-8,class:"note","text-anchor":"end"},gR,"大洗―苫小牧フェリー航路"),el("text",{x:m.x-22,y:m.y+16,class:"note","text-anchor":"end"},gR,"（物件なし・赤マス多め）")):el("text",{x:m.x+18,y:m.y-18,class:"note"},gR,"青函トンネル")}});
+    if(r.kind>=2){const m=N[r.pts[Math.floor(r.pts.length/2)]];if(r.kind===2&&r.meta){el("text",{x:m.x-22,y:m.y-8,class:"note","text-anchor":"end"},gR,r.meta.name);el("text",{x:m.x-22,y:m.y+16,class:"note","text-anchor":"end"},gR,r.meta.sub)}else if(r.kind===3)el("text",{x:m.x+18,y:m.y-18,class:"note"},gR,"青函トンネル")}});
   const gS=el("g",{},svg);
   Object.values(N).forEach(n=>{if(n.type==="shop")el("rect",{x:n.x-11,y:n.y-11,width:22,height:22,rx:3,transform:`rotate(45 ${n.x} ${n.y})`,class:"sqo sq-shop"},gS);else if(n.type!=="st")el("circle",{cx:n.x,cy:n.y,r:11,class:"sqo sq-"+n.type},gS)});
   gDyn=el("g",{},svg);
@@ -741,33 +822,123 @@ function placeTokens(){if(!S)return;const pts=[];S.players.forEach((p,i)=>{const
   if(yokEl){const y=S.yokai,on=S.rules&&S.rules.yokai&&y&&y.owner!=null;yokEl.style.display=on?"":"none";
     if(on){yokEl.lastChild.textContent=YOKAI[y.form].s;yokEl.style.transform=`translate(${pts[y.owner][0]+15}px,${pts[y.owner][1]-15}px)`;gTok.appendChild(yokEl)}}}
 function baseW(){const w=$("#mapWrap");return Math.min(w.clientWidth,w.clientHeight*VW/VH)}
-function applyZoom(){const svg=$("#map"),W=baseW()*zoom;svg.style.width=W+"px";svg.style.height=W*VH/VW+"px"}
+function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.width=W+"px";svg.style.height=W*VH/VW+"px"}
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
+
+/* ---------- scene illustrations (placeholders; img/<key>.png or .webp on the site replaces them) ---------- */
+const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",win:"ゲーム終了（優勝）",title:"タイトル画面"};
+const SCENE_IMG={};
+let SVGID=0;
+const BG={sky:["#8CCDF0","#E6F5FD","#7CC26B"],sea:["#9BD3F2","#E3F3FC","#2F7FB8"],night:["#1B2440","#3B3F70","#283055"],snow:["#C9DDEA","#F2F8FB","#FFFFFF"],
+  sunset:["#F6A15B","#FBD38D","#5E8A5A"],station:["#E9E2D3","#F6F1E6","#B9AD98"],purple:["#3E2A5C","#7A55A6","#2E2046"],gold:["#F3B33D","#FBE29A","#E09A1F"],
+  red:["#E9786C","#F8D0C8","#C9584C"],quiz:["#BFE0FF","#EEF7FF","#8BB8E6"]};
+function bgSVG(t,id){const[a,b,g]=BG[t];let s=`<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="320" height="180" fill="url(#g${id})"/>`;
+  if(t==="sea")s+=`<rect y="118" width="320" height="62" fill="${g}"/><path d="M0 130 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/><path d="M0 155 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#fff" stroke-width="3" fill="none" opacity=".4"/>`;
+  else if(t==="night")s+=[[40,30],[90,55],[150,25],[230,40],[300,70],[200,15],[20,80],[120,90]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2" fill="#fff"/>`).join("")+`<circle cx="270" cy="35" r="14" fill="#F8E7A1"/><rect y="152" width="320" height="28" fill="${g}"/>`;
+  else if(t==="gold")s+=Array.from({length:12},(_,i)=>{const a1=i*Math.PI/6,a2=a1+.2;return `<path d="M160 90 L${(160+260*Math.cos(a1)).toFixed(0)} ${(90+260*Math.sin(a1)).toFixed(0)} L${(160+260*Math.cos(a2)).toFixed(0)} ${(90+260*Math.sin(a2)).toFixed(0)}Z" fill="#fff" opacity=".2"/>`}).join("");
+  else if(t==="station")s+=`<rect y="146" width="320" height="34" fill="${g}"/><rect y="146" width="320" height="5" fill="#F2C443"/><rect x="24" y="18" width="70" height="22" rx="4" fill="#0C8565"/><rect x="34" y="26" width="50" height="6" fill="#fff"/>`;
+  else if(t==="purple")s+=`<ellipse cx="60" cy="160" rx="120" ry="30" fill="#fff" opacity=".08"/><ellipse cx="260" cy="150" rx="120" ry="26" fill="#fff" opacity=".08"/><rect y="160" width="320" height="20" fill="${g}"/>`;
+  else s+=`<path d="M0 150 Q80 122 160 146 T320 140 V180 H0Z" fill="${g}"/>`;
+  return s}
+const IC={
+  rail:()=>`<rect x="0" y="151" width="320" height="5" fill="#6B5644"/>`,
+  train:(x=70,y=82,s=1)=>`<g transform="translate(${x},${y}) scale(${s})"><rect x="0" y="0" width="180" height="58" rx="18" fill="#F7F7F2" stroke="#2B3540" stroke-width="3"/><rect x="0" y="38" width="180" height="9" fill="#0C8565"/>${[14,50,86,122].map(i=>`<rect x="${i}" y="12" width="26" height="18" rx="4" fill="#2B3540"/>`).join("")}<rect x="152" y="10" width="20" height="24" rx="5" fill="#2B3540"/><circle cx="36" cy="64" r="9" fill="#2B3540"/><circle cx="144" cy="64" r="9" fill="#2B3540"/></g>`,
+  die:(cx,cy,rot,n)=>{const P={1:[[0,0]],3:[[-16,-16],[0,0],[16,16]],5:[[-16,-16],[16,-16],[0,0],[-16,16],[16,16]],6:[[-16,-18],[16,-18],[-16,0],[16,0],[-16,18],[16,18]]};return `<g transform="translate(${cx},${cy}) rotate(${rot})"><rect x="-32" y="-32" width="64" height="64" rx="12" fill="#fff" stroke="#2B3540" stroke-width="3"/>${P[n].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6" fill="${n===1?"#DE3F34":"#2B3540"}"/>`).join("")}</g>`},
+  coins:(cx,cy,s=1)=>`<g transform="translate(${cx},${cy}) scale(${s})">${[0,1,2,3].map(i=>`<ellipse cx="0" cy="${30-i*13}" rx="36" ry="13" fill="#F2C443" stroke="#9A6B00" stroke-width="3"/>`).join("")}<text x="0" y="-8" text-anchor="middle" font-size="18" font-weight="700" fill="#9A6B00">¥</text></g>`,
+  arrow:(cx,cy,up,c)=>up?`<path d="M${cx} ${cy-38} l30 34 h-17 v40 h-26 v-40 h-17z" fill="${c}" stroke="#fff" stroke-width="3"/>`:`<path d="M${cx} ${cy+38} l30 -34 h-17 v-40 h-26 v40 h-17z" fill="${c}" stroke="#fff" stroke-width="3"/>`,
+  card:(cx,cy,rot,fill,mark)=>`<g transform="translate(${cx},${cy}) rotate(${rot})"><rect x="-30" y="-42" width="60" height="84" rx="8" fill="${fill}" stroke="#2B3540" stroke-width="3"/><rect x="-22" y="-34" width="44" height="68" rx="5" fill="none" stroke="#fff" stroke-width="2" opacity=".6"/><text x="0" y="12" text-anchor="middle" font-size="32" font-weight="700" fill="#fff">${mark}</text></g>`,
+  bolt:(x,y,s=1)=>`<g transform="translate(${x},${y}) scale(${s})"><path d="M22 0 L0 50 H20 L8 96 L52 36 H30 L44 0Z" fill="#FFD43B" stroke="#7A5200" stroke-width="3"/></g>`,
+  ship:(x,y)=>`<g transform="translate(${x},${y})"><rect x="92" y="0" width="16" height="22" fill="#DE3F34" stroke="#2B3540" stroke-width="3"/><rect x="28" y="20" width="96" height="26" rx="4" fill="#fff" stroke="#2B3540" stroke-width="3"/>${[38,58,78,98].map(i=>`<circle cx="${i}" cy="33" r="5" fill="#2B62D6"/>`).join("")}<path d="M0 46 H156 L134 80 H20Z" fill="#F7F7F2" stroke="#2B3540" stroke-width="3"/><rect x="10" y="58" width="134" height="7" fill="#2B62D6"/></g>`,
+  stall:(cx,cy)=>`<g transform="translate(${cx-90},${cy-62})"><rect x="12" y="42" width="156" height="78" fill="#B57A4A" stroke="#2B3540" stroke-width="3"/>${[0,1,2,3,4,5].map(i=>`<path d="M${i*30} 12 h30 l-3 30 h-24z" fill="${i%2?"#fff":"#DE3F34"}" stroke="#2B3540" stroke-width="2"/>`).join("")}<rect x="12" y="92" width="156" height="12" fill="#8A5A33"/>${[[34,"#F2C443"],[72,"#5A93FF"],[110,"#E05A9A"],[146,"#2CC696"]].map(([x,c])=>`<rect x="${x-14}" y="54" width="28" height="38" rx="4" fill="${c}" stroke="#2B3540" stroke-width="2"/>`).join("")}</g>`,
+  houses:(x,y)=>`<g transform="translate(${x},${y})">${[[0,40,"#F7E7C6","#DE3F34"],[60,20,"#E6F1F7","#2B62D6"],[120,46,"#F3E3D3","#0C8565"]].map(([dx,h,w,r])=>`<rect x="${dx}" y="${80-h}" width="52" height="${h+0}" fill="${w}" stroke="#2B3540" stroke-width="3"/><path d="M${dx-6} ${80-h} L${dx+26} ${80-h-26} L${dx+58} ${80-h}Z" fill="${r}" stroke="#2B3540" stroke-width="3"/><rect x="${dx+18}" y="${62}" width="16" height="18" fill="#2B3540"/>`).join("")}</g>`,
+  flag:(x,y)=>`<g transform="translate(${x},${y})"><rect x="0" y="0" width="6" height="110" fill="#2B3540"/><path d="M6 4 L62 18 L6 34Z" fill="#DE3F34" stroke="#2B3540" stroke-width="2"/>${[[-30,10,"#2B62D6"],[40,50,"#F2C443"],[-50,60,"#0C8565"],[70,0,"#E05A9A"],[20,80,"#F2C443"]].map(([a,b,c])=>`<rect x="${a}" y="${b}" width="8" height="12" fill="${c}" transform="rotate(25 ${a} ${b})"/>`).join("")}</g>`,
+  wheel:(cx,cy)=>`<g transform="translate(${cx},${cy})">${Array.from({length:8},(_,i)=>{const a1=i*Math.PI/4,a2=a1+Math.PI/4,r=58;return `<path d="M0 0 L${(r*Math.cos(a1)).toFixed(1)} ${(r*Math.sin(a1)).toFixed(1)} A${r} ${r} 0 0 1 ${(r*Math.cos(a2)).toFixed(1)} ${(r*Math.sin(a2)).toFixed(1)}Z" fill="${["#DE3F34","#F7F7F2","#2B62D6","#F2C443"][i%4]}" stroke="#2B3540" stroke-width="2"/>`}).join("")}<circle r="10" fill="#2B3540"/><path d="M-10 -70 H10 L0 -52Z" fill="#2B3540"/></g>`,
+  q:(cx,cy)=>`<circle cx="${cx}" cy="${cy}" r="52" fill="#2B62D6" stroke="#fff" stroke-width="5"/><text x="${cx}" y="${cy+26}" text-anchor="middle" font-size="76" font-weight="700" fill="#fff">?</text>`,
+  ok:(cx,cy)=>`<circle cx="${cx}" cy="${cy}" r="48" fill="none" stroke="#0C8565" stroke-width="16"/>`,
+  tanuki:(cx,cy,s=1)=>`<g transform="translate(${cx},${cy}) scale(${s})"><ellipse cx="0" cy="42" rx="48" ry="36" fill="#9A6B43" stroke="#2E1E12" stroke-width="3"/><ellipse cx="0" cy="50" rx="27" ry="21" fill="#E9D3B0"/><circle cx="-30" cy="-44" r="13" fill="#7A5232" stroke="#2E1E12" stroke-width="3"/><circle cx="30" cy="-44" r="13" fill="#7A5232" stroke="#2E1E12" stroke-width="3"/><circle cx="0" cy="-10" r="42" fill="#9A6B43" stroke="#2E1E12" stroke-width="3"/><path d="M-36 -14 Q-20 -32 -4 -12 Q-18 8 -36 -4Z" fill="#3A2A20"/><path d="M36 -14 Q20 -32 4 -12 Q18 8 36 -4Z" fill="#3A2A20"/><circle cx="-17" cy="-12" r="5" fill="#fff"/><circle cx="17" cy="-12" r="5" fill="#fff"/><ellipse cx="0" cy="10" rx="16" ry="12" fill="#E9D3B0"/><circle cx="0" cy="5" r="5" fill="#2B2018"/><path d="M-8 -50 Q0 -80 20 -72 Q12 -54 -8 -50Z" fill="#4CAF50" stroke="#1E5E22" stroke-width="2"/></g>`,
+  swap:(cx,cy)=>`<g transform="translate(${cx},${cy})" fill="none" stroke="#F2C443" stroke-width="9" stroke-linecap="round"><path d="M-40 -14 Q0 -50 40 -14"/><path d="M40 14 Q0 50 -40 14"/><path d="M28 -30 L42 -12 L20 -8" stroke-linejoin="round"/><path d="M-28 30 L-42 12 L-20 8" stroke-linejoin="round"/></g>`,
+  omamori:(cx,cy)=>`<g transform="translate(${cx},${cy})"><path d="M-12 -40 Q0 -62 12 -40" stroke="#F2C443" stroke-width="5" fill="none"/><rect x="-32" y="-42" width="64" height="84" rx="10" fill="#DE3F34" stroke="#7A1A14" stroke-width="3"/><rect x="-19" y="-26" width="38" height="50" rx="4" fill="#F7E7C6"/><text x="0" y="8" text-anchor="middle" font-size="22" font-weight="700" fill="#7A1A14">守</text></g>`,
+  sparkle:(x,y,s=1)=>`<path transform="translate(${x},${y}) scale(${s})" d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4Z" fill="#FFF7C2" stroke="#F2B134" stroke-width="2"/>`,
+  swirl:(cx,cy)=>`<path transform="translate(${cx},${cy})" d="M0 0 m0 -6 a6 6 0 1 1 -6 6 a14 14 0 1 1 14 14 a24 24 0 1 1 -24 -24 a36 36 0 1 1 36 36 a50 50 0 1 1 -50 -50" fill="none" stroke="#B9A6FF" stroke-width="7" stroke-linecap="round"/>`,
+  bars:(cx,cy)=>`<g transform="translate(${cx-80},${cy-60})"><rect x="0" y="118" width="160" height="5" fill="#2B3540"/>${[[10,40,"#2B62D6"],[50,62,"#0C8565"],[90,86,"#F7F7F2"],[130,110,"#DE3F34"]].map(([x,h,c])=>`<rect x="${x}" y="${118-h}" width="28" height="${h}" fill="${c}" stroke="#2B3540" stroke-width="3"/>`).join("")}</g>`,
+  trophy:(cx,cy)=>`<g transform="translate(${cx},${cy})"><path d="M-40 -50 H40 V-20 Q40 20 0 26 Q-40 20 -40 -20Z" fill="#F2C443" stroke="#7A5200" stroke-width="4"/><path d="M-40 -40 Q-66 -40 -60 -16 Q-54 4 -36 0" fill="none" stroke="#7A5200" stroke-width="6"/><path d="M40 -40 Q66 -40 60 -16 Q54 4 36 0" fill="none" stroke="#7A5200" stroke-width="6"/><rect x="-8" y="26" width="16" height="18" fill="#F2C443" stroke="#7A5200" stroke-width="3"/><rect x="-32" y="44" width="64" height="14" rx="3" fill="#8A5A33" stroke="#4A2E18" stroke-width="3"/><text x="0" y="-8" text-anchor="middle" font-size="26" font-weight="700" fill="#7A5200">1</text></g>`,
+  flakes:()=>[[40,30],[110,55],[200,25],[270,60],[150,15],[300,20],[70,95]].map(([x,y])=>`<g transform="translate(${x},${y})" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M-8 0H8M0 -8V8M-6 -6L6 6M-6 6L6 -6"/></g>`).join(""),
+  zzz:(x,y)=>`<text x="${x}" y="${y}" font-size="30" font-weight="700" fill="#F8E7A1">Z</text><text x="${x+22}" y="${y-18}" font-size="22" font-weight="700" fill="#F8E7A1">z</text><text x="${x+38}" y="${y-32}" font-size="16" font-weight="700" fill="#F8E7A1">z</text>`,
+  dots:(x,y)=>`<g transform="translate(${x},${y})"><ellipse cx="0" cy="0" rx="40" ry="24" fill="#fff" stroke="#2B3540" stroke-width="3"/><circle cx="-26" cy="34" r="6" fill="#fff" stroke="#2B3540" stroke-width="3"/>${[-16,0,16].map(i=>`<circle cx="${i}" cy="0" r="5" fill="#2B3540"/>`).join("")}</g>`
+};
+const SCENES={
+  roll:["sky",()=>IC.die(125,92,-12,5)+IC.die(198,98,10,3)],
+  move:["sky",()=>IC.rail()+IC.train(70,82)],
+  cpu:["station",()=>IC.rail()+IC.train(50,82)+IC.dots(262,46)],
+  plus:["sky",()=>IC.coins(125,104)+IC.arrow(220,92,true,"#0C8565")],
+  minus:["red",()=>IC.coins(125,104)+IC.arrow(220,92,false,"#B3261E")],
+  snow:["snow",()=>IC.rail()+IC.train(70,82)+IC.flakes()],
+  sea:["sea",()=>IC.ship(70,48)+IC.arrow(268,72,false,"#B3261E")],
+  card:["sky",()=>IC.card(132,90,-10,"#E5AC12","★")+IC.card(190,92,8,"#2B62D6","★")],
+  bad:["red",()=>IC.card(150,92,-6,"#3A3A46","×")+IC.bolt(186,26,.8)],
+  shop:["station",()=>IC.stall(160,96)],
+  buy:["sky",()=>IC.houses(78,60)],
+  roulette:["sunset",()=>IC.wheel(160,96)],
+  arrive:["sunset",()=>IC.rail()+IC.train(20,82,.85)+IC.flag(236,30)],
+  quiz:["quiz",()=>IC.q(160,88)],
+  correct:["quiz",()=>IC.ok(160,88)+IC.sparkle(90,40)+IC.sparkle(236,128)],
+  yokai:["purple",()=>IC.tanuki(160,96,1)],
+  mischief:["purple",()=>IC.tanuki(115,96,.85)+IC.coins(225,112,.75)+IC.arrow(285,88,false,"#F28B82")],
+  bigyokai:["purple",()=>IC.tanuki(160,100,1.3)],
+  pass:["purple",()=>IC.tanuki(105,96,.75)+IC.swap(225,90)],
+  oharai:["sky",()=>IC.omamori(160,94)+IC.sparkle(100,50)+IC.sparkle(222,44,1.3)+IC.sparkle(236,120,.8)],
+  attack:["red",()=>IC.bolt(108,30)+IC.card(205,95,10,"#2B62D6","!")],
+  guard:["sky",()=>IC.omamori(140,94)+IC.bolt(212,20,.6)+IC.sparkle(200,120)],
+  warp:["night",()=>IC.swirl(160,90)],
+  rest:["night",()=>IC.rail()+IC.train(40,82)+IC.zzz(248,62)],
+  settle:["gold",()=>IC.bars(160,96)],
+  win:["gold",()=>IC.trophy(160,90)],
+  title:["sunset",()=>`<path d="M0 118 L55 72 L100 104 L165 46 L232 108 L282 78 L320 98 V180 H0Z" fill="#7B5E8C" opacity=".55"/><path d="M152 58 L165 46 L178 58 L172 62 L165 56 L158 62Z" fill="#fff"/><rect y="132" width="320" height="48" fill="#2F7FB8"/><path d="M0 142 q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#fff" stroke-width="2" fill="none" opacity=".5"/><rect x="0" y="120" width="320" height="6" fill="#4A3A2E"/>${[20,70,120,170,220,270].map(x=>`<rect x="${x}" y="126" width="6" height="18" fill="#4A3A2E"/>`).join("")}`+IC.train(96,62,.72)]
+};
+function sceneSVG(key){const[bg,fn]=SCENES[key]||SCENES.move;const id=++SVGID;return `<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${SCENE_KEYS[key]||""}" preserveAspectRatio="xMidYMid slice">${bgSVG(bg,id)}${fn()}</svg>`}
+function artHTML(key){return SCENE_IMG[key]?`<img src="${SCENE_IMG[key]}" alt="${SCENE_KEYS[key]||""}">`:sceneSVG(key)}
+const sceneHTML=key=>`<div class="scene-pic">${artHTML(key)}</div>`;
+// on the published site, pick up img/<key>.webp or .png automatically
+function probeImages(){if(!/github\.io$/.test(location.hostname))return;
+  Object.keys(SCENE_KEYS).forEach(k=>{const tryUrl=(ext,next)=>{const im=new Image();im.onload=()=>{SCENE_IMG[k]=im.src;if(k==="title")$("#tVisual").innerHTML=artHTML("title");if(curScene===k)$("#scene").innerHTML=artHTML(k)};im.onerror=next||(()=>{});im.src=`img/${k}.${ext}`};tryUrl("webp",()=>tryUrl("png"))})}
 
 /* ---------- side panel ---------- */
 const pcol=i=>COLORS[S.players[i].color??i];
+function setView(){const b=document.body;let v="title";
+  if(S&&$("#title").hidden){const p=cp();v=S.phase==="over"?"roll":p.cpu?"cpu":S.phase==="roll"?"roll":"map"}
+  const prev=b.dataset.view;b.dataset.view=v;b.dataset.phase=S?S.phase:"";
+  if(prev!==v&&(v==="map"||v==="cpu")){applyZoom();requestAnimationFrame(()=>S&&focus(cp().pos,false))}}
+function statusTags(p){const t=[];if(p.slow>0)t.push(`<span class="tag bad">鈍行 残り${p.slow}回</span>`);if(p.rest>0)t.push(`<span class="tag bad">運休</span>`);
+  if(S.rules.yokai&&S.yokai.owner===p.idx)t.push(`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`);if(p.cards.includes("omamori"))t.push(`<span class="tag">お守り</span>`);return t.join("")}
 function render(){if(!S)return;
   $("#when").textContent=`${S.year}年目 ${MONTHS[S.month]}　(全${S.years}年)`;
   $("#goalName").textContent=S.dest;
-  renderPlayers();renderAction();renderLog();renderDyn();placeTokens();
+  const p=cp(),d=distTo(S.dest)[p.pos];
+  $("#statusBar").innerHTML=`<span class="dot" style="background:${pcol(S.cur)}"></span><b>${esc(p.name)}</b><span class="sb-money ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sb-dist">${esc(S.dest)}まで ${d}マス</span>${statusTags(p)}`;
+  renderPlayers();renderAction();renderLog();renderDyn();placeTokens();setView();
 }
 function assets(i){let v=0;for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)v+=P(s)[k][1]});return v}
 function lastPlace(){if(!S.assist)return -1;const t=S.players.map((p,i)=>p.money+assets(i)),mn=Math.min(...t);return t.filter(x=>x===mn).length===1?t.indexOf(mn):-1}
-function renderPlayers(){const d=distTo(S.dest),lp=lastPlace();
-  $("#players").innerHTML=S.players.map((p,i)=>{const cnt=Object.values(S.owners).flat().filter(o=>o===i).length;
-    return `<div class="pl ${i===S.cur?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><span class="nm">${esc(p.name)}<small>${p.cpu?"CPU":"人"}</small>${i===lp?'<span class="tag">追い上げ中</span>':""}${S.rules.yokai&&S.yokai.owner===i?`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`:""}</span><span class="mo ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sub">${sqName(p.pos)}・目的地まで${d[p.pos]}マス・物件${cnt}件・カード${p.cards.length}枚</span></div>`}).join("")}
+function playersHTML(){const d=distTo(S.dest),lp=lastPlace();
+  return S.players.map((p,i)=>{const cnt=Object.values(S.owners).flat().filter(o=>o===i).length;
+    return `<div class="pl ${i===S.cur?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><span class="nm">${esc(p.name)}<small>${p.cpu?"CPU":"人"}</small>${i===lp?'<span class="tag">追い上げ中</span>':""}${statusTags(p)}</span><span class="mo ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sub">${sqName(p.pos)}・目的地まで${d[p.pos]}マス・物件${cnt}件・カード${p.cards.length}枚</span></div>`}).join("")}
+function renderPlayers(){$("#players").innerHTML=playersHTML()}
 function diceHTML(v){return `<div class="dice" id="dice">${(v||[]).map(x=>`<span class="die">${x}</span>`).join("")}</div>`}
+function cardDisabled(c){const p=cp();return (S.dice>1&&(c==="kyuko"||c==="tokkyu"))||((c==="oharai"||c==="nasuri")&&!possessed())||c==="omamori"}
 function renderAction(){const a=$("#action"),p=cp();const d=distTo(S.dest)[p.pos];
-  if(S.phase==="over"){a.innerHTML=`<p class="label">ゲーム終了</p><button class="btn primary big" data-act="new">もう一度あそぶ</button>`;return}
+  if(S.phase==="over"){a.innerHTML=`<p class="label">ゲーム終了</p><button class="btn primary big" data-act="new">もう一度あそぶ</button><button class="btn" data-act="title" style="width:100%;margin-top:8px">タイトルへ</button>`;return}
   if(S.phase==="roll"&&!p.cpu){
-    a.innerHTML=`<p class="label">${esc(p.name)}の番</p>${diceHTML(S.lastDice)}<p class="hint">目的地「${S.dest}」まであと${d}マス${S.rules.exact?"（ぴったり止まると到着）":""}。${S.cur===lastPlace()?"<br>追い上げサポートで大きい目が出やすくなっています。":""}${possessed()?`<br>${YOKAI[S.yokai.form].n}が取り憑いています。ほかの社長のいるマスを通れば押し付けられます。`:""}</p>
+    const notes=[];if(S.rules.exact)notes.push("ぴったり止まると到着");if(p.slow>0)notes.push(`鈍行中：出た目が半分になります（残り${p.slow}回）`);
+    if(S.cur===lastPlace())notes.push("追い上げサポートで大きい目が出やすくなっています");
+    if(possessed())notes.push(`${YOKAI[S.yokai.form].n}が取り憑いています。ほかの社長のいるマスを通れば押し付けられます`);
+    a.innerHTML=`<p class="label">${esc(p.name)}の番</p>${diceHTML(S.lastDice)}<p class="hint">目的地「${S.dest}」まであと<b>${d}</b>マス。${notes.length?"<br>"+notes.join("<br>"):""}</p>
     <button class="btn primary big" data-act="roll">サイコロを振る${S.dice>1?`（${S.dice}個）`:""}</button>
-    ${p.cards.length?`<div class="cards"><p class="label" style="margin-top:6px">カードを使う</p>${p.cards.map((c,i)=>`<button class="cardbtn" data-card="${i}" ${(S.dice>1&&(c==="kyuko"||c==="tokkyu"))||(c==="oharai"&&!possessed())?"disabled":""}><span><b>${CARDS[c].n}</b></span><small>${CARDS[c].d}</small></button>`).join("")}</div>`:""}`;return}
+    ${p.cards.length?`<div class="cards"><p class="label" style="margin-top:6px">カードを使う</p>${p.cards.map((c,i)=>{const C=CARDS[c]||{n:c,d:""};return `<button class="cardbtn ${C.t==="attack"?"atk":""}" data-card="${i}" ${cardDisabled(c)?"disabled":""}><span><b>${C.n}</b></span><small>${c==="omamori"?"持っているだけで効果":C.d}</small></button>`}).join("")}</div>`:""}`;return}
   if(S.phase==="choose"&&CAND){const dd=distTo(S.dest);const list=[...CAND.keys()].sort((x,y)=>dd[x]-dd[y]);
-    a.innerHTML=`<p class="label">${esc(p.name)}の番</p>${diceHTML(S.lastDice)}<p class="hint">止まるマスを地図か下から選んでください。</p><div class="chips">${list.map(id=>{const n=N[id],c=n.type==="st"?"var(--ink)":`var(--${n.type})`;return `<button class="chip" data-go="${id}"><span class="sq" style="background:${c}"></span>${sqName(id)}<small>${id===S.dest?"目的地！":"あと"+dd[id]}${possessed()&&passes(CAND.get(id))?"・押し付け":""}</small></button>`}).join("")}</div>`;return}
-  a.innerHTML=`<p class="label">${esc(p.name)}の番</p>${diceHTML(S.lastDice)}<p class="hint">${p.cpu?"考え中です…":"移動中…"}</p>`;
+    a.innerHTML=`<p class="label">止まるマスを選ぶ</p><div class="chips">${list.map(id=>{const n=N[id],c=n.type==="st"?"var(--ink)":`var(--${n.type})`;return `<button class="chip" data-go="${id}"><span class="sq" style="background:${c}"></span>${sqName(id)}<small>${id===S.dest?"目的地！":"あと"+dd[id]}${possessed()&&passes(CAND.get(id))?"・押し付け":""}</small></button>`}).join("")}</div>`;return}
+  a.innerHTML=`<p class="label">${esc(p.name)}の番</p>${diceHTML(S.lastDice)}<p class="hint">${p.cpu?"CPUが考えています…":"移動中…"}</p>`;
 }
-function renderLog(){if(!S)return;$("#log ol").innerHTML=S.log.slice(0,7).map(t=>`<li>${esc(t)}</li>`).join("")}
+function renderLog(){if(!S)return;$("#log ol").innerHTML=S.log.slice(0,8).map(t=>`<li>${esc(t)}</li>`).join("")}
 function showDice(v){S.lastDice=v;const d=$("#dice");if(d)d.outerHTML=diceHTML(v)}
 
 /* ---------- modal ---------- */
@@ -785,35 +956,38 @@ const possessed=()=>S.rules.yokai&&S.yokai.owner===S.cur;
 const passes=path=>path.slice(1).some(id=>S.players.some((q,j)=>j!==S.cur&&q.pos===id));
 function newGame(seats,years,assist,rules,mapId){useMap(mapId);
   const props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(master(s[0]))]));
-  S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"]})),cur:0,year:1,month:0,years,assist,rules,map:CUR_MAP,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"roll",dice:1,lastDice:null};
+  S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"],slow:0,rest:0})),cur:0,year:1,month:0,years,assist,rules,map:CUR_MAP,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"busy",dice:1,lastDice:null};
   STATIONS.forEach(([n])=>S.owners[n]=props[n].map(()=>null));
   S.destFrom="東京";S.dest="東京";const first=pickDest("東京");
-  buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);render();
+  buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);setScene("title",`${years}年間の旅が東京駅から始まります。`);render();
   revealDest(first,"最初の目的地は……").then(()=>startTurn());
 }
 async function startTurn(){CAND=null;S.dice=1;const p=cp();
-  if(p.cpu){S.phase="busy";render();autosave();focus(p.pos);await wait(500);await cpuTurn()}
-  else{S.phase="roll";render();autosave();focus(p.pos);
-    if(S.players.filter(q=>!q.cpu).length>1){toast(`${p.name}の番です`);Snd.sfx("turn")}}
+  if(p.rest>0){p.rest--;S.phase="busy";render();focus(p.pos);log(`${p.name}は運休で1回休み。`);await say(`${p.name}は運休のため、今回は1回休みです。`,"rest");return endTurn()}
+  if(p.cpu){S.phase="busy";setScene("cpu",`${p.name}の番です。`);render();autosave();focus(p.pos);await wait(500);await cpuTurn()}
+  else{S.phase="roll";setScene("roll",`${p.name}の番です。サイコロを振ってください。`);render();autosave();
+    if(S.players.filter(q=>!q.cpu).length>1)Snd.sfx("turn")}
 }
-async function rollDice(){const n=S.dice,boost=S.cur===lastPlace();let v;
+async function rollDice(){const p=cp(),n=S.dice,boost=S.cur===lastPlace();let v;
   for(let i=0;i<9;i++){v=Array.from({length:n},()=>rnd(1,6));showDice(v);Snd.sfx("dice");await sleep(55)}
   if(boost)v=v.map(x=>Math.random()<.5?Math.max(x,rnd(1,6)):x);
-  showDice(v);return v.reduce((a,b)=>a+b,0)}
+  showDice(v);let t=v.reduce((a,b)=>a+b,0);
+  if(p.slow>0){const t0=t;t=Math.max(1,Math.ceil(t/2));p.slow--;log(`${p.name}は鈍行中のため${t0}マスが${t}マスに。`);await say(`鈍行中のため、${t0}マスが半分の${t}マスになりました。${p.slow?`（残り${p.slow}回）`:"（鈍行はこれで終わり）"}`,"bad")}
+  return t}
 async function humanRoll(){S.phase="busy";renderAction();const t=await rollDice();const p=cp();log(`${p.name}は${t}マス進める。`);
   CAND=reach(p.pos,t,S.dest,S.rules.exact);
-  if(CAND.size===1){const id=[...CAND.keys()][0];return choose(id)}
-  S.phase="choose";render();const ids=[...CAND.keys()];focus(ids[0])}
+  if(CAND.size===1){const id=[...CAND.keys()][0];setScene("move",`${t}マス進みます。`);return choose(id)}
+  S.phase="choose";setScene("move",`${t}マス進めます。地図で光っているマスか、下のボタンから止まるマスを選んでください。`);render();const ids=[...CAND.keys()];focus(ids[0])}
 async function choose(id){if(!CAND||!CAND.has(id))return;const path=CAND.get(id);CAND=null;S.phase="busy";render();await moveAlong(path);await land();await endTurn()}
 async function moveAlong(path){const p=cp();for(let i=1;i<path.length;i++){p.pos=path[i];placeTokens();Snd.sfx("step");if(i%3===1)focus(p.pos);
     if(possessed()){const j=S.players.findIndex((q,k)=>k!==S.cur&&q.pos===path[i]);if(j>=0)await passYokai(j)}
     await sleep(reduce?40:150)}focus(p.pos);renderPlayers()}
 async function passYokai(j){const y=S.yokai,from=cp(),to=S.players[j];y.owner=j;y.turns=0;
-  const m=`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`;log(m);Snd.sfx("pass");placeTokens();renderPlayers();await say(m)}
+  const m=`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`;log(m);Snd.sfx("pass");placeTokens();renderPlayers();await say(m,"pass")}
 function ownedList(i){const a=[];for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)a.push([s,k,P(s)[k][1]])});return a}
 function sellHalf(p,s,k){const pr=P(s)[k],v=r100(pr[1]/2);S.owners[s][k]=null;p.money+=v;return `${s}の「${pr[0]}」`}
-async function mischief(p){const y=S.yokai;y.turns++;let pre="";
-  if(y.form===0&&y.turns>=6){y.form=1;y.turns=0;pre=`${YOKAI[0].n}が${YOKAI[1].n}に化けた！ `}
+async function mischief(p){const y=S.yokai;y.turns++;let pre="",evolved=false;
+  if(y.form===0&&y.turns>=6){y.form=1;y.turns=0;evolved=true;pre=`${YOKAI[0].n}が${YOKAI[1].n}に化けた！ `}
   const f=y.form,nm=YOKAI[f].n,r=Math.random(),mine=ownedList(p.idx);let msg;
   if(f===0){
     if(r<.25)msg=`${nm}は昼寝している。今回は何もしなかった。`;
@@ -828,17 +1002,31 @@ async function mischief(p){const y=S.yokai;y.turns++;let pre="";
     else if(r<.85&&p.cards.length){p.cards=[];msg=`${nm}がカードをすべて食べてしまった。`}
     else{const a=r100(rnd(3000,6000)*yf());p.money-=a;msg=`${nm}が駅前で大騒ぎした。後始末に${yen(a)}かかった。`}
   }
-  msg=pre+msg;log(`${p.name}：${msg}`);Snd.sfx("yokai");render();
-  if(p.cpu)await say(`${p.name}　${msg}`);
-  else await modal(`<h2>${nm}のしわざ</h2><p>${esc(msg)}</p><p class="hint">ほかの社長のいるマスを通るか同じマスに止まると、${nm}を押し付けられます。お祓いカードでも追い払えます。</p>`,[["つづける",1,"primary"]])}
-function randomCard(){const r=Math.random();return r<.32?"kyuko":r<.5?"tokkyu":r<.68?"buttobi":r<.86||!S.rules.yokai?"rinji":"oharai"}
+  msg=pre+msg;log(`${p.name}：${msg}`);Snd.sfx("yokai");render();const key=evolved||f===1?"bigyokai":"mischief";
+  if(p.cpu)await say(`${p.name}　${msg}`,key);
+  else{setScene(key,msg);await modal(`${sceneHTML(key)}<h2>${nm}のしわざ</h2><p>${esc(msg)}</p><p class="hint">ほかの社長のいるマスを通るか同じマスに止まると、${nm}を押し付けられます。お祓いカードや妖怪なすりつけカードでも追い払えます。</p>`,[["つづける",1,"primary"]])}}
+/* cards */
+const GOOD_W={kyuko:20,tokkyu:12,buttobi:10,rinji:14,oharai:6,ashidome:8,donko:7,goudatsu:7,buttobashi:5,nasuri:4,omamori:7};
+function randomCard(){const ks=Object.keys(GOOD_W).filter(k=>S.rules.yokai||!CARDS[k].yokai);let tot=ks.reduce((a,k)=>a+GOOD_W[k],0),r=Math.random()*tot;for(const k of ks){r-=GOOD_W[k];if(r<0)return k}return "kyuko"}
+async function badCard(p){const ks=Object.keys(BAD),k=ks[rnd(0,ks.length-1)];let m;
+  if(k==="slow"){p.slow=3;m="3回の間、サイコロの目が半分になります。"}
+  else if(k==="rest"){p.rest=(p.rest||0)+1;m="次の番は1回休みです。"}
+  else if(k==="fine"){const a=r100(rnd(1000,3000)*yf());p.money-=a;m=`罰金${yen(a)}を払いました。`}
+  else{if(p.cards.length){const c=p.cards.splice(rnd(0,p.cards.length-1),1)[0];m=`${CARDS[c].n}をなくしてしまいました。`}else m="なくすカードを持っておらず、助かりました。"}
+  log(`${p.name}：災難カード「${BAD[k].n}」。${m}`);Snd.sfx("minus");render();await say(`災難カード「${BAD[k].n}」　${p.name}：${m}`,"bad")}
 async function land(){const p=cp(),n=N[p.pos];
   if(p.pos===S.dest)await arrive(p);
   if(n.type==="st"){await quiz(p);
-    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");await say(`${p.name}が${n.id}駅で物件を${b.length}件買いました。`)}}else await shopModal(p,n.id)}
-  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(`青マス　${p.name}：${m}。${yen(amt)}の収入！`)}
-  else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10&&n.y<MAP.snowY;let amt=r100(rnd(600,2000)*yf()*(winter?2:1));const m=winter?"大雪で除雪費がかかった":MINUS_MSG[rnd(0,MINUS_MSG.length-1)];p.money-=amt;log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(`赤マス　${p.name}：${m}。${yen(amt)}の出費。`)}
-  else if(n.type==="card"){if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);await say(`カードマス　${p.name}はカードがいっぱいで受け取れませんでした。`)}else{const c=randomCard();p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");render();await say(`カードマス　${p.name}が${CARDS[c].n}を手に入れた！`)}}
+    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件買いました。`,"buy")}}else await shopModal(p,n.id)}
+  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(`青マス　${p.name}：${m}。${yen(amt)}の収入！`,n.sea?"sea":"plus")}
+  else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10;let mult=1,m,key="minus";
+    if(n.sea){key="sea";if(n.sea==="js"&&winter){mult=2;m="冬の日本海が大しけで、船の修理費がかさんだ"}else m=SEA_MSG[rnd(0,SEA_MSG.length-1)]}
+    else if(winter&&n.y<MAP.snowY){mult=2;m="大雪で除雪費がかかった";key="snow"}
+    else m=MINUS_MSG[rnd(0,MINUS_MSG.length-1)];
+    const amt=r100(rnd(600,2000)*yf()*mult);p.money-=amt;log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(`赤マス　${p.name}：${m}。${yen(amt)}の出費。`,key)}
+  else if(n.type==="card"){if(Math.random()<.3)await badCard(p);
+    else if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);await say(`カードマス　${p.name}はカードがいっぱいで受け取れませんでした。`,"card")}
+    else{const c=randomCard();p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");render();await say(`カードマス　${p.name}が${CARDS[c].n}を手に入れた！`,"card")}}
   else if(n.type==="shop")await cardShop(p);
   render();
 }
@@ -850,23 +1038,23 @@ async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r10
     if(y.owner!==t){S.yokai={owner:t,form:0,turns:0};yk=`${old}駅からいちばん遠い${S.players[t].name}に${YOKAI[0].n}が取り憑いた！`}
     else yk=`${S.players[t].name}には${YOKAI[y.form].n}が取り憑いたままです。`;
     log(yk)}
-  render();Snd.sfx("arrive");
-  await modal(`<h2>${esc(old)}駅に到着！</h2><p>${esc(p.name)}が一番乗りしました。</p><div class="big-money">＋${yen(amt)}</div><p>援助金を受け取りました。</p>`,[["次の目的地を決める",1,"primary"]]);
+  render();Snd.sfx("arrive");setScene("arrive",`${p.name}が${old}駅に一番乗り！`);
+  await modal(`${sceneHTML("arrive")}<h2>${esc(old)}駅に到着！</h2><p>${esc(p.name)}が一番乗りしました。</p><div class="big-money">＋${yen(amt)}</div><p>援助金を受け取りました。</p>`,[["次の目的地を決める",1,"primary"]]);
   await revealDest(next);
-  if(yk){render();await say(yk)}
+  if(yk){render();await say(yk,"yokai")}
 }
 async function revealDest(next,title){
-  const pr=modal(`<h2>${title||"次の目的地は……"}</h2><div class="roulette" id="roul">？</div><p class="hint" id="roulHint" style="text-align:center">ルーレットを回しています</p>`,[["つづける",1,"primary"]]);
+  const pr=modal(`${sceneHTML("roulette")}<h2>${title||"次の目的地は……"}</h2><div class="roulette" id="roul">？</div><p class="hint" id="roulHint" style="text-align:center">ルーレットを回しています</p>`,[["つづける",1,"primary"]]);
   $("#modalBtns").hidden=true;const names=STATIONS.map(s=>s[0]).filter(n=>n!==next);let d=45;const steps=reduce?1:18;
   for(let i=0;i<steps;i++){$("#roul").textContent=names[rnd(0,names.length-1)];Snd.sfx("dice");await sleep(d);d*=1.15}
   S.dest=next;log(`次の目的地は${next}駅です。`);$("#roul").textContent=next+"駅";$("#roul").classList.add("hit");Snd.sfx("settle");
-  $("#roulHint").textContent=`${title?"最初":"次"}の目的地は「${next}駅」です！地図の赤い旗を目指しましょう。`;render();focus(next);
+  $("#roulHint").textContent=`${title?"最初":"次"}の目的地は「${next}駅」です！地図の赤い旗を目指しましょう。`;setScene("roulette",`目的地は${next}駅です。`);render();focus(next);
   $("#modalBtns").hidden=false;$("#modalBtns button").focus();await pr}
 function isMono(st,i){return S.owners[st].every(x=>x===i)}
 function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
 function cpuBuy(p,st){const own=S.owners[st],props=P(st),got=[];for(;;){let best=-1,sc=-1;props.forEach((pr,i)=>{if(own[i]!=null||p.money-pr[1]<2000)return;const s=pr[2]+(own.some(o=>o===p.idx)?4:0)+(own.every((o,k)=>k===i||o===p.idx)?6:0);if(s>sc){sc=s;best=i}});if(best<0)break;buy(p,st,best);got.push(best)}return got}
-function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),mine=new Set();
-  const draw=()=>{const own=S.owners[st];body.innerHTML=`<h2>${esc(st)}駅の物件</h2><p>所持金 <b>${yen(p.money)}</b></p>`+P(st).map((pr,i)=>{const o=own[i];
+function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),mine=new Set();setScene("buy",`${st}駅に着きました。物件を買えます。`);
+  const draw=()=>{const own=S.owners[st];body.innerHTML=`${sceneHTML("buy")}<h2>${esc(st)}駅の物件</h2><p>所持金 <b>${yen(p.money)}</b></p>`+P(st).map((pr,i)=>{const o=own[i];
     const right=o==null?`<button class="btn primary" data-buy="${i}" ${p.money<pr[1]?"disabled":""}>買う</button>`:mine.has(i)?`<button class="btn danger" data-undo="${i}">取り消す</button>`:`<span class="own" style="background:${pcol(o)}">${esc(S.players[o].name)}</span>`;
     return `<div class="row"><span class="pn">${esc(pr[0])}</span><span class="pp">${yen(pr[1])}・${pr[2]}%</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">駅の物件をすべて持つと独占になり、決算での収益が2倍になります。この画面にいる間は、買った物件を取り消して代金を戻せます。</p>`;renderPlayers();renderDyn()};
   modal("",[["購入を終える",1,"primary"]]).then(()=>{body.onclick=null;res()});
@@ -875,17 +1063,17 @@ function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),min
     else if(u){const i=+u.dataset.undo,pr=P(st)[i];if(S.owners[st][i]===p.idx){S.owners[st][i]=null;p.money+=pr[1];mine.delete(i);log(`${p.name}が「${pr[0]}」の購入を取り消した。`);Snd.sfx("click")}}
     draw()};
 })}
-/* card shop */
-const CARD_PRICE={kyuko:1000,tokkyu:3000,buttobi:2500,rinji:2500,oharai:3000};
+/* card shop: no money cards on sale */
+const CARD_PRICE={kyuko:1000,tokkyu:3000,buttobi:2500,oharai:3000,ashidome:2500,donko:3000,goudatsu:2000,buttobashi:4000,nasuri:3000,omamori:2000};
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
 async function cardShop(p){Snd.sfx("card");
-  const kinds=shuffle(Object.keys(CARDS).filter(k=>k!=="oharai"||S.rules.yokai)).slice(0,4);
+  const kinds=shuffle(Object.keys(CARD_PRICE).filter(k=>S.rules.yokai||!CARDS[k].yokai)).slice(0,4);
   const offer=kinds.map(k=>({k,price:r100(CARD_PRICE[k]*yf()),got:false}));
-  if(p.cpu){const got=[];for(const o of offer){if(p.cards.length>=5)break;const want=o.k==="oharai"?possessed():true;if(want&&p.money-o.price>=6000){p.money-=o.price;p.cards.push(o.k);got.push(CARDS[o.k].n)}}
-    if(got.length){log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render();await say(`カード売り場　${p.name}が${got.join("・")}を買いました。`)}
-    else await say(`カード売り場　${p.name}は何も買いませんでした。`);return}
-  const body=$("#modalBody");
-  const draw=()=>{body.innerHTML=`<h2>カード売り場</h2><p>所持金 <b>${yen(p.money)}</b>・カード ${p.cards.length}/6枚</p>`+offer.map((o,i)=>{
+  if(p.cpu){const got=[];for(const o of offer){if(p.cards.length>=5)break;const want=CARDS[o.k].yokai?possessed():true;if(want&&p.money-o.price>=6000){p.money-=o.price;p.cards.push(o.k);got.push(CARDS[o.k].n)}}
+    if(got.length){log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render();await say(`カード売り場　${p.name}が${got.join("・")}を買いました。`,"shop")}
+    else await say(`カード売り場　${p.name}は何も買いませんでした。`,"shop");return}
+  const body=$("#modalBody");setScene("shop","カード売り場に着きました。");
+  const draw=()=>{body.innerHTML=`${sceneHTML("shop")}<h2>カード売り場</h2><p>所持金 <b>${yen(p.money)}</b>・カード ${p.cards.length}/6枚</p>`+offer.map((o,i)=>{
     const right=o.got?`<button class="btn danger" data-cundo="${i}">取り消す</button>`:`<button class="btn primary" data-cbuy="${i}" ${p.money<o.price||p.cards.length>=6?"disabled":""}>買う</button>`;
     return `<div class="row"><span class="pn">${CARDS[o.k].n}<br><small style="font-weight:400;color:var(--muted)">${CARDS[o.k].d}</small></span><span class="pp">${yen(o.price)}</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">今日の品ぞろえは4種類です。この画面にいる間は取り消せます。</p>`;renderPlayers()};
   const pr=modal("",[["売り場を出る",1,"primary"]]);draw();
@@ -899,10 +1087,10 @@ const REWARDS=[["again","もう一度サイコロを振れる"],["card","カー�
 function pickQuestion(){if(!S.quizUsed||S.quizUsed.length>=QUIZ.length)S.quizUsed=[];let i;do{i=rnd(0,QUIZ.length-1)}while(S.quizUsed.includes(i));S.quizUsed.push(i);return [QUIZ[i],QUIZ_EXPL[i]]}
 async function quiz(p){if(p.cpu||!S.rules.quiz||Math.random()>=1/3)return;
   const[q,ex]=pickQuestion(),[genre,text,ans]=q,opts=shuffle(q.slice(2,6)),rw=REWARDS[rnd(0,REWARDS.length-1)];
-  let ok;
-  ok=await new Promise(res=>{const body=$("#modalBody");Snd.sfx("turn");
-    modal(`<span class="qgenre">${esc(genre)}</span><h2>クイズ</h2><p style="font-size:16px;font-weight:700">${esc(text)}</p><p class="qreward">正解すると：${rw[1]}</p><div class="qopts">${opts.map((o,i)=>`<button class="qopt" data-q="${i}">${esc(o)}</button>`).join("")}</div><p class="qres" id="qres"></p><p class="qex" id="qex" hidden></p>`,[["つづける",1,"primary"]]).then(()=>{body.onclick=null;res(result)});
-    $("#modalBtns").hidden=true;let result=false;
+  setScene("quiz","クイズに挑戦！");
+  const ok=await new Promise(res=>{const body=$("#modalBody");Snd.sfx("turn");let result=false;
+    modal(`${sceneHTML("quiz")}<span class="qgenre">${esc(genre)}</span><h2>クイズ</h2><p style="font-size:16px;font-weight:700">${esc(text)}</p><p class="qreward">正解すると：${rw[1]}</p><div class="qopts">${opts.map((o,i)=>`<button class="qopt" data-q="${i}">${esc(o)}</button>`).join("")}</div><p class="qres" id="qres"></p><p class="qex" id="qex" hidden></p>`,[["つづける",1,"primary"]]).then(()=>{body.onclick=null;res(result)});
+    $("#modalBtns").hidden=true;
     body.onclick=e=>{const b=e.target.closest("[data-q]");if(!b||b.disabled)return;result=opts[+b.dataset.q]===ans;
       body.querySelectorAll(".qopt").forEach((x,i)=>{x.disabled=true;if(opts[i]===ans)x.classList.add("ok");else if(x===b)x.classList.add("ng")});
       $("#qres").textContent=result?"正解です！":`残念、正解は「${ans}」でした。`;$("#qex").textContent="解説："+ex;$("#qex").hidden=false;Snd.sfx(result?"plus":"minus");$("#modalBtns").hidden=false;$("#modalBtns button").focus()}});
@@ -915,46 +1103,75 @@ async function award(p,k){let m;
   else if(k==="card"){const c=randomCard();p.cards.push(c);m=`特典：${p.name}が${CARDS[c].n}をもらいました。`}
   else if(k==="yield"){const l=ownedList(p.idx);l.forEach(([s,i])=>P(s)[i][2]+=1);m=`特典：${p.name}の物件${l.length}件の収益率が1%上がりました。`}
   else{const a=r100(3000*yf());p.money+=a;m=`特典：${p.name}に賞金${yen(a)}！`}
-  log(m);Snd.sfx("card");render();await say(m)}
-async function useCard(p,i){const c=p.cards[i];p.cards.splice(i,1);log(`${p.name}が${CARDS[c].n}を使った。`);Snd.sfx("card");
+  log(m);Snd.sfx("card");render();await say(m,"correct")}
+/* using cards */
+async function attack(from,k,to){const p=S.players[from],t=S.players[to];log(`${p.name}が${t.name}に${CARDS[k].n}を使った。`);
+  if(t.cards.includes("omamori")){t.cards.splice(t.cards.indexOf("omamori"),1);Snd.sfx("settle");render();await say(`${p.name}が${t.name}に${CARDS[k].n}を使った！　しかし${t.name}のお守りカードが守ってくれました。`,"guard");return}
+  let m;
+  if(k==="ashidome"){t.rest=(t.rest||0)+1;m=`${t.name}は次の番、1回休みになりました。`}
+  else if(k==="donko"){t.slow=Math.max(t.slow||0,2);m=`${t.name}のサイコロが2回分、半分になります。`}
+  else if(k==="goudatsu"){if(t.cards.length&&p.cards.length<6){const c=t.cards.splice(rnd(0,t.cards.length-1),1)[0];p.cards.push(c);m=`${p.name}が${t.name}から${CARDS[c].n}を奪った！`}else m=`${t.name}から奪えるカードはありませんでした。`}
+  else if(k==="buttobashi"){const st=STATIONS[rnd(0,STATIONS.length-1)][0];t.pos=st;placeTokens();focus(st);Snd.sfx("warp");m=`${t.name}は${st}駅へぶっとばされた！`}
+  else if(k==="nasuri"){if(S.rules.yokai&&S.yokai.owner===from){S.yokai.owner=to;S.yokai.turns=0;placeTokens();m=`${YOKAI[S.yokai.form].n}を${t.name}になすりつけた！`}else m="取り憑いている妖怪がいませんでした。"}
+  log(m);Snd.sfx("minus");render();await say(`${p.name}が${CARDS[k].n}を使った！　${m}`,"attack")}
+function pickTarget(from,k){const others=S.players.filter(q=>q.idx!==from);if(!others.length)return null;
+  if(k==="buttobashi"){const d=distTo(S.dest);return others.sort((a,b)=>d[a.pos]-d[b.pos])[0].idx}
+  if(k==="goudatsu"){const w=others.filter(q=>q.cards.length);if(w.length)return w.sort((a,b)=>b.cards.length-a.cards.length)[0].idx}
+  return others.sort((a,b)=>(b.money+assets(b.idx))-(a.money+assets(a.idx)))[0].idx}
+function chooseTarget(k){return new Promise(res=>{const p=cp(),others=S.players.filter(q=>q.idx!==p.idx),d=distTo(S.dest);
+  modal(`${sceneHTML("attack")}<h2>${CARDS[k].n}</h2><p>${CARDS[k].d}。だれに使いますか？</p>${others.map(q=>`<div class="row"><span class="pn"><span class="dot" style="background:${pcol(q.idx)};display:inline-block;vertical-align:middle;margin-right:6px"></span>${esc(q.name)}<br><small style="font-weight:400;color:var(--muted)">${yen(q.money)}・目的地まで${d[q.pos]}マス・カード${q.cards.length}枚</small></span><span></span><button class="btn primary" data-t="${q.idx}">使う</button></div>`).join("")}<p class="hint" style="margin-top:10px">相手がお守りカードを持っていると防がれます。</p>`,[["やめる",-1]]).then(()=>res(null));
+  $("#modalBody").onclick=e=>{const b=e.target.closest("[data-t]");if(!b)return;$("#modal").hidden=true;$("#modalBody").onclick=null;res(+b.dataset.t)}})}
+async function useCard(p,i){const c=p.cards[i];
+  if(CARDS[c]&&CARDS[c].t==="attack"){const target=p.cpu?pickTarget(p.idx,c):await chooseTarget(c);
+    if(target==null)return null;p.cards.splice(p.cards.indexOf(c),1);await attack(p.idx,c,target);render();return null}
+  p.cards.splice(i,1);log(`${p.name}が${CARDS[c].n}を使った。`);Snd.sfx("card");
   if(c==="kyuko")S.dice=2;else if(c==="tokkyu")S.dice=3;
-  else if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");log(`${p.name}に${yen(amt)}の臨時収入。`);render();await say(`臨時収入カード　${p.name}に${yen(amt)}の臨時収入！`)}
-  else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`);render();await say(`お祓い成功！${nm}が${p.name}のもとから去っていきました。`)}else toast("取り憑いている妖怪がいませんでした")}
-  else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");log(`${p.name}が${to}駅へワープ。`);await say(`ぶっとびカード　${p.name}は${to}駅へぶっとんだ！`);return "warp"}
-  else if(c==="kyuko"||c==="tokkyu")await say(`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みます。`);
+  if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");log(`${p.name}に${yen(amt)}の臨時収入。`);render();await say(`臨時収入カード　${p.name}に${yen(amt)}の臨時収入！`,"plus")}
+  else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`);render();await say(`お祓い成功！${nm}が${p.name}のもとから去っていきました。`,"oharai")}else toast("取り憑いている妖怪がいませんでした")}
+  else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");log(`${p.name}が${to}駅へワープ。`);await say(`ぶっとびカード　${p.name}は${to}駅へぶっとんだ！`,"warp");return "warp"}
+  else if(c==="kyuko"||c==="tokkyu")await say(`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みます。`,"roll");
   render();return null}
 async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];
   let ri=p.cards.indexOf("rinji");while(ri>=0){await useCard(p,ri);ri=p.cards.indexOf("rinji")}
   const oi=p.cards.indexOf("oharai");if(oi>=0&&possessed())await useCard(p,oi);
+  const ni=p.cards.indexOf("nasuri");if(ni>=0&&possessed())await useCard(p,ni);
+  const ai=p.cards.findIndex(c=>CARDS[c]&&CARDS[c].t==="attack"&&c!=="nasuri");if(ai>=0&&Math.random()<.5)await useCard(p,ai);
   const bi=p.cards.indexOf("buttobi");if(bi>=0&&d>=24&&Math.random()<.6){await useCard(p,bi);S.phase="busy";await land();return endTurn()}
   const ti=p.cards.indexOf("tokkyu"),ki=p.cards.indexOf("kyuko");
   if(ti>=0&&d>=10)await useCard(p,ti);else if(ki>=0&&d>=6)await useCard(p,ki);
-  renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);
+  renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);setScene("cpu",`${p.name}は${t}マス進みます。`);
   const r=reach(p.pos,t,S.dest,S.rules.exact),dd=distTo(S.dest),pref={plus:0,card:1,shop:1,st:2,minus:3},ps=possessed();
   const key=id=>[id===S.dest?0:1,ps&&passes(r.get(id))?0:1,dd[id],pref[N[id].type]];
   const best=[...r.keys()].sort((a,b)=>{const A=key(a),B=key(b);for(let i=0;i<4;i++)if(A[i]!==B[i])return A[i]-B[i];return 0})[0];
   await wait(400);await moveAlong(r.get(best));await land();return endTurn()}
 async function forceSell(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);
   let sold=0;while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が借金返済のため${s}の「${P(s)[k][0]}」を売却。`)}
-  if(sold){render();await say(`${p.name}は借金返済のため物件を${sold}件売却しました。`)}}
+  if(sold){render();await say(`${p.name}は借金返済のため物件を${sold}件売却しました。`,"minus")}}
 async function endTurn(){const p=cp();
-  if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await say(`${p.name}がもう一度サイコロを振ります。`);return startTurn()}
+  if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await say(`${p.name}がもう一度サイコロを振ります。`,"roll");return startTurn()}
   if(possessed())await mischief(p);if(p.money<0)await forceSell(p);
   S.cur=(S.cur+1)%S.players.length;
   if(S.cur===0){S.month++;if(S.month>=12){await settle();S.month=0;S.year++;if(S.year>S.years)return gameOver()}}
   startTurn()}
 async function settle(){render();const rows=S.players.map((p,i)=>{let inc=0,mono=0;for(const s in S.owners){const m=isMono(s,i);if(m)mono++;S.owners[s].forEach((o,k)=>{if(o===i){const[,pr,rt]=P(s)[k];inc+=pr*rt/100*(m?2:1)}})}inc=r100(inc);p.money+=inc;return{p,inc,mono}});
-  log(`${S.year}年目の決算が終わりました。`);render();Snd.sfx("settle");
-  await modal(`<h2>${S.year}年目 決算</h2><p>物件の収益が入りました。独占した駅は収益2倍です。</p><table><tr><th>社長</th><th>独占駅</th><th>収益</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}</td><td>${r.mono}</td><td>＋${yen(r.inc)}</td></tr>`).join("")}</table>`,[["つづける",1,"primary"]])}
+  log(`${S.year}年目の決算が終わりました。`);setScene("settle",`${S.year}年目の決算です。`);render();Snd.sfx("settle");
+  await modal(`${sceneHTML("settle")}<h2>${S.year}年目 決算</h2><p>物件の収益が入りました。独占した駅は収益2倍です。</p><table><tr><th>社長</th><th>独占駅</th><th>収益</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}</td><td>${r.mono}</td><td>＋${yen(r.inc)}</td></tr>`).join("")}</table>`,[["つづける",1,"primary"]])}
 async function gameOver(){S.year=S.years;S.month=11;S.phase="over";render();autosave();Snd.sfx("over");
-  const rank=S.players.map((p,i)=>({p,t:p.money+assets(i)})).sort((a,b)=>b.t-a.t);
-  const r=await modal(`<h2>${esc(rank[0].p.name)}の優勝！</h2><p>${S.years}年間の総資産ランキングです。</p><table><tr><th>順位</th><th>社長</th><th>総資産</th></tr>${rank.map((x,i)=>`<tr><td>${i+1}位</td><td>${esc(x.p.name)}</td><td>${yen(x.t)}</td></tr>`).join("")}</table>`,[["地図を見る",0],["もう一度あそぶ",1,"primary"]]);
-  if(r)setup(false)}
+  const rank=S.players.map((p,i)=>({p,t:p.money+assets(i)})).sort((a,b)=>b.t-a.t);setScene("win",`${rank[0].p.name}の優勝です！`);
+  const r=await modal(`${sceneHTML("win")}<h2>${esc(rank[0].p.name)}の優勝！</h2><p>${S.years}年間の総資産ランキングです。</p><table><tr><th>順位</th><th>社長</th><th>総資産</th></tr>${rank.map((x,i)=>`<tr><td>${i+1}位</td><td>${esc(x.p.name)}</td><td>${yen(x.t)}</td></tr>`).join("")}</table>`,[["地図を見る",0],["もう一度あそぶ",1,"primary"]]);
+  if(r)setup()}
 
-/* ---------- setup ---------- */
-async function setup(allowResume){const saved=allowResume?await Store.get("auto"):null;const canResume=saved&&saved.phase!=="over"&&validState(saved);
+/* ---------- title & setup ---------- */
+const VERSION="ver 1.0";
+async function showTitle(){$("#title").hidden=false;setView();$("#tVisual").innerHTML=artHTML("title");
+  const saved=S&&S.phase!=="over"?S:await Store.get("auto");const ok=saved&&saved.phase!=="over"&&validState(saved);
+  $("#tCont").disabled=!ok;$("#tContInfo").textContent=ok?`${MAPS[saved.map||"kanto"].name}・${saved.year}年目 ${MONTHS[saved.month]}`:"保存されたゲームはありません";
+  $("#tNew").focus()}
+function hideTitle(){$("#title").hidden=true;setView();applyZoom()}
+async function setup(){hideTitle();
+  const order=["east","kanto"],cur=GP.map||"east";
   const pr=modal(`<h2>出発の準備</h2><p>駅をサイコロで巡り、目的地への一番乗りと物件の独占で総資産トップを目指します。</p>
-  <div class="field"><label for="fMap">遊ぶ地図</label><select id="fMap">${Object.entries(MAPS).map(([k,m])=>`<option value="${k}" ${(GP.map||"kanto")===k?"selected":""}>${m.name}</option>`).join("")}</select><small class="hint" id="fMapDesc" style="margin:0">${MAPS[GP.map||"kanto"].desc}</small></div>
+  <div class="field"><label for="fMap">遊ぶ地図</label><select id="fMap">${order.map(k=>`<option value="${k}" ${cur===k?"selected":""}>${MAPS[k].name}</option>`).join("")}</select><small class="hint" id="fMapDesc" style="margin:0">${MAPS[cur].desc}</small></div>
   <h3>参加する社長</h3><p class="hint">1台の端末を交代で使えば、人間同士でも遊べます。</p>
   ${DEFAULT_SEATS.map(([nm,ty],i)=>`<div class="prow"><span class="dot" style="background:${COLORS[i]}"></span><input id="seatN${i}" maxlength="8" value="${esc(nm)}" aria-label="${i+1}人目の名前"><select id="seatT${i}" aria-label="${i+1}人目の種類"><option value="human" ${ty==="human"?"selected":""}>人間</option><option value="cpu" ${ty==="cpu"?"selected":""}>CPU</option><option value="none" ${ty==="none"?"selected":""}>参加しない</option></select></div>`).join("")}
   <div class="field" style="margin-top:12px"><label for="fYears">プレイ年数</label><select id="fYears"><option value="1">1年</option><option value="3" selected>3年</option><option value="5">5年</option><option value="10">10年</option></select></div>
@@ -965,32 +1182,46 @@ async function setup(allowResume){const saved=allowResume?await Store.get("auto"
   <label class="check"><input type="checkbox" id="fYokai" checked><span>妖怪「${YOKAI[0].n}」<small>誰かが目的地に着くたびに、いちばん遠い社長へ取り憑いて毎ターン悪さをします。ほかの社長のいるマスを通ると押し付けられます。</small></span></label>
   <label class="check"><input type="checkbox" id="fQuiz" checked><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。全ジャンル・難しめ。正解すると特典があります。出題は人間の社長だけです。</small></span></label>
   <label class="check"><input type="checkbox" id="fAssist"><span>追い上げサポート<small>総資産が最下位の社長は、大きい目が少し出やすくなります。CPUにも同じように働きます。</small></span></label>
-  <p class="err" id="setupErr"></p>
-  ${canResume?`<p class="hint">前回のゲーム（${saved.year}年目 ${MONTHS[saved.month]}）が残っています。</p>`:""}`,
-  [...(canResume?[["続きから",2]]:[]),["出発する",1,"primary",()=>{const n=DEFAULT_SEATS.filter((_,i)=>$("#seatT"+i).value!=="none").length;if(n<2){$("#setupErr").textContent="2人以上の社長を参加させてください。";return false}}]]);
+  <p class="err" id="setupErr"></p>`,
+  [["タイトルへ",0],["出発する",1,"primary",()=>{const n=DEFAULT_SEATS.filter((_,i)=>$("#seatT"+i).value!=="none").length;if(n<2){$("#setupErr").textContent="2人以上の社長を参加させてください。";return false}}]]);
   const applySound=()=>{Snd.prefs.on=$("#fSound").checked;Snd.savePrefs();Snd.apply();updSndBtn()};
   $("#modalBody").onchange=e=>{if(e.target.id==="fSound"){applySound();Snd.sfx("click")}if(e.target.id==="fMap")$("#fMapDesc").textContent=MAPS[e.target.value].desc};
   const r=await pr;applySound();
-  if(r===2){resume(saved);return}
+  if(r!==1){showTitle();return}
   const seats=[];DEFAULT_SEATS.forEach(([nm],i)=>{const t=$("#seatT"+i).value;if(t!=="none")seats.push({name:$("#seatN"+i).value.trim()||nm,cpu:t==="cpu",color:i})});
   GP.speed=$("#fSpeed").value;GP.map=$("#fMap").value;saveGP();
   newGame(seats,+$("#fYears").value,$("#fAssist").checked,{exact:$("#fExact").checked,yokai:$("#fYokai").checked,quiz:$("#fQuiz").checked},GP.map)}
-function resume(state){useMap(state.map||"kanto");S=state;S.map=CUR_MAP;CAND=null;S.players.forEach(p=>{if(!N[p.pos])p.pos="東京"});if(!N[S.dest])S.dest="東京";
+function resume(state){hideTitle();useMap(state.map||"kanto");S=state;S.map=CUR_MAP;CAND=null;S.players.forEach(p=>{if(!N[p.pos])p.pos="東京"});if(!N[S.dest])S.dest="東京";
   if(!S.rules)S.rules={exact:false,yokai:false};if(S.rules.quiz==null)S.rules.quiz=true;if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
   if(!S.props){S.props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(DEFAULT_PROPS[s[0]])]))}
-  S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i});
+  S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i;p.slow=p.slow||0;p.rest=p.rest||0});
   buildTokens();render();startTurn()}
+async function howTo(){await modal(`<h2>遊び方</h2>
+  <h3>目的</h3><p>決められた年数のあいだ駅をめぐり、最後に総資産（お金＋物件の価値）がいちばん多い社長の勝ちです。</p>
+  <h3>進み方</h3><p>自分の番にサイコロを振り、地図で光るマスから止まる場所を選びます。目的地にぴったり止まると援助金がもらえ、ルーレットで次の目的地が決まります。</p>
+  <h3>マス</h3><p><b style="color:var(--plus)">青</b>はお金が入り、<b style="color:var(--minus)">赤</b>は出費です。冬の北国では大雪で出費が増えます。<b style="color:var(--card)">黄</b>はカードがもらえますが、ときどき災難カード（鈍行・運休・罰金・紛失）を引きます。<b style="color:var(--shop)">ピンクのひし形</b>はカード売り場です。駅では物件を買えます。駅の物件をすべて持つと独占になり、毎年3月の決算で収益が2倍になります。</p>
+  <h3>カード</h3><p>急行・特急・ぶっとびなどの移動カードのほか、相手を1回休みにする足止め、サイコロを半分にする鈍行押し付け、カード強奪、ぶっとばし、妖怪なすりつけといった邪魔カードがあります。お守りカードを持っていると、邪魔カードを1回防げます。</p>
+  <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠い社長に妖怪「${YOKAI[0].n}」が取り憑きます。ほかの社長のいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
+  <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
+  <p class="hint">物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>`,[["閉じる",0,"primary"]])}
+function openMenu(){modal(`<h2>メニュー</h2><div class="menu">
+  <button class="btn" data-m="players">社長一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件編集</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
+  $("#modalBody").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;const m=b.dataset.m;
+    if((m==="save"||m==="edit"||m==="title")&&busy()){toast("手番が終わるまでお待ちください");return}
+    $("#modal").hidden=true;$("#modalBody").onclick=null;
+    ({players:showPlayers,save:openSaves,edit:openEditor,set:openSettings,how:howTo,title:showTitle})[m]()}}
+async function showPlayers(){await modal(`<h2>社長一覧</h2>${playersHTML()}`,[["閉じる",0,"primary"]])}
 
 /* ---------- save slots ---------- */
 const busy=()=>S&&S.phase==="busy";
 async function openSaves(){
-  const canSave=S&&S.phase==="roll"&&!cp().cpu;
+  const canSave=S&&$("#title").hidden&&S.phase==="roll"&&!cp().cpu;
   const p=modal(`<h2>セーブとロード</h2><p class="hint">読み込み中…</p>`,[["閉じる",0]]);
   const slots=await Promise.all([1,2,3].map(i=>Store.get("slot"+i)));
   const body=$("#modalBody");let armed=null,codeOut="";
   const draw=()=>{body.innerHTML=`<h2>セーブとロード</h2>
     <p class="hint">${Store.cloud?"セーブはこの端末とあなたのアカウントに保存され、ほかの端末からも続きができます。":"セーブはこの端末のブラウザに保存されます。別の端末で続けるときはセーブコードを使ってください。"}${canSave?"":"<br>セーブは人間の社長がサイコロを振る前にできます。"}</p>
-    ${[1,2,3].map(i=>{const s=slots[i-1];const info=s?`${s.year}年目 ${MONTHS[s.month]}・${s.players.map(x=>esc(x.name)).join("、")}`:"空き";const when=s&&s.savedAt?new Date(s.savedAt).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+    ${[1,2,3].map(i=>{const s=slots[i-1];const info=s?`${MAPS[s.map||"kanto"].name}・${s.year}年目 ${MONTHS[s.month]}・${s.players.map(x=>esc(x.name)).join("、")}`:"空き";const when=s&&s.savedAt?new Date(s.savedAt).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
       return `<div class="slot"><span><b>スロット${i}</b><small>${info}${when?"・"+when:""}</small></span><button class="btn sm ${armed===i?"danger":""}" data-save="${i}" ${canSave?"":"disabled"}>${armed===i?"上書きする":"セーブ"}</button><button class="btn sm" data-load="${i}" ${s&&validState(s)?"":"disabled"}>ロード</button></div>`}).join("")}
     <h3>セーブコード</h3><p class="hint">コードをメモ帳などに保存しておけば、別の端末やブラウザでも続きができます。</p>
     <div class="btns" style="justify-content:flex-start;margin:0 0 8px"><button class="btn sm" data-code ${canSave?"":"disabled"}>今の状態をコードにする</button>${codeOut?`<button class="btn sm" data-copy>コピー</button>`:""}</div>
@@ -1067,27 +1298,36 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
 $("#action").addEventListener("click",async e=>{if(!S)return;const p=cp();
   const a=e.target.closest("[data-act]"),c=e.target.closest("[data-card]"),g=e.target.closest("[data-go]");
   if(a&&a.dataset.act==="roll"&&S.phase==="roll")humanRoll();
-  else if(a&&a.dataset.act==="new")setup(false);
-  else if(c&&S.phase==="roll"){const res=await useCard(p,+c.dataset.card);if(res==="warp"){S.phase="busy";await land();await endTurn()}else renderAction()}
+  else if(a&&a.dataset.act==="new")setup();
+  else if(a&&a.dataset.act==="title")showTitle();
+  else if(c&&S.phase==="roll"&&!usingCard){usingCard=true;const res=await useCard(p,+c.dataset.card);usingCard=false;if(res==="warp"){S.phase="busy";render();await land();await endTurn()}else render()}
   else if(g)choose(g.dataset.go)});
+let usingCard=false;
 const guard=fn=>()=>{if(modalOpen())return;if(busy()){toast("手番が終わるまでお待ちください");return}fn()};
-$("#newBtn").onclick=guard(()=>setup(false));
+$("#newBtn").onclick=guard(showTitle);
 $("#saveBtn").onclick=guard(openSaves);
 $("#editBtn").onclick=guard(openEditor);
+$("#howBtn").onclick=()=>{if(!modalOpen())howTo()};
+$("#menuBtn").onclick=()=>{if(!modalOpen())openMenu()};
 $("#sndBtn").onclick=()=>{if(!Snd.wasRunning)Snd.prefs.on=true;else Snd.prefs.on=!Snd.prefs.on;Snd.savePrefs();Snd.apply();Snd.sfx("click");updSndBtn()};
 $("#setBtn").onclick=()=>{if(!modalOpen())openSettings()};
-$("#zin").onclick=()=>{zoom=Math.min(8,zoom*1.3);applyZoom();S&&focus(cp().pos,false)};
-$("#zout").onclick=()=>{zoom=Math.max(1,zoom/1.3);applyZoom();S&&focus(cp().pos,false)};
+$("#tNew").onclick=()=>{if(!modalOpen())setup()};
+$("#tCont").onclick=async()=>{if(modalOpen())return;if(S&&S.phase!=="over"){hideTitle();render();return}const s=await Store.get("auto");if(s&&validState(s))resume(s)};
+$("#tLoad").onclick=()=>{if(!modalOpen())openSaves()};
+$("#tHow").onclick=()=>{if(!modalOpen())howTo()};
+$("#tSet").onclick=()=>{if(!modalOpen())openSettings()};
+$("#zin").onclick=()=>{scale=Math.min(3,Math.max(scale,baseW()/VW)*1.3);applyZoom();S&&focus(cp().pos,false)};
+$("#zout").onclick=()=>{scale=Math.max(baseW()/VW,scale/1.3);applyZoom();S&&focus(cp().pos,false)};
 $("#zme").onclick=()=>S&&focus(cp().pos);
 addEventListener("resize",()=>{applyZoom()});
 
 /* ---------- boot ---------- */
-async function boot(data){useMap(GP.map||"kanto");Snd.loadPrefs();
+async function boot(data){Snd.loadPrefs();useMap(GP.map||"east");probeImages();$("#tVisual").innerHTML=artHTML("title");
   if(data&&data.S&&validState(data.S)){resume(data.S);Store.init().then(async()=>{CUSTOM=(await Store.get("props"))||{}});return}
-  focus("東京",false);
+  $("#title").hidden=false;setView();
   await Promise.race([Store.init(),sleep(4000)]);
   try{CUSTOM=(await Store.get("props"))||{}}catch(e){CUSTOM={}}
-  setup(true)}
+  showTitle()}
 window.claude?.hot?.snapshot?.(()=>({S:S&&S.phase!=="over"?S:null}));
 window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
 </script>
