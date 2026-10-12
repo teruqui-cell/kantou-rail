@@ -114,6 +114,7 @@ table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right}
 td:first-child,th:first-child{text-align:left}
 th{font-size:12px;color:var(--muted)}
+.settle td{white-space:nowrap;font-size:13px}.settle td:first-child{white-space:normal}
 #msgLayer{position:fixed;inset:0;z-index:15;cursor:pointer}
 @keyframes bob{50%{transform:translateY(3px)}}
 .qgenre{display:inline-block;font-size:12px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;margin-bottom:8px}
@@ -124,6 +125,43 @@ th{font-size:12px;color:var(--muted)}
 .qopt.ng{border:2px solid var(--minus);background:color-mix(in srgb,var(--minus) 12%,transparent)}
 .qopt:disabled{cursor:default;opacity:1}
 .qres{font-weight:700;margin:12px 0 0;font-size:16px}
+body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:none;opacity:.5}
+.cer-title{font-family:var(--f-display);font-weight:400;font-size:32px;text-align:center}
+.cer-rank{font-family:var(--f-display);font-size:34px;text-align:center;margin:2px 0}
+.cer-rank.r1{color:var(--card)}.cer-rank.r2{color:var(--muted)}.cer-rank.r3{color:#B5743D}.cer-rank.r4{color:var(--muted)}
+.cer-rank.arr{font-size:26px}
+.tag.ttl{background:color-mix(in srgb,var(--card) 22%,transparent);border-color:var(--card);color:var(--ink)}
+.tag.ttl.t4,.tag.ttl.t5{background:var(--card);color:#2B3540}
+.ladder{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;margin:10px 0 4px;font-size:13px}
+.ladder span{border:1.5px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
+.ladder span.done{color:var(--ink);border-color:var(--card)}
+.ladder span.on{background:var(--card);border-color:var(--card);color:#2B3540;font-weight:700}
+.ladder i{color:var(--muted);font-style:normal}
+.cer-name{text-align:center;display:flex;gap:8px;justify-content:center;align-items:center}
+.cer-line{text-align:center;font-weight:700;line-height:1.7}
+.big-money{text-align:center}.big-money.neg{color:var(--minus)}
+.awards{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.award{border:2px solid var(--card);background:color-mix(in srgb,var(--card) 15%,transparent);border-radius:999px;padding:3px 12px;font-weight:700;font-size:13px}
+.ach{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;opacity:.6}
+.ach.got{opacity:1;border-color:var(--card);background:color-mix(in srgb,var(--card) 10%,transparent)}
+.ach small{color:var(--muted)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}
+.tab{font:inherit;font-weight:700;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.tab.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.dex{display:flex;flex-wrap:wrap;gap:5px}
+.dexst{font-size:12px;padding:3px 8px;border-radius:6px;border:1px solid var(--line);color:var(--muted)}
+.dexst.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.dexrow{display:grid;grid-template-columns:5.5em minmax(0,1fr);gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.dexrow>span{display:flex;flex-wrap:wrap;gap:4px}
+.dp{padding:1px 7px;border-radius:6px;border:1px dashed var(--line);color:var(--muted)}
+.dp.on{border-style:solid;border-color:var(--accent);color:var(--ink)}
+.chart{position:relative}.chart svg{display:block;width:100%;height:auto;touch-action:pan-y}
+.chart-tip{position:absolute;top:8px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;line-height:1.6;box-shadow:0 4px 14px color-mix(in srgb,#000 18%,transparent);pointer-events:none;white-space:nowrap}
+.stat-wrap{overflow-x:auto}
+.stat td,.stat th{white-space:nowrap;font-size:13px}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.confetti i{position:absolute;top:-16px;height:14px;border-radius:2px;animation-name:fall;animation-timing-function:linear;animation-fill-mode:forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(760deg)}}
 .qex{margin:8px 0 0;padding:10px 12px;border-radius:10px;background:var(--bg);line-height:1.7;font-size:14px}
 .roulette{font-family:var(--f-display);font-size:clamp(28px,8vw,44px);text-align:center;padding:18px 8px;border:3px dashed var(--goal);border-radius:14px;margin:4px 0 12px}
 .roulette.hit{color:var(--goal);border-style:solid;animation:pop .35s ease-out}
@@ -182,8 +220,9 @@ th{font-size:12px;color:var(--muted)}
 .t-sub{display:inline-block;margin:0 auto;font-family:var(--f-display);font-size:20px;background:var(--goal);color:#fff;padding:4px 18px;border-radius:999px}
 .t-btns{display:grid;gap:10px}
 .t-btns .btn{width:100%}
-.t-cont small{display:block;font-family:var(--f-body);font-size:12px;opacity:.8;margin-top:2px}
-.t-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.t-cont small,.t-btns .btn small{display:block;font-family:var(--f-body);font-size:12px;opacity:.8;margin-top:2px}
+.t-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.t-row .btn{padding:10px 4px}
 .t-note{font-size:12px;color:var(--muted);line-height:1.6;margin:0}
 @media (max-width:820px){
   body{gap:6px;padding-block:6px}
@@ -245,7 +284,7 @@ th{font-size:12px;color:var(--muted)}
     <svg id="map" viewBox="0 0 1060 1120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="路線図"></svg>
   </div>
   <aside>
-    <section class="box" id="playersBox"><p class="label">社長一覧</p><div id="players"></div></section>
+    <section class="box" id="playersBox"><p class="label">オーナー一覧</p><div id="players"></div></section>
     <section class="box" id="action"><p class="hint">読み込み中…</p></section>
     <section class="box" id="log" aria-live="polite"><div class="scene" id="scene"></div><p class="scene-text" id="sceneText"></p><p class="scene-hint" id="sceneHint"></p><p class="label loglabel">これまでの出来事</p><ol></ol></section>
   </aside>
@@ -256,9 +295,10 @@ th{font-size:12px;color:var(--muted)}
     <div class="t-logo"><span>大人の</span>鉄道すごろく</div>
     <p class="t-sub">東日本編</p>
     <div class="t-btns">
-      <button class="btn primary big" id="tNew">はじめから</button>
+      <button class="btn primary big t-cont" id="tSingle">ひとりで遊ぶ<small>CPUと対戦・成績が記録に残ります</small></button>
+      <button class="btn big t-cont" id="tMulti">みんなで遊ぶ<small>1台を交代で使います・記録は残りません</small></button>
       <button class="btn big t-cont" id="tCont">つづきから<small id="tContInfo"></small></button>
-      <div class="t-row"><button class="btn" id="tLoad">セーブ</button><button class="btn" id="tHow">遊び方</button><button class="btn" id="tSet">設定</button></div>
+      <div class="t-row"><button class="btn" id="tLoad">セーブ</button><button class="btn" id="tRec">記録</button><button class="btn" id="tHow">遊び方</button><button class="btn" id="tSet">設定</button></div>
     </div>
     <p class="t-note">ver 1.0　物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>
   </div>
@@ -395,7 +435,8 @@ const MAPS={
 };
 const ALL_ST=[...KANTO_ST,...MAPS.east.stations.filter(s=>!KANTO_ST.some(k=>k[0]===s[0]))];
 const COLORS=["#D8392F","#2B62D6","#159A5C","#E0860F"];
-const DEFAULT_SEATS=[["あなた","human"],["あさま社長","cpu"],["とき社長","cpu"],["なすの社長","none"]];
+const DEFAULT_SEATS=[["あなた","human"],["鷹山オーナー","cpu"],["亀井オーナー","cpu"],["真中オーナー","none"]];
+const CPU_NAMES=["福富オーナー","鷹山オーナー","亀井オーナー","真中オーナー"],CPU_STYLE_N=["ほどほど派","積極派","堅実派","ほどほど派"];
 const MONTHS=["4月","5月","6月","7月","8月","9月","10月","11月","12月","1月","2月","3月"];
 const CARDS={
   kyuko:{n:"急行カード",d:"サイコロ2個で進む",t:"move"},tokkyu:{n:"特急カード",d:"サイコロ3個で進む",t:"move"},buttobi:{n:"ぶっとびカード",d:"どこかの駅へワープ",t:"move"},
@@ -656,7 +697,7 @@ function reach(start,steps,dest,exact){
 
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const sleep=ms=>new Promise(r=>setTimeout(r,window.__FAST?0:ms));
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const r100=v=>Math.round(v/100)*100;
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -678,8 +719,8 @@ const saveGP=()=>{try{localStorage.setItem("kks-game",JSON.stringify(GP))}catch(
 const SPEEDS={tap:{n:"タップで進む",k:1},slow:{n:"ゆっくり",k:1.6,base:1500,per:110},normal:{n:"ふつう",k:1,base:1000,per:65},fast:{n:"はやい",k:.6,base:550,per:32}};
 const wait=ms=>sleep(ms*(SPEEDS[GP.speed]||SPEEDS.normal).k);
 function setScene(key,text){if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}if(text!=null)$("#sceneText").textContent=text}
-function say(text,key){return new Promise(res=>{setScene(key||curScene||"move",text);const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
-  const done=()=>{clearTimeout(t);box.classList.remove("active");h.textContent="";h.className="scene-hint";layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",kd);res()};
+function say(text,key){return new Promise(res=>{setScene(key||curScene||"move",text);document.body.dataset.wait="1";const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
+  const done=()=>{clearTimeout(t);delete document.body.dataset.wait;box.classList.remove("active");h.textContent="";h.className="scene-hint";layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",kd);res()};
   const kd=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();done()}};
   addEventListener("keydown",kd);box.onclick=done;
   if(GP.speed==="tap"){h.textContent="タップで次へ";h.className="scene-hint tap";layer.hidden=false;layer.onclick=done}
@@ -749,6 +790,7 @@ const Snd={ctx:null,master:null,bgmG:null,seG:null,prefs:{on:true,bgm:true,se:tr
     if(slide)o.frequency.exponentialRampToValueAtTime(slide,start+dur);
     g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(vol,start+.008);g.gain.exponentialRampToValueAtTime(.0001,start+dur);
     o.connect(g);g.connect(dest);o.start(start);o.stop(start+dur+.03)},
+  noiseHit(start,vol,dur){const c=this.ctx,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=this.nb;s.loop=true;f.type="bandpass";f.frequency.value=1800;g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(.0001,start+dur);s.connect(f);f.connect(g);g.connect(this.seG);s.start(start);s.stop(start+dur+.02)},
   hat(start,vol){const c=this.ctx,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=this.nb;f.type="highpass";f.frequency.value=7000;
     g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(.0001,start+.05);s.connect(f);f.connect(g);g.connect(this.bgmG);s.start(start);s.stop(start+.06)},
   startBgm(){if(!this.ctx||this.timer)return;this.bgmG.gain.setTargetAtTime(.3,this.ctx.currentTime,.1);this.next=this.ctx.currentTime+.1;this.step=0;this.timer=setInterval(()=>this.sched(),25)},
@@ -776,6 +818,8 @@ const Snd={ctx:null,master:null,bgmG:null,seG:null,prefs:{on:true,bgm:true,se:tr
       case"settle":this.duck(1.6);this.seq(["C6","G6","C7"],"sine",.3,.16,.8);break;
       case"over":this.duck(3.5);this.seq(["C5","E5","G5","C6","G5","C6","E6","G6"],"square",.13,.13);this.tone(hz(midi("C7")),t+1.1,1.4,"square",.13,d);this.tone(hz(midi("C4")),t+1.1,1.4,"triangle",.35,d);break;
       case"click":this.tone(880,t,.04,"triangle",.15,d);break;
+      case"drum":this.duck(2.2);for(let i=0;i<22;i++)this.noiseHit(t+i*.07,.05+i*.012,.06);this.noiseHit(t+1.6,.4,.5);this.tone(hz(midi("C4")),t+1.6,.6,"triangle",.35,d);break;
+      case"sad":this.duck(2.2);["G4","F4","E4"].forEach((n,i)=>this.tone(hz(midi(n)),t+i*.35,.32,"sawtooth",.09,d));this.tone(hz(midi("D4")),t+1.05,1.1,"sawtooth",.09,d,hz(midi("C4")));break;
       case"yokai":this.tone(300,t,.25,"sawtooth",.1,d,200);this.tone(240,t+.22,.4,"sawtooth",.1,d,120);break;
       case"pass":this.seq(["C6","A5","F5","D6"],"square",.12,.07);break;
     }}
@@ -826,7 +870,7 @@ function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
 
 /* ---------- scene illustrations (placeholders; img/<key>.png or .webp on the site replaces them) ---------- */
-const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",win:"ゲーム終了（優勝）",title:"タイトル画面"};
+const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面"};
 const SCENE_IMG={};
 let SVGID=0;
 const BG={sky:["#8CCDF0","#E6F5FD","#7CC26B"],sea:["#9BD3F2","#E3F3FC","#2F7FB8"],night:["#1B2440","#3B3F70","#283055"],snow:["#C9DDEA","#F2F8FB","#FFFFFF"],
@@ -893,6 +937,12 @@ const SCENES={
   rest:["night",()=>IC.rail()+IC.train(40,82)+IC.zzz(248,62)],
   settle:["gold",()=>IC.bars(160,96)],
   win:["gold",()=>IC.trophy(160,90)],
+  promote:["gold",()=>`<g transform="translate(160,86)"><path d="M-56 34 L-64 -26 L-30 4 L0 -40 L30 4 L64 -26 L56 34Z" fill="#F2C443" stroke="#2B3540" stroke-width="4" stroke-linejoin="round"/><rect x="-58" y="34" width="116" height="18" rx="3" fill="#E0A82E" stroke="#2B3540" stroke-width="4"/><circle cx="0" cy="12" r="9" fill="#DE3F34" stroke="#2B3540" stroke-width="3"/><circle cx="-64" cy="-30" r="6" fill="#F7F7F2" stroke="#2B3540" stroke-width="3"/><circle cx="0" cy="-44" r="6" fill="#F7F7F2" stroke="#2B3540" stroke-width="3"/><circle cx="64" cy="-30" r="6" fill="#F7F7F2" stroke="#2B3540" stroke-width="3"/></g>`+IC.sparkle(80,50,1.3)+IC.sparkle(246,44)+IC.coins(84,118,.8)+IC.coins(240,120,.8)],
+  news:["station",()=>`<g transform="translate(92,34) rotate(-4)"><rect width="136" height="104" rx="4" fill="#FBFAF5" stroke="#2B3540" stroke-width="3"/><rect x="10" y="10" width="116" height="20" fill="#DE3F34"/><text x="68" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">経済ニュース</text>${[40,52,64,76,88].map(y=>`<rect x="10" y="${y}" width="${y===40?116:70}" height="6" fill="#B9C2C9"/>`).join("")}<rect x="86" y="52" width="40" height="42" fill="#2B62D6" opacity=".7"/><path d="M90 88 L100 74 L108 80 L122 60" stroke="#fff" stroke-width="3" fill="none"/></g>`],
+  season:["sunset",()=>IC.sparkle(80,50,1.4)+IC.sparkle(250,40)+IC.coins(160,104)+IC.sparkle(230,120,.8)],
+  bank:["sky",()=>`<g transform="translate(90,30)"><path d="M0 34 L70 4 L140 34Z" fill="#E9E2D3" stroke="#2B3540" stroke-width="3"/><text x="70" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#0C8565">¥</text><rect x="6" y="34" width="128" height="8" fill="#E9E2D3" stroke="#2B3540" stroke-width="3"/>${[16,44,72,100].map(x=>`<rect x="${x}" y="44" width="14" height="60" fill="#F7F7F2" stroke="#2B3540" stroke-width="3"/>`).join("")}<rect x="0" y="104" width="140" height="12" fill="#E9E2D3" stroke="#2B3540" stroke-width="3"/></g>`],
+  ceremony:["night",()=>`<path d="M0 0 H70 Q60 90 80 180 H0Z" fill="#B3261E"/><path d="M320 0 H250 Q260 90 240 180 H320Z" fill="#B3261E"/><path d="M110 0 L80 180 H240 L210 0Z" fill="#F8E7A1" opacity=".25"/><rect x="0" y="0" width="320" height="16" fill="#8A1C15"/>`+IC.trophy(160,100)],
+  lose:["night",()=>`<g fill="#9AA6B2"><ellipse cx="150" cy="44" rx="56" ry="24"/><ellipse cx="200" cy="50" rx="40" ry="20"/><ellipse cx="110" cy="54" rx="34" ry="16"/></g>${[110,140,170,200,125,185].map((x,i)=>`<path d="M${x} ${78+i%2*14} l-6 16" stroke="#8CCDF0" stroke-width="3" stroke-linecap="round"/>`).join("")}`+IC.tanuki(250,118,.55)+IC.arrow(80,118,false,"#B3261E")],
   title:["sunset",()=>`<path d="M0 118 L55 72 L100 104 L165 46 L232 108 L282 78 L320 98 V180 H0Z" fill="#7B5E8C" opacity=".55"/><path d="M152 58 L165 46 L178 58 L172 62 L165 56 L158 62Z" fill="#fff"/><rect y="132" width="320" height="48" fill="#2F7FB8"/><path d="M0 142 q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#fff" stroke-width="2" fill="none" opacity=".5"/><rect x="0" y="120" width="320" height="6" fill="#4A3A2E"/>${[20,70,120,170,220,270].map(x=>`<rect x="${x}" y="126" width="6" height="18" fill="#4A3A2E"/>`).join("")}`+IC.train(96,62,.72)]
 };
 function sceneSVG(key){const[bg,fn]=SCENES[key]||SCENES.move;const id=++SVGID;return `<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${SCENE_KEYS[key]||""}" preserveAspectRatio="xMidYMid slice">${bgSVG(bg,id)}${fn()}</svg>`}
@@ -902,6 +952,242 @@ const sceneHTML=key=>`<div class="scene-pic">${artHTML(key)}</div>`;
 function probeImages(){if(!/github\.io$/.test(location.hostname))return;
   Object.keys(SCENE_KEYS).forEach(k=>{const tryUrl=(ext,next)=>{const im=new Image();im.onload=()=>{SCENE_IMG[k]=im.src;if(k==="title")$("#tVisual").innerHTML=artHTML("title");if(curScene===k)$("#scene").innerHTML=artHTML(k)};im.onerror=next||(()=>{});im.src=`img/${k}.${ext}`};tryUrl("webp",()=>tryUrl("png"))})}
 
+/* ---------- economy: categories, news, seasons, settlements, bank, tax ---------- */
+const ECON={incomeHalf:1,taxRate:.014,loanRatio:.5,rateStart:5,rateMin:2,rateMax:9,newsChance:.35};
+const CAT_NAME={food:"飲食",lodging:"宿泊・温泉",ski:"スキー場",industry:"工場・工房",farm:"農園・漁業・市場",tourism:"観光・お店"};
+const CAT_KW=[
+  ["tourism",["売店","土産","雑貨","劇場","資料館","美術館","水族館","遊覧船","観光船","デパート","アウトレット","ビル","グッズ","ミュージアム","マンガ館","渡し","オルゴール","家電"]],
+  ["ski",["スキー"]],
+  ["food",["ラーメン","そば","うどん","丼","餃子","食堂","寿司","焼","料亭","レストラン","カフェ","フレンチ","屋台","バー","弁当","まんじゅう","菓子","団子","ずんだ","もち","おでん","プリン","肉まん","カレー","かまぼこ","冷麺","きりたんぽ","せんべい","炉端","うなぎ","茶屋","たまご","おやき","七味","ほうとう","しらす","干物","鍋","牛たん","芋煮","ジャム","羊羹","ようかん","納豆","パスタ","パン","海鮮","がに","白えび","鱒","湯葉","わらじ","笹","餅","唐揚げ","寿司","試飲","ずし"]],
+  ["lodging",["ホテル","旅館","宿","温泉","民宿","ペンション","別荘","スパ","リゾート"]],
+  ["industry",["工場","製鉄","製紙","工房","倉庫","研究所","採石","精密","電機","酒蔵","醤油蔵","ワイナリー","ビール","加工","ベンチャー","問屋","オフィス","本社","ホール"]],
+  ["farm",["園","田","農場","牧場","漁場","養殖","網元","畑","市場","漁港","梅林","米蔵"]]];
+function propCat(name){for(const[c,kws]of CAT_KW)if(kws.some(k=>name.includes(k)))return c;return "tourism"}
+const COAST_KW=["海","港","浜","湖","遊覧船","水族館","しらす","民宿","あさり","ホタテ","カキ","漁","運河","フェリー"];
+const NEWS=[
+  {t:"ご当地グルメのブームが到来！",d:"飲食の物件を持つオーナーに臨時収入。",cat:"food",pct:.12},
+  {t:"海外からの旅行客が急増！",d:"宿泊・温泉の物件を持つオーナーに売上ボーナス。",cat:"lodging",pct:.10},
+  {t:"円安で輸出が好調！",d:"工場・工房の物件を持つオーナーに臨時収入。",cat:"industry",pct:.10},
+  {t:"豊作・豊漁で市場がにぎわう！",d:"農園・漁業・市場の物件を持つオーナーに臨時収入。",cat:"farm",pct:.12},
+  {t:"旅行キャンペーンで観光客が増加！",d:"観光・お店の物件を持つオーナーに臨時収入。",cat:"tourism",pct:.10},
+  {t:"原材料の値上がりが直撃…",d:"飲食の物件を持つオーナーに追加の出費。",cat:"food",pct:-.06},
+  {t:"大型台風で宿のキャンセルが相次ぐ…",d:"宿泊・温泉の物件を持つオーナーに損失。",cat:"lodging",pct:-.06},
+  {t:"工場で設備トラブルが続発…",d:"工場・工房の物件を持つオーナーに修理費。",cat:"industry",pct:-.06},
+  {t:"不作・不漁で仕入れが苦しい…",d:"農園・漁業・市場の物件を持つオーナーに損失。",cat:"farm",pct:-.06},
+  {t:"長雨で観光客が減少…",d:"観光・お店の物件を持つオーナーに損失。",cat:"tourism",pct:-.05},
+  {t:"日銀が利上げを発表",d:"借入金の年利が1%上がります。",rate:1},
+  {t:"日銀が利下げを発表",d:"借入金の年利が1%下がります。",rate:-1}];
+const SEASONS={4:{t:"夏休みの観光シーズン！",d:"海辺・湖畔の物件と、宿泊・観光の物件に夏のボーナス。",fn:(name,cat)=>COAST_KW.some(k=>name.includes(k))?.10:(cat==="lodging"||cat==="tourism")?.05:0},
+  6:{t:"食欲の秋！",d:"飲食と農園・漁業・市場の物件に秋のボーナス。",fn:(name,cat)=>cat==="food"||cat==="farm"?.08:0},
+  9:{t:"冬のレジャーシーズン！",d:"スキー場と温泉宿にお客さんが殺到。",fn:(name,cat,st)=>cat==="ski"?.18:cat==="lodging"?(N[st]&&N[st].y<MAP.snowY?.10:.04):0}};
+const debtOf=p=>p.debt||0;
+const netWorth=i=>S.players[i].money+assets(i)-debtOf(S.players[i]);
+const loanLimit=i=>Math.floor(assets(i)*ECON.loanRatio/1000)*1000;
+const r1000=v=>Math.ceil(v/1000)*1000;
+function payoutRows(fn){return S.players.map((p,i)=>{let a=0;ownedList(i).forEach(([s,k,price])=>{const nm=P(s)[k][0];a+=price*fn(nm,propCat(nm),s)});return{p,a:r100(a)}}).filter(r=>r.a!==0)}
+async function econModal(key,title,desc,rows,extra){rows.forEach(r=>{r.p.money+=r.a;gain(r.p,r.a)});
+  rows.forEach(r=>log(`${title}　${r.p.name}${r.a>0?"に":"は"}${yen(Math.abs(r.a))}の${r.a>0?"収入":"出費"}。`));render();Snd.sfx(rows.some(r=>r.a<0)&&!rows.some(r=>r.a>0)?"minus":"plus");setScene(key,title);
+  await modal(`${sceneHTML(key)}<h2>${esc(title)}</h2><p>${esc(desc)}</p>${rows.length?`<table><tr><th>オーナー</th><th>影響</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}</td><td style="color:${r.a<0?"var(--minus)":"var(--accent)"}">${r.a>0?"＋":"−"}${yen(Math.abs(r.a))}</td></tr>`).join("")}</table>`:`<p class="hint">${extra||"影響を受けるオーナーはいませんでした。"}</p>`}`,[["つづける",1,"primary"]])}
+async function monthEvents(){
+  const se=SEASONS[S.month];if(se){const rows=payoutRows(se.fn);if(rows.length)await econModal("season",se.t,se.d,rows)}
+  if(Math.random()<ECON.newsChance){
+    for(let tries=0;tries<4;tries++){const n=NEWS[rnd(0,NEWS.length-1)];
+      if(n.rate){const was=S.rate;S.rate=Math.max(ECON.rateMin,Math.min(ECON.rateMax,S.rate+n.rate));if(S.rate===was)continue;
+        log(`${n.t}。年利は${S.rate}%になりました。`);setScene("news",n.t);Snd.sfx(n.rate>0?"minus":"plus");render();
+        await modal(`${sceneHTML("news")}<h2>経済ニュース：${esc(n.t)}</h2><p>${esc(n.d)}借入金の年利は <b>${was}% → ${S.rate}%</b> になりました。</p>`,[["つづける",1,"primary"]]);return}
+      const rows=payoutRows((nm,cat)=>cat===n.cat?n.pct:0);if(!rows.length)continue;
+      await econModal("news","経済ニュース："+n.t,n.d,rows);return}}}
+async function settle(yearEnd){render();
+  const rows=S.players.map((p,i)=>{let inc=0,mono=0;for(const s in S.owners){const m=isMono(s,i);if(m)mono++;S.owners[s].forEach((o,k)=>{if(o===i){const[,pr,rt]=P(s)[k];inc+=pr*rt/100*(m?2:1)*ECON.incomeHalf}})}
+    inc=r100(inc);const interest=r100(debtOf(p)*S.rate/100/2),tax=yearEnd?r100(assets(i)*ECON.taxRate):0,net=inc-interest-tax;p.money+=net;gain(p,net);return{p,inc,mono,interest,tax,net}});
+  const label=yearEnd?`${S.year}年目 本決算（3月）`:`${S.year}年目 中間決算（9月）`;
+  log(`${label}が終わりました。`);setScene("settle",label);render();Snd.sfx("settle");
+  await modal(`${sceneHTML("settle")}<h2>${label}</h2><p>物件の収益が入り、借入の利息${yearEnd?"と固定資産税（物件評価額の1.4%）":""}を支払いました。独占した駅は収益2倍です。</p><div style="overflow-x:auto"><table class="settle"><tr><th>オーナー</th><th>収益</th><th>利息</th>${yearEnd?"<th>税金</th>":""}<th>差引</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}${r.mono?`<br><small style="color:var(--muted)">独占${r.mono}駅</small>`:""}</td><td>＋${yen(r.inc)}</td><td>${r.interest?"−"+yen(r.interest):"—"}</td>${yearEnd?`<td>${r.tax?"−"+yen(r.tax):"—"}</td>`:""}<td style="color:${r.net<0?"var(--minus)":"var(--accent)"}"><b>${r.net<0?"−":"＋"}${yen(Math.abs(r.net))}</b></td></tr>`).join("")}</table></div>`,[["つづける",1,"primary"]]);
+  for(const p of S.players)if(p.money<0)await forceSellOf(p)}
+async function forceSellOf(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);let sold=0;
+  while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が資金繰りのため${s}の「${P(s)[k][0]}」を売却。`)}
+  if(sold){render();await say(`${p.name}は資金繰りのため物件を${sold}件売却しました。`,"minus")}}
+/* bank */
+function bankModal(){return new Promise(res=>{const p=cp(),i=S.cur,body=$("#modalBody");
+  const draw=()=>{const lim=loanLimit(i),d=debtOf(p),room=Math.max(0,lim-d);
+    body.innerHTML=`${sceneHTML("bank")}<h2>銀行</h2><p>持っている物件の評価額の半分まで借りられます。利息は年${S.rate}%で、9月と3月の決算で半年分ずつ払います。</p>
+    <div class="row"><span class="pn">所持金</span><span></span><b>${yen(p.money)}</b></div>
+    <div class="row"><span class="pn">借入残高</span><span></span><b>${yen(d)}</b></div>
+    <div class="row"><span class="pn">借入限度額<br><small style="font-weight:400;color:var(--muted)">物件評価額 ${yen(assets(i))} の50%</small></span><span></span><b>${yen(lim)}</b></div>
+    <h3>借りる</h3><div class="chips">${[1000,5000,10000].map(v=>`<button class="btn sm primary" data-borrow="${v}" ${room<v?"disabled":""}>${yen(v)}</button>`).join("")}<button class="btn sm" data-borrow="${room}" ${room<1000?"disabled":""}>限度いっぱい</button></div>
+    <h3>返す</h3><div class="chips">${[1000,5000,10000].map(v=>`<button class="btn sm" data-repay="${v}" ${d<v||p.money<v?"disabled":""}>${yen(v)}</button>`).join("")}<button class="btn sm" data-repay="${Math.min(d,Math.floor(p.money/100)*100)}" ${d<=0||p.money<=0?"disabled":""}>返せるだけ返す</button></div>
+    <p class="hint" style="margin-top:10px">ゲーム終了時の総資産は「現金＋物件の評価額−借入残高」です。収益率が年利より高い物件を借金で買えば得になります。</p>`;render()};
+  modal("",[["閉じる",1,"primary"]]).then(()=>{body.onclick=null;res()});draw();
+  body.onclick=e=>{const b=e.target.closest("[data-borrow]"),r=e.target.closest("[data-repay]");
+    if(b){const v=+b.dataset.borrow;if(v>0&&debtOf(p)+v<=loanLimit(i)){p.debt=debtOf(p)+v;p.money+=v;ST(p).maxDebt=Math.max(ST(p).maxDebt,p.debt);log(`${p.name}が銀行から${yen(v)}を借りた。`);Snd.sfx("buy")}}
+    else if(r){const v=Math.min(+r.dataset.repay,debtOf(p),p.money);if(v>0){p.debt=debtOf(p)-v;p.money-=v;log(`${p.name}が銀行に${yen(v)}を返した。`);Snd.sfx("click")}}
+    draw()}})}
+/* CPU personalities: aggressive borrows to expand, cautious never borrows */
+const STYLE={aggressive:{reserve:1000,margin:1,maxDebt:.5,repayAbove:30000},normal:{reserve:2500,margin:3,maxDebt:.3,repayAbove:15000},cautious:{reserve:4000,margin:99,maxDebt:0,repayAbove:5000}};
+const styleOf=p=>STYLE[p.style]||STYLE.normal;
+function cpuRepay(p){const st=styleOf(p),d=debtOf(p);if(d<=0||p.money<=st.repayAbove)return;const v=Math.min(d,Math.floor((p.money-st.repayAbove*.6)/1000)*1000);if(v>0){p.debt=d-v;p.money-=v;log(`${p.name}が銀行に${yen(v)}を返した。`)}}
+
+/* ---------- per-game stats ---------- */
+const newSt=()=>({steps:0,stations:[],arrivals:0,bought:0,boughtValue:0,boughtList:[],plus:0,minus:0,bad:0,cardsUsed:0,cardKinds:[],quizN:0,quizOk:0,yokaiTurns:0,maxGain:0,maxLoss:0,sea:0,attacks:0,maxDebt:0,wasLast:false});
+const ST=p=>p.st||(p.st=newSt());
+function gain(p,a){const s=ST(p);if(a>s.maxGain)s.maxGain=a;if(-a>s.maxLoss)s.maxLoss=-a}
+function useKind(p,c){const s=ST(p);s.cardsUsed++;if(!s.cardKinds.includes(c))s.cardKinds.push(c)}
+function snapshot(label){S.hist=S.hist||[];const nw=S.players.map((_,i)=>netWorth(i));S.hist.push({l:label,v:nw});const mn=Math.min(...nw);
+  S.players.forEach((p,i)=>{const s=ST(p);s.maxDebt=Math.max(s.maxDebt,debtOf(p));if(!p.cpu&&S.hist.length>3&&nw[i]===mn&&nw.filter(v=>v===mn).length===1)s.wasLast=true})}
+const monoCount=i=>STATIONS.filter(([st])=>S.owners[st]&&S.owners[st].length&&isMono(st,i)).length;
+function confetti(n=100){if(reduce)return;const box=document.createElement("div");box.className="confetti";const cs=["#DE3F34","#2B62D6","#0C8565","#F2C443","#E05A9A","#FFFFFF"];
+  for(let i=0;i<n;i++){const s=document.createElement("i");s.style.left=(Math.random()*100)+"%";s.style.background=cs[i%cs.length];s.style.animationDelay=(Math.random()*.9).toFixed(2)+"s";s.style.animationDuration=(2.2+Math.random()*1.6).toFixed(2)+"s";s.style.width=(6+Math.random()*6).toFixed(0)+"px";box.appendChild(s)}
+  document.body.appendChild(box);setTimeout(()=>box.remove(),5000)}
+const kingTitle=()=>MAP.name.replace("編","")+"の鉄道王";
+const pick=a=>a[rnd(0,a.length-1)];
+
+/* ---------- awards ---------- */
+const AWARDS=[["不動産王",i=>assets(i)],["独占王",i=>monoCount(i)],["一番乗り名人",i=>ST(S.players[i]).arrivals],["クイズ博士",i=>ST(S.players[i]).quizOk],["借金王",i=>ST(S.players[i]).maxDebt],
+  ["狸の大親友",i=>ST(S.players[i]).yokaiTurns],["健脚賞",i=>ST(S.players[i]).steps],["青マスの申し子",i=>ST(S.players[i]).plus],["赤マスの常連",i=>ST(S.players[i]).minus],["災難の主人公",i=>ST(S.players[i]).bad]];
+function computeAwards(){const res=S.players.map(()=>[]);
+  AWARDS.forEach(([n,f])=>{const v=S.players.map((_,i)=>f(i)),mx=Math.max(...v);if(mx<=0)return;const w=v.map((x,i)=>x===mx?i:-1).filter(i=>i>=0);if(w.length>2)return;w.forEach(i=>res[i].push(n))});
+  return res.map(a=>a.length?a.slice(0,3):["完走賞"])}
+function ceremonyLine(x,first,last,order){const p=x.p,s=ST(p);
+  if(first){const ex=[];if(debtOf(p)===0&&s.maxDebt===0)ex.push("しかも借金ゼロの堅実経営でした！");if(s.arrivals>=3)ex.push(`目的地への一番乗りは${s.arrivals}回！`);if(monoCount(x.i)>=3)ex.push(`${monoCount(x.i)}駅を独占した手腕はお見事です。`);if(s.wasLast)ex.push("一度は最下位からの、見事な大逆転でした！");
+    return `${p.name}が「${kingTitle()}」の称号を手にしました！ ${ex.length?pick(ex):"文句なしの優勝です！"}`}
+  if(last){const ex=[];if(x.nw<0)ex.push("まさかの債務超過で幕を閉じました…。");if(s.yokaiTurns>=8)ex.push("狸に気に入られすぎました…。");if(debtOf(p)>assets(x.i)*.4&&debtOf(p)>0)ex.push("借金が重くのしかかりました…。");if(s.bad>=3)ex.push("災難カードに泣かされました…。");if(s.minus>=s.plus+4)ex.push("赤マスとの相性が悪すぎました…。");
+    return `${pick(["来年こそは…。","オーナー室から、深いため息が聞こえてきます…。","株主総会が荒れそうです…。","故郷の駅弁が身にしみます…。"])} ${ex.length?pick(ex):`ほろ苦い${S.years}年間でした。`}`}
+  if(x.rank===2){const gap=order[0].nw-x.nw;return `あと一歩で鉄道王！ その差は${yen(gap)}。${pick(["悔しさをバネに、次こそ頂点へ。","惜しい、実に惜しい準優勝です。"])}`}
+  return pick(["表彰台の端っこで、なんとか面目を保ちました。","可もなく不可もなく、手堅い経営でした。","次の旅では、もうひと花咲かせたいところです。"])}
+async function gameOver(){S.year=S.years;S.month=11;S.phase="over";snapshot("終了");render();autosave();
+  const order=S.players.map((p,i)=>({p,i,nw:netWorth(i)})).sort((a,b)=>b.nw-a.nw);order.forEach((x,k)=>x.rank=k+1);
+  const awards=computeAwards();const rec=S.mode==="single"?updateRecords(order):null;
+  Snd.sfx("drum");setScene("ceremony","結果発表！");
+  await modal(`${sceneHTML("ceremony")}<h2 class="cer-title">結果発表！</h2><p>${MAP.name}・${S.years}年間の旅が終わりました。総資産（現金＋物件の評価額−借入残高）の少ないオーナーから、順に発表します。</p>`,[["発表を聞く",1,"primary"]]);
+  for(let k=order.length-1;k>=0;k--){const x=order[k],first=k===0,last=k===order.length-1&&order.length>1;
+    const key=first?"win":last?"lose":"ceremony";Snd.sfx(first?"over":last?"sad":"settle");setScene(key,`${x.rank}位 ${x.p.name}`);
+    const pr=modal(`${sceneHTML(key)}<div class="cer-rank r${Math.min(x.rank,4)}">${first?"優勝":x.rank+"位"}</div><h2 class="cer-name"><span class="dot" style="background:${pcol(x.i)}"></span>${esc(x.p.name)}</h2><p style="text-align:center;margin:0">称号：<b>${TITLES[x.p.title||0].n}</b></p><div class="big-money ${x.nw<0?"neg":""}">${x.nw<0?"−":""}${yen(Math.abs(x.nw))}</div><p class="cer-line">${esc(ceremonyLine(x,first,last,order))}</p><div class="awards">${awards[x.i].map(a=>`<span class="award">${a}</span>`).join("")}</div>`,[[first?"表彰式を終える":"次の発表へ",1,"primary"]]);
+    if(first)confetti(140);await pr}
+  if(rec&&rec.newAch.length){Snd.sfx("card");confetti(50);await modal(`${sceneHTML("correct")}<h2>新しい実績を獲得！</h2>${rec.newAch.map(a=>`<div class="ach got"><b>${a.n}</b><small>${a.d}</small></div>`).join("")}`,[["つづける",1,"primary"]])}
+  for(;;){const r=await modal(summaryHTML(order,rec,awards),[["成績を見る",2],["タイトルへ",0],["もう一度あそぶ",1,"primary"]]);
+    if(r===2){await statsModal();continue}
+    if(r===1)setup(S.mode);else showTitle();break}}
+function summaryHTML(order,rec,awards){
+  const note=S.mode==="single"?(rec?`<p class="hint">記録を更新しました。通算 ${REC.games}戦 ${REC.wins}勝${rec.bestUp?"・<b>自己ベストの総資産を更新！</b>":""}</p>`:""):`<p class="hint">みんなで遊ぶモードのため、記録は残りません。</p>`;
+  return `<h2>最終結果</h2><p>${MAP.name}・${S.years}年間</p><table><tr><th>順位</th><th>オーナー</th><th>総資産</th></tr>${order.map(x=>`<tr><td>${x.rank}位</td><td><span class="dot" style="background:${pcol(x.i)};display:inline-block;vertical-align:middle;margin-right:6px"></span>${esc(x.p.name)}　${ttlTag(x.p)}<br><small style="color:var(--muted)">${awards[x.i].join("・")}</small></td><td style="${x.nw<0?"color:var(--minus)":""}">${x.nw<0?"−":""}${yen(Math.abs(x.nw))}</td></tr>`).join("")}</table>${note}`}
+
+/* ---------- stats screen ---------- */
+const yShort=v=>Math.abs(v)>=10000?(v/10000).toFixed(Math.abs(v)>=100000?0:1)+"億":Math.round(v).toLocaleString()+"万";
+function niceStep(r){const c=[1000,2000,5000,10000,20000,50000,100000,200000,500000,1000000,2000000];return c.find(x=>x>=r)||c.at(-1)}
+const DASH=["","7 4","2 4","10 4 2 4"];
+function marker(x,y,i,c){return i===0?`<circle cx="${x}" cy="${y}" r="5" fill="${c}" stroke="var(--panel)" stroke-width="2"/>`:i===1?`<rect x="${x-5}" y="${y-5}" width="10" height="10" fill="${c}" stroke="var(--panel)" stroke-width="2"/>`:i===2?`<path d="M${x} ${y-6} L${x+6} ${y+5} L${x-6} ${y+5}Z" fill="${c}" stroke="var(--panel)" stroke-width="2"/>`:`<path d="M${x} ${y-6} L${x+6} ${y} L${x} ${y+6} L${x-6} ${y}Z" fill="${c}" stroke="var(--panel)" stroke-width="2"/>`}
+function chartSVG(){const H=S.hist||[];if(H.length<2)return "";const W=640,Ht=280,ml=52,mr=96,mt=14,mb=30;
+  const all=H.flatMap(h=>h.v);let mn=Math.min(0,...all),mx=Math.max(...all,1);const st=niceStep((mx-mn)/4);mn=Math.floor(mn/st)*st;mx=Math.ceil(mx/st)*st;if(mx===mn)mx=mn+st;
+  const X=i=>ml+(W-ml-mr)*i/(H.length-1),Y=v=>mt+(Ht-mt-mb)*(1-(v-mn)/(mx-mn));
+  let g="";for(let v=mn;v<=mx+1;v+=st)g+=`<line x1="${ml}" x2="${W-mr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="${v===0?1.5:1}"/><text x="${ml-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${yShort(v)}</text>`;
+  H.forEach((h,i)=>{if(i===0||i===H.length-1||/年4月$/.test(h.l))g+=`<text x="${X(i)}" y="${Ht-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${i===0?"開始":i===H.length-1?"終了":h.l.replace("4月","")}</text>`});
+  const ends=S.players.map((p,pi)=>({pi,y:Y(H.at(-1).v[pi])})).sort((a,b)=>a.y-b.y);for(let k=1;k<ends.length;k++)if(ends[k].y-ends[k-1].y<15)ends[k].y=ends[k-1].y+15;
+  const lines=S.players.map((p,pi)=>{const c=pcol(pi),d="M"+H.map((h,i)=>`${X(i).toFixed(1)} ${Y(h.v[pi]).toFixed(1)}`).join(" L");const ly=ends.find(e=>e.pi===pi).y;
+    return `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="${DASH[pi%4]}"/>${marker(X(H.length-1),Y(H.at(-1).v[pi]),pi%4,c)}<text x="${W-mr+10}" y="${ly+4}" font-size="12" font-weight="700" fill="var(--ink)">${esc(p.name.slice(0,6))}</text>`}).join("");
+  return `<div class="chart" id="chart"><svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="総資産の推移">${g}${lines}<line id="chX" x1="0" x2="0" y1="${mt}" y2="${Ht-mb}" stroke="var(--muted)" stroke-dasharray="3 3" visibility="hidden"/><rect x="${ml}" y="${mt}" width="${W-ml-mr}" height="${Ht-mt-mb}" fill="transparent" id="chHit"/></svg><div class="chart-tip" id="chTip" hidden></div></div>`}
+function bindChart(){const svg=$("#chart svg"),hit=$("#chHit");if(!svg||!hit)return;const H=S.hist,W=640,ml=52,mr=96;
+  const move=e=>{const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)*W/r.width;const i=Math.max(0,Math.min(H.length-1,Math.round((x-ml)/(W-ml-mr)*(H.length-1))));
+    const cx=ml+(W-ml-mr)*i/(H.length-1);const ln=$("#chX");ln.setAttribute("x1",cx);ln.setAttribute("x2",cx);ln.setAttribute("visibility","visible");
+    const tip=$("#chTip");tip.hidden=false;tip.innerHTML=`<b>${esc(H[i].l)}</b>`+S.players.map((p,pi)=>`<div><span class="dot" style="background:${pcol(pi)};display:inline-block;margin-right:4px"></span>${esc(p.name)}　${yen(H[i].v[pi])}</div>`).join("");
+    const px=cx/W*r.width;tip.style.left=Math.min(r.width-tip.offsetWidth-4,Math.max(4,px+10))+"px"};
+  hit.addEventListener("pointermove",move);hit.addEventListener("pointerdown",move);hit.addEventListener("pointerleave",()=>{$("#chTip").hidden=true;$("#chX").setAttribute("visibility","hidden")})}
+async function statsModal(){
+  const rows=[["称号",i=>TITLES[S.players[i].title||0].n],["総資産",i=>yen(netWorth(i))],["現金",i=>yen(S.players[i].money)],["物件の評価額",i=>yen(assets(i))],["借入残高",i=>yen(debtOf(S.players[i]))],["物件の数",i=>ownedList(i).length+"件"],["独占した駅",i=>monoCount(i)+"駅"],
+    ["目的地への一番乗り",i=>ST(S.players[i]).arrivals+"回"],["進んだマス",i=>ST(S.players[i]).steps+"マス"],["立ち寄った駅",i=>ST(S.players[i]).stations.length+"駅"],["航路を進んだマス",i=>ST(S.players[i]).sea+"マス"],
+    ["青マス",i=>ST(S.players[i]).plus+"回"],["赤マス",i=>ST(S.players[i]).minus+"回"],["災難カード",i=>ST(S.players[i]).bad+"回"],["使ったカード",i=>ST(S.players[i]).cardsUsed+"枚"],["邪魔カードを使った",i=>ST(S.players[i]).attacks+"回"],
+    ["クイズ",i=>S.players[i].cpu?"—":`${ST(S.players[i]).quizOk}/${ST(S.players[i]).quizN}問正解`],["妖怪に取り憑かれた",i=>ST(S.players[i]).yokaiTurns+"回"],["1回の最大収入",i=>yen(ST(S.players[i]).maxGain)],["1回の最大損失",i=>yen(ST(S.players[i]).maxLoss)],["最大借入額",i=>yen(ST(S.players[i]).maxDebt)]];
+  const pr=modal(`<h2>成績</h2><h3>総資産の推移</h3>${chartSVG()}<p class="hint">グラフをなぞると、その時点の総資産が見られます。</p><h3>詳しい成績</h3><div class="stat-wrap"><table class="stat"><tr><th></th>${S.players.map((p,i)=>`<th><span class="dot" style="background:${pcol(i)};display:inline-block;margin-right:4px"></span>${esc(p.name)}</th>`).join("")}</tr>${rows.map(([n,f])=>`<tr><td>${n}</td>${S.players.map((_,i)=>`<td>${f(i)}</td>`).join("")}</tr>`).join("")}</table></div>`,[["閉じる",0,"primary"]],true);
+  bindChart();await pr}
+
+/* ---------- titles (promotion by net worth) ---------- */
+const TITLES=[{n:"駆け出し",min:-Infinity},{n:"小金持ち",min:20000},{n:"資産家",min:40000},{n:"大地主",min:80000},{n:"大富豪",min:150000},{n:"億万長者",min:300000}];
+const titleOf=nw=>{let t=0;TITLES.forEach((x,k)=>{if(nw>=x.min)t=k});return t};
+const ttlTag=p=>`<span class="tag ttl t${p.title||0}">${TITLES[p.title||0].n}</span>`;
+function ladderHTML(t){return `<div class="ladder">${TITLES.map((x,k)=>`<span class="${k===t?"on":k<t?"done":""}">${x.n}</span>`).join('<i aria-hidden="true">›</i>')}</div>`}
+async function checkTitles(){for(const p of S.players){const t=titleOf(netWorth(p.idx));if(t<=(p.title||0))continue;p.title=t;const T=TITLES[t],nx=TITLES[t+1];
+    log(`${p.name}の称号が「${T.n}」に上がった！`);render();Snd.sfx("arrive");setScene("promote",`${p.name}が「${T.n}」に昇格！`);
+    const msg=`総資産が${yen(T.min)}を超えました。`+(nx?`次の「${nx.n}」は総資産${yen(nx.min)}からです。`:"これ以上の称号はありません。名実ともに頂点です！");
+    const pr=modal(`${sceneHTML("promote")}<div class="cer-rank r1 arr">称号が上がった！</div><h2 class="cer-name"><span class="dot" style="background:${pcol(p.idx)}"></span>${esc(p.name)}は「${T.n}」に</h2><p>${msg}</p>${ladderHTML(t)}`,[["つづける",1,"primary"]]);
+    confetti(p.cpu?30:t>=4?140:80);await pr}}
+
+/* ---------- lifetime records (single-player mode only) ---------- */
+const HOK=["函館","長万部","東室蘭","苫小牧","札幌","小樽","旭川","富良野","帯広","釧路"];
+const REC_NEW=()=>({v:1,games:0,wins:0,bestNW:null,bestTitle:0,steps:0,bought:0,monos:0,arrivals:0,quizOk:0,quizN:0,sea:0,cardKinds:[],visited:{},props:{},ach:{},recent:[]});
+let REC=REC_NEW();
+async function loadRec(){try{REC=Object.assign(REC_NEW(),(await Store.get("records"))||{})}catch(e){REC=REC_NEW()}}
+const saveRec=()=>Store.set("records",REC);
+const ACH=[
+ {id:"first",n:"はじめての旅",d:"ひとりで遊ぶモードを1回遊び終える",t:R=>R.games>=1},
+ {id:"games10",n:"常連の旅人",d:"10回遊び終える",t:R=>R.games>=10},
+ {id:"win1",n:"鉄道王デビュー",d:"はじめて優勝する",t:R=>R.wins>=1},
+ {id:"win5",n:"名門の鉄道王",d:"通算5回優勝する",t:R=>R.wins>=5},
+ {id:"win20",n:"伝説の鉄道王",d:"通算20回優勝する",t:R=>R.wins>=20},
+ {id:"nw10",n:"10億円の壁",d:"1回のゲームで総資産10億円を超える",t:(R,g)=>g.nw>=100000},
+ {id:"nw30",n:"30億円の大台",d:"1回のゲームで総資産30億円を超える",t:(R,g)=>g.nw>=300000},
+ {id:"nw100",n:"百億長者",d:"1回のゲームで総資産100億円を超える",t:(R,g)=>g.nw>=1000000},
+ {id:"ttl3",n:"大地主の仲間入り",d:"称号「大地主」に昇格する",t:(R,g)=>g.title>=3},
+ {id:"ttl5",n:"億万長者",d:"称号の頂点「億万長者」に昇格する",t:(R,g)=>g.title>=5},
+ {id:"comeback",n:"大逆転",d:"一度は最下位になりながら優勝する",t:(R,g)=>g.won&&g.wasLast},
+ {id:"nodebt",n:"無借金経営",d:"一度も借入をせずに優勝する",t:(R,g)=>g.won&&g.maxDebt===0},
+ {id:"leverage",n:"借金も実力のうち",d:"借入10億円以上を経験して優勝する",t:(R,g)=>g.won&&g.maxDebt>=100000},
+ {id:"yokaifree",n:"狸知らず",d:"妖怪に一度も取り憑かれずに優勝する",t:(R,g)=>g.won&&g.yokai===0},
+ {id:"tanuki",n:"狸の大親友",d:"1回のゲームで妖怪に12回以上悪さをされる",t:(R,g)=>g.yokai>=12},
+ {id:"mono1",n:"はじめての独占",d:"駅を1つ独占したままゲームを終える",t:(R,g)=>g.monos>=1},
+ {id:"mono5",n:"独占企業",d:"1回のゲームで5駅以上を独占したまま終える",t:(R,g)=>g.monos>=5},
+ {id:"mono30",n:"独占の鬼",d:"独占した駅が通算30駅に達する",t:R=>R.monos>=30},
+ {id:"hokkaido",n:"北の大地の覇者",d:"東日本編で北海道の駅を3つ以上独占したまま終える",t:(R,g)=>g.hokMono>=3},
+ {id:"arrive5",n:"一番乗りの常連",d:"1回のゲームで目的地に5回一番乗りする",t:(R,g)=>g.arrivals>=5},
+ {id:"arrive50",n:"目的地ハンター",d:"一番乗りが通算50回に達する",t:R=>R.arrivals>=50},
+ {id:"steps1000",n:"千里の道",d:"進んだマスが通算1,000マスに達する",t:R=>R.steps>=1000},
+ {id:"steps5000",n:"列島縦断の健脚",d:"進んだマスが通算5,000マスに達する",t:R=>R.steps>=5000},
+ {id:"east_all",n:"東日本全駅制覇",d:"東日本編の全駅に立ち寄る（通算）",t:R=>(R.visited.east||[]).length>=MAPS.east.stations.length},
+ {id:"kanto_all",n:"関東甲信越全駅制覇",d:"関東甲信越編の全駅に立ち寄る（通算）",t:R=>(R.visited.kanto||[]).length>=MAPS.kanto.stations.length},
+ {id:"props50",n:"物件コレクター",d:"物件図鑑を50件埋める",t:R=>Object.keys(R.props).length>=50},
+ {id:"props150",n:"物件マニア",d:"物件図鑑を150件埋める",t:R=>Object.keys(R.props).length>=150},
+ {id:"quiz10",n:"物知りオーナー",d:"クイズに通算10問正解する",t:R=>R.quizOk>=10},
+ {id:"quiz100",n:"歩く百科事典",d:"クイズに通算100問正解する",t:R=>R.quizOk>=100},
+ {id:"quizperfect",n:"満点のオーナー",d:"1回のゲームでクイズに5問以上出題され、全問正解する",t:(R,g)=>g.quizN>=5&&g.quizOk===g.quizN},
+ {id:"sailor",n:"海の男",d:"フェリー航路を通算100マス進む",t:R=>R.sea>=100},
+ {id:"allcards",n:"カードの達人",d:"すべての種類のカードを使う（通算）",t:R=>Object.keys(CARDS).every(k=>R.cardKinds.includes(k))},
+ {id:"years10",n:"10年オーナー",d:"10年のゲームを遊び終える",t:(R,g)=>g.years>=10},
+ {id:"unlucky",n:"災難の主人公",d:"1回のゲームで災難カードを5回引く",t:(R,g)=>g.bad>=5},
+ {id:"broke",n:"どん底からの出直し",d:"総資産マイナスでゲームを終える",t:(R,g)=>g.nw<0}];
+function updateRecords(order){const me=order.find(x=>!x.p.cpu);if(!me)return null;const p=me.p,s=ST(p),i=me.i;
+  REC.games++;if(me.rank===1)REC.wins++;const bestUp=REC.bestNW==null||me.nw>REC.bestNW;if(bestUp)REC.bestNW=me.nw;REC.bestTitle=Math.max(REC.bestTitle||0,p.title||0);
+  const monos=monoCount(i);REC.steps+=s.steps;REC.bought+=s.bought;REC.monos+=monos;REC.arrivals+=s.arrivals;REC.quizOk+=s.quizOk;REC.quizN+=s.quizN;REC.sea+=s.sea;
+  s.cardKinds.forEach(k=>{if(!REC.cardKinds.includes(k))REC.cardKinds.push(k)});
+  const vis=REC.visited[S.map]||(REC.visited[S.map]=[]);s.stations.forEach(st=>{if(!vis.includes(st))vis.push(st)});
+  s.boughtList.forEach(k=>REC.props[k]=1);
+  const g={won:me.rank===1,nw:me.nw,monos,arrivals:s.arrivals,quizN:s.quizN,quizOk:s.quizOk,yokai:s.yokaiTurns,maxDebt:s.maxDebt,years:S.years,bad:s.bad,title:p.title||0,wasLast:s.wasLast,hokMono:S.map==="east"?HOK.filter(st=>S.owners[st]&&isMono(st,i)).length:0};
+  const newAch=[];ACH.forEach(a=>{if(!REC.ach[a.id]&&a.t(REC,g)){REC.ach[a.id]=Date.now();newAch.push(a)}});
+  REC.recent.unshift({t:Date.now(),map:S.map,years:S.years,rank:me.rank,n:order.length,nw:me.nw});REC.recent=REC.recent.slice(0,10);
+  saveRec();return{newAch,bestUp}}
+async function recordsModal(){await loadRec();const body=$("#modalBody");let tab="total",armed=false;
+  const pr=modal("",[["閉じる",0,"primary"]],true);
+  const dexKeys=()=>{const m=new Map();ALL_ST.forEach(s=>DEFAULT_PROPS[s[0]].forEach(pp=>m.set(s[0]+"|"+pp[0],[s[0],pp[0]])));return m};
+  const draw=()=>{const tabs=[["total","通算成績"],["ach","実績"],["st","駅図鑑"],["prop","物件図鑑"],["io","引き継ぎ"]];
+    let h=`<h2>記録</h2><p class="hint">「ひとりで遊ぶ」モードの成績だけが、この端末に記録されます。</p><div class="tabs" role="tablist">${tabs.map(([k,n])=>`<button class="tab ${tab===k?"on":""}" data-tab="${k}" role="tab" aria-selected="${tab===k}">${n}</button>`).join("")}</div>`;
+    const R=REC,got=Object.keys(R.ach).length;
+    if(tab==="total"){const rows=[["遊んだ回数",R.games+"回"],["優勝",`${R.wins}回${R.games?`（勝率${Math.round(R.wins/R.games*100)}%）`:""}`],["最高の総資産",R.bestNW==null?"—":yen(R.bestNW)],["最高の称号",R.games?TITLES[R.bestTitle||0].n:"—"],["進んだマス",R.steps.toLocaleString()+"マス"],["買った物件",R.bought+"件"],["独占した駅",R.monos+"駅"],["目的地への一番乗り",R.arrivals+"回"],["クイズ",`${R.quizOk}/${R.quizN}問正解`],["航路を進んだマス",R.sea+"マス"],["実績",`${got}/${ACH.length}`]];
+      h+=rows.map(([a,b])=>`<div class="row"><span class="pn">${a}</span><span></span><b>${b}</b></div>`).join("");
+      h+=`<h3>最近の成績</h3>${R.recent.length?R.recent.map(r=>`<div class="row"><span class="pn">${new Date(r.t).toLocaleDateString("ja-JP")}・${MAPS[r.map]?MAPS[r.map].name:""}・${r.years}年<br><small style="font-weight:400;color:var(--muted)">${r.n}人中</small></span><span></span><b>${r.rank===1?"優勝":r.rank+"位"}　${r.nw<0?"−":""}${yen(Math.abs(r.nw))}</b></div>`).join(""):`<p class="hint">まだ記録がありません。「ひとりで遊ぶ」で1回遊び終えると、ここに成績が並びます。</p>`}`}
+    else if(tab==="ach")h+=`<p>${got}/${ACH.length}個を達成</p>`+ACH.map(a=>R.ach[a.id]?`<div class="ach got"><b>${a.n}</b><small>${a.d}・${new Date(R.ach[a.id]).toLocaleDateString("ja-JP")}達成</small></div>`:`<div class="ach"><b>？？？</b><small>${a.d}</small></div>`).join("");
+    else if(tab==="st")h+=["east","kanto"].map(m=>{const v=R.visited[m]||[];return `<h3>${MAPS[m].name}　${v.length}/${MAPS[m].stations.length}駅</h3><div class="dex">${MAPS[m].stations.map(s=>`<span class="dexst ${v.includes(s[0])?"on":""}">${s[0]}</span>`).join("")}</div>`}).join("")+`<p class="hint">駅に止まったり通過したりすると、色がつきます。</p>`;
+    else if(tab==="prop"){const m=dexKeys(),have=[...m.keys()].filter(k=>R.props[k]).length;const by={};m.forEach(([st,n],k)=>{(by[st]=by[st]||[]).push([n,!!R.props[k]])});
+      h+=`<p>${have}/${m.size}件を購入済み</p><div class="dexprop">${Object.entries(by).map(([st,l])=>`<div class="dexrow"><b>${st}</b><span>${l.map(([n,g])=>g?`<span class="dp on">${esc(n)}</span>`:`<span class="dp">？？？</span>`).join("")}</span></div>`).join("")}</div>`}
+    else h+=`<p>記録を文字列にして、別の端末やブラウザへ引き継げます。</p><div class="btns" style="justify-content:flex-start;margin:0 0 8px"><button class="btn sm" data-rexp>記録をコードにする</button></div><textarea id="recOut" rows="3" readonly hidden></textarea>
+      <div class="field" style="margin-top:12px"><label for="recIn">コードから記録を読み込む</label><textarea id="recIn" rows="3" placeholder="KKSR: から始まるコードを貼り付け"></textarea></div>
+      <button class="btn sm ${armed?"danger":"primary"}" data-rimp>${armed?"今の記録を上書きして読み込む":"読み込む"}</button><p class="err" id="recErr"></p>`;
+    body.innerHTML=h};
+  draw();
+  body.onclick=async e=>{const t=e.target.closest("button");if(!t)return;
+    if(t.dataset.tab){tab=t.dataset.tab;armed=false;draw()}
+    else if("rexp"in t.dataset){const code="KKSR:"+btoa(unescape(encodeURIComponent(JSON.stringify(REC))));const ta=$("#recOut");ta.hidden=false;ta.value=code;try{await navigator.clipboard.writeText(code);toast("コピーしました")}catch(err){ta.focus();ta.select()}}
+    else if("rimp"in t.dataset){const v=($("#recIn").value||"").replace(/\s+/g,"");let o=null;try{if(!v.startsWith("KKSR:"))throw 0;o=JSON.parse(decodeURIComponent(escape(atob(v.slice(5)))));if(!o||o.v!==1)throw 0}catch(err){$("#recErr").textContent="コードを読み取れませんでした。最初から最後まで欠けずに貼り付けてあるか確認してください。";return}
+      if(REC.games>0&&!armed){armed=true;const keep=$("#recIn").value;draw();$("#recIn").value=keep;return}
+      REC=Object.assign(REC_NEW(),o);saveRec();armed=false;tab="total";draw();toast("記録を読み込みました")}};
+  await pr}
+
 /* ---------- side panel ---------- */
 const pcol=i=>COLORS[S.players[i].color??i];
 function setView(){const b=document.body;let v="title";
@@ -909,7 +1195,7 @@ function setView(){const b=document.body;let v="title";
   const prev=b.dataset.view;b.dataset.view=v;b.dataset.phase=S?S.phase:"";
   if(prev!==v&&(v==="map"||v==="cpu")){applyZoom();requestAnimationFrame(()=>S&&focus(cp().pos,false))}}
 function statusTags(p){const t=[];if(p.slow>0)t.push(`<span class="tag bad">鈍行 残り${p.slow}回</span>`);if(p.rest>0)t.push(`<span class="tag bad">運休</span>`);
-  if(S.rules.yokai&&S.yokai.owner===p.idx)t.push(`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`);if(p.cards.includes("omamori"))t.push(`<span class="tag">お守り</span>`);return t.join("")}
+  if(S.rules.yokai&&S.yokai.owner===p.idx)t.push(`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`);if(p.cards.includes("omamori"))t.push(`<span class="tag">お守り</span>`);if(debtOf(p)>0)t.push(`<span class="tag">借入${yen(debtOf(p))}</span>`);return t.join("")}
 function render(){if(!S)return;
   $("#when").textContent=`${S.year}年目 ${MONTHS[S.month]}　(全${S.years}年)`;
   $("#goalName").textContent=S.dest;
@@ -918,21 +1204,22 @@ function render(){if(!S)return;
   renderPlayers();renderAction();renderLog();renderDyn();placeTokens();setView();
 }
 function assets(i){let v=0;for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)v+=P(s)[k][1]});return v}
-function lastPlace(){if(!S.assist)return -1;const t=S.players.map((p,i)=>p.money+assets(i)),mn=Math.min(...t);return t.filter(x=>x===mn).length===1?t.indexOf(mn):-1}
+function lastPlace(){if(!S.assist)return -1;const t=S.players.map((p,i)=>netWorth(i)),mn=Math.min(...t);return t.filter(x=>x===mn).length===1?t.indexOf(mn):-1}
 function playersHTML(){const d=distTo(S.dest),lp=lastPlace();
   return S.players.map((p,i)=>{const cnt=Object.values(S.owners).flat().filter(o=>o===i).length;
-    return `<div class="pl ${i===S.cur?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><span class="nm">${esc(p.name)}<small>${p.cpu?"CPU":"人"}</small>${i===lp?'<span class="tag">追い上げ中</span>':""}${statusTags(p)}</span><span class="mo ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sub">${sqName(p.pos)}・目的地まで${d[p.pos]}マス・物件${cnt}件・カード${p.cards.length}枚</span></div>`}).join("")}
+    return `<div class="pl ${i===S.cur?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><span class="nm">${esc(p.name)}<small>${p.cpu?"CPU":"人"}</small>${ttlTag(p)}${i===lp?'<span class="tag">追い上げ中</span>':""}${statusTags(p)}</span><span class="mo ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sub">総資産${yen(netWorth(i))}・物件${cnt}件・${sqName(p.pos)}・あと${d[p.pos]}マス・カード${p.cards.length}枚</span></div>`}).join("")}
 function renderPlayers(){$("#players").innerHTML=playersHTML()}
 function diceHTML(v){return `<div class="dice" id="dice">${(v||[]).map(x=>`<span class="die">${x}</span>`).join("")}</div>`}
 function cardDisabled(c){const p=cp();return (S.dice>1&&(c==="kyuko"||c==="tokkyu"))||((c==="oharai"||c==="nasuri")&&!possessed())||c==="omamori"}
 function renderAction(){const a=$("#action"),p=cp();const d=distTo(S.dest)[p.pos];
-  if(S.phase==="over"){a.innerHTML=`<p class="label">ゲーム終了</p><button class="btn primary big" data-act="new">もう一度あそぶ</button><button class="btn" data-act="title" style="width:100%;margin-top:8px">タイトルへ</button>`;return}
+  if(S.phase==="over"){a.innerHTML=`<p class="label">ゲーム終了</p><button class="btn primary big" data-act="new">もう一度あそぶ</button><button class="btn" data-act="stats" style="width:100%;margin-top:8px">成績を見る</button><button class="btn" data-act="title" style="width:100%;margin-top:8px">タイトルへ</button>`;return}
   if(S.phase==="roll"&&!p.cpu){
     const notes=[];if(S.rules.exact)notes.push("ぴったり止まると到着");if(p.slow>0)notes.push(`鈍行中：出た目が半分になります（残り${p.slow}回）`);
     if(S.cur===lastPlace())notes.push("追い上げサポートで大きい目が出やすくなっています");
-    if(possessed())notes.push(`${YOKAI[S.yokai.form].n}が取り憑いています。ほかの社長のいるマスを通れば押し付けられます`);
+    if(possessed())notes.push(`${YOKAI[S.yokai.form].n}が取り憑いています。ほかのオーナーのいるマスを通れば押し付けられます`);
     a.innerHTML=`<p class="label">${esc(p.name)}の番</p>${diceHTML(S.lastDice)}<p class="hint">目的地「${S.dest}」まであと<b>${d}</b>マス。${notes.length?"<br>"+notes.join("<br>"):""}</p>
     <button class="btn primary big" data-act="roll">サイコロを振る${S.dice>1?`（${S.dice}個）`:""}</button>
+    <button class="btn" data-act="bank" style="width:100%;margin-top:8px">銀行（借入 ${yen(debtOf(p))}・年利${S.rate}%）</button>
     ${p.cards.length?`<div class="cards"><p class="label" style="margin-top:6px">カードを使う</p>${p.cards.map((c,i)=>{const C=CARDS[c]||{n:c,d:""};return `<button class="cardbtn ${C.t==="attack"?"atk":""}" data-card="${i}" ${cardDisabled(c)?"disabled":""}><span><b>${C.n}</b></span><small>${c==="omamori"?"持っているだけで効果":C.d}</small></button>`}).join("")}</div>`:""}`;return}
   if(S.phase==="choose"&&CAND){const dd=distTo(S.dest);const list=[...CAND.keys()].sort((x,y)=>dd[x]-dd[y]);
     a.innerHTML=`<p class="label">止まるマスを選ぶ</p><div class="chips">${list.map(id=>{const n=N[id],c=n.type==="st"?"var(--ink)":`var(--${n.type})`;return `<button class="chip" data-go="${id}"><span class="sq" style="background:${c}"></span>${sqName(id)}<small>${id===S.dest?"目的地！":"あと"+dd[id]}${possessed()&&passes(CAND.get(id))?"・押し付け":""}</small></button>`}).join("")}</div>`;return}
@@ -947,18 +1234,18 @@ function modal(html,buttons,wide){return new Promise(res=>{const m=$("#modal"),b
   body.innerHTML=html;const bb=$("#modalBtns");bb.innerHTML="";bb.hidden=false;
   buttons.forEach(([label,val,cls,before])=>{const b=document.createElement("button");b.textContent=label;b.className="btn "+(cls||"");
     b.onclick=async()=>{if(before&&(await before())===false)return;m.hidden=true;res(val)};bb.appendChild(b)});
-  m.hidden=false;$("#sheet").scrollTop=0;bb.lastChild&&bb.lastChild.focus()})}
+  m.hidden=false;$("#sheet").scrollTop=0;bb.lastChild&&bb.lastChild.focus({preventScroll:true})})}
 const modalOpen=()=>!$("#modal").hidden;
 
 /* ---------- game ---------- */
 function pickDest(from){const d=distTo(from);const c=STATIONS.map(s=>s[0]).filter(n=>n!==from&&d[n]>=MAP.minDest);return c[rnd(0,c.length-1)]}
 const possessed=()=>S.rules.yokai&&S.yokai.owner===S.cur;
 const passes=path=>path.slice(1).some(id=>S.players.some((q,j)=>j!==S.cur&&q.pos===id));
-function newGame(seats,years,assist,rules,mapId){useMap(mapId);
+function newGame(seats,years,assist,rules,mapId,mode){useMap(mapId);
   const props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(master(s[0]))]));
-  S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"],slow:0,rest:0})),cur:0,year:1,month:0,years,assist,rules,map:CUR_MAP,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"busy",dice:1,lastDice:null};
+  S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"],slow:0,rest:0,debt:0,title:0,style:s.cpu?["aggressive","cautious","normal","normal"][(s.color+3)%4]:null})),rate:ECON.rateStart,cur:0,year:1,month:0,years,assist,rules,map:CUR_MAP,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"busy",dice:1,lastDice:null};
   STATIONS.forEach(([n])=>S.owners[n]=props[n].map(()=>null));
-  S.destFrom="東京";S.dest="東京";const first=pickDest("東京");
+  S.mode=mode||"multi";S.players.forEach(p=>p.st=newSt());S.destFrom="東京";S.dest="東京";snapshot("開始");const first=pickDest("東京");
   buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);setScene("title",`${years}年間の旅が東京駅から始まります。`);render();
   revealDest(first,"最初の目的地は……").then(()=>startTurn());
 }
@@ -979,14 +1266,14 @@ async function humanRoll(){S.phase="busy";renderAction();const t=await rollDice(
   if(CAND.size===1){const id=[...CAND.keys()][0];setScene("move",`${t}マス進みます。`);return choose(id)}
   S.phase="choose";setScene("move",`${t}マス進めます。地図で光っているマスか、下のボタンから止まるマスを選んでください。`);render();const ids=[...CAND.keys()];focus(ids[0])}
 async function choose(id){if(!CAND||!CAND.has(id))return;const path=CAND.get(id);CAND=null;S.phase="busy";render();await moveAlong(path);await land();await endTurn()}
-async function moveAlong(path){const p=cp();for(let i=1;i<path.length;i++){p.pos=path[i];placeTokens();Snd.sfx("step");if(i%3===1)focus(p.pos);
+async function moveAlong(path){const p=cp(),st=ST(p);for(let i=1;i<path.length;i++){p.pos=path[i];st.steps++;const nd=N[p.pos];if(nd.type==="st"&&!st.stations.includes(p.pos))st.stations.push(p.pos);if(nd.sea)st.sea++;placeTokens();Snd.sfx("step");if(i%3===1)focus(p.pos);
     if(possessed()){const j=S.players.findIndex((q,k)=>k!==S.cur&&q.pos===path[i]);if(j>=0)await passYokai(j)}
     await sleep(reduce?40:150)}focus(p.pos);renderPlayers()}
 async function passYokai(j){const y=S.yokai,from=cp(),to=S.players[j];y.owner=j;y.turns=0;
   const m=`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`;log(m);Snd.sfx("pass");placeTokens();renderPlayers();await say(m,"pass")}
 function ownedList(i){const a=[];for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)a.push([s,k,P(s)[k][1]])});return a}
 function sellHalf(p,s,k){const pr=P(s)[k],v=r100(pr[1]/2);S.owners[s][k]=null;p.money+=v;return `${s}の「${pr[0]}」`}
-async function mischief(p){const y=S.yokai;y.turns++;let pre="",evolved=false;
+async function mischief(p){const y=S.yokai;y.turns++;ST(p).yokaiTurns++;let pre="",evolved=false;
   if(y.form===0&&y.turns>=6){y.form=1;y.turns=0;evolved=true;pre=`${YOKAI[0].n}が${YOKAI[1].n}に化けた！ `}
   const f=y.form,nm=YOKAI[f].n,r=Math.random(),mine=ownedList(p.idx);let msg;
   if(f===0){
@@ -1004,33 +1291,33 @@ async function mischief(p){const y=S.yokai;y.turns++;let pre="",evolved=false;
   }
   msg=pre+msg;log(`${p.name}：${msg}`);Snd.sfx("yokai");render();const key=evolved||f===1?"bigyokai":"mischief";
   if(p.cpu)await say(`${p.name}　${msg}`,key);
-  else{setScene(key,msg);await modal(`${sceneHTML(key)}<h2>${nm}のしわざ</h2><p>${esc(msg)}</p><p class="hint">ほかの社長のいるマスを通るか同じマスに止まると、${nm}を押し付けられます。お祓いカードや妖怪なすりつけカードでも追い払えます。</p>`,[["つづける",1,"primary"]])}}
+  else{setScene(key,msg);await modal(`${sceneHTML(key)}<h2>${nm}のしわざ</h2><p>${esc(msg)}</p><p class="hint">ほかのオーナーのいるマスを通るか同じマスに止まると、${nm}を押し付けられます。お祓いカードや妖怪なすりつけカードでも追い払えます。</p>`,[["つづける",1,"primary"]])}}
 /* cards */
 const GOOD_W={kyuko:20,tokkyu:12,buttobi:10,rinji:14,oharai:6,ashidome:8,donko:7,goudatsu:7,buttobashi:5,nasuri:4,omamori:7};
 function randomCard(){const ks=Object.keys(GOOD_W).filter(k=>S.rules.yokai||!CARDS[k].yokai);let tot=ks.reduce((a,k)=>a+GOOD_W[k],0),r=Math.random()*tot;for(const k of ks){r-=GOOD_W[k];if(r<0)return k}return "kyuko"}
-async function badCard(p){const ks=Object.keys(BAD),k=ks[rnd(0,ks.length-1)];let m;
+async function badCard(p){const ks=Object.keys(BAD),k=ks[rnd(0,ks.length-1)];let m;ST(p).bad++;
   if(k==="slow"){p.slow=3;m="3回の間、サイコロの目が半分になります。"}
   else if(k==="rest"){p.rest=(p.rest||0)+1;m="次の番は1回休みです。"}
-  else if(k==="fine"){const a=r100(rnd(1000,3000)*yf());p.money-=a;m=`罰金${yen(a)}を払いました。`}
+  else if(k==="fine"){const a=r100(rnd(1000,3000)*yf());p.money-=a;gain(p,-a);m=`罰金${yen(a)}を払いました。`}
   else{if(p.cards.length){const c=p.cards.splice(rnd(0,p.cards.length-1),1)[0];m=`${CARDS[c].n}をなくしてしまいました。`}else m="なくすカードを持っておらず、助かりました。"}
   log(`${p.name}：災難カード「${BAD[k].n}」。${m}`);Snd.sfx("minus");render();await say(`災難カード「${BAD[k].n}」　${p.name}：${m}`,"bad")}
 async function land(){const p=cp(),n=N[p.pos];
   if(p.pos===S.dest)await arrive(p);
   if(n.type==="st"){await quiz(p);
     if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件買いました。`,"buy")}}else await shopModal(p,n.id)}
-  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(`青マス　${p.name}：${m}。${yen(amt)}の収入！`,n.sea?"sea":"plus")}
+  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;ST(p).plus++;gain(p,amt);const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(`青マス　${p.name}：${m}。${yen(amt)}の収入！`,n.sea?"sea":"plus")}
   else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10;let mult=1,m,key="minus";
     if(n.sea){key="sea";if(n.sea==="js"&&winter){mult=2;m="冬の日本海が大しけで、船の修理費がかさんだ"}else m=SEA_MSG[rnd(0,SEA_MSG.length-1)]}
     else if(winter&&n.y<MAP.snowY){mult=2;m="大雪で除雪費がかかった";key="snow"}
     else m=MINUS_MSG[rnd(0,MINUS_MSG.length-1)];
-    const amt=r100(rnd(600,2000)*yf()*mult);p.money-=amt;log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(`赤マス　${p.name}：${m}。${yen(amt)}の出費。`,key)}
+    const amt=r100(rnd(600,2000)*yf()*mult);p.money-=amt;ST(p).minus++;gain(p,-amt);log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(`赤マス　${p.name}：${m}。${yen(amt)}の出費。`,key)}
   else if(n.type==="card"){if(Math.random()<.3)await badCard(p);
     else if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);await say(`カードマス　${p.name}はカードがいっぱいで受け取れませんでした。`,"card")}
     else{const c=randomCard();p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");render();await say(`カードマス　${p.name}が${CARDS[c].n}を手に入れた！`,"card")}}
   else if(n.type==="shop")await cardShop(p);
   render();
 }
-async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r100((4000+dist*260)*yf());p.money+=amt;
+async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r100((4000+dist*260)*yf());p.money+=amt;const sa=ST(p);sa.arrivals++;gain(p,amt);
   const old=S.dest,next=pickDest(old);S.destFrom=old;log(`${p.name}が${old}駅に一番乗り！援助金${yen(amt)}。`);
   let yk="";
   if(S.rules.yokai){const dd=distTo(old);let far=-1,c=[];S.players.forEach((q,i)=>{if(i===S.cur)return;const d=dd[q.pos];if(d>far){far=d;c=[i]}else if(d===far)c.push(i)});
@@ -1039,7 +1326,9 @@ async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r10
     else yk=`${S.players[t].name}には${YOKAI[y.form].n}が取り憑いたままです。`;
     log(yk)}
   render();Snd.sfx("arrive");setScene("arrive",`${p.name}が${old}駅に一番乗り！`);
-  await modal(`${sceneHTML("arrive")}<h2>${esc(old)}駅に到着！</h2><p>${esc(p.name)}が一番乗りしました。</p><div class="big-money">＋${yen(amt)}</div><p>援助金を受け取りました。</p>`,[["次の目的地を決める",1,"primary"]]);
+  const foods=(P(old)||[]).filter(pp=>propCat(pp[0])==="food"),toast2=foods.length?`駅前の「${foods[rnd(0,foods.length-1)][0]}」で祝杯をあげました！`:"駅前で祝杯をあげました！";
+  const pr=modal(`${sceneHTML("arrive")}<div class="cer-rank r1 arr">一番乗り！</div><h2 class="cer-name">${esc(old)}駅に到着！</h2><p><span class="dot" style="background:${pcol(S.cur)};display:inline-block;vertical-align:middle;margin-right:6px"></span><b>${esc(p.name)}</b>、この旅で<b>${sa.arrivals}回目</b>の一番乗りです。</p><div class="big-money">＋${yen(amt)}</div><p>援助金を受け取りました。${toast2}</p>`,[["次の目的地を決める",1,"primary"]]);
+  confetti(p.cpu?40:90);await pr;
   await revealDest(next);
   if(yk){render();await say(yk,"yokai")}
 }
@@ -1051,8 +1340,15 @@ async function revealDest(next,title){
   $("#roulHint").textContent=`${title?"最初":"次"}の目的地は「${next}駅」です！地図の赤い旗を目指しましょう。`;setScene("roulette",`目的地は${next}駅です。`);render();focus(next);
   $("#modalBtns").hidden=false;$("#modalBtns button").focus();await pr}
 function isMono(st,i){return S.owners[st].every(x=>x===i)}
-function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
-function cpuBuy(p,st){const own=S.owners[st],props=P(st),got=[];for(;;){let best=-1,sc=-1;props.forEach((pr,i)=>{if(own[i]!=null||p.money-pr[1]<2000)return;const s=pr[2]+(own.some(o=>o===p.idx)?4:0)+(own.every((o,k)=>k===i||o===p.idx)?6:0);if(s>sc){sc=s;best=i}});if(best<0)break;buy(p,st,best);got.push(best)}return got}
+function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];{const s=ST(p);s.bought++;s.boughtValue+=pr[1];const k=st+"|"+pr[0];if(!s.boughtList.includes(k))s.boughtList.push(k)}log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
+function cpuBuy(p,st){const own=S.owners[st],props=P(st),got=[],sty=styleOf(p);
+  for(;;){let best=-1,sc=-1;props.forEach((pr,i)=>{if(own[i]!=null)return;const canCash=p.money-pr[1]>=sty.reserve;
+      const room=Math.floor((assets(p.idx)+pr[1])*Math.min(ECON.loanRatio,sty.maxDebt)/1000)*1000-debtOf(p);
+      const canLoan=!canCash&&pr[2]>=S.rate+sty.margin&&p.money+room-pr[1]>=sty.reserve;if(!canCash&&!canLoan)return;
+      const s=pr[2]+(own.some(o=>o===p.idx)?4:0)+(own.every((o,k)=>k===i||o===p.idx)?6:0)-(canLoan?2:0);if(s>sc){sc=s;best=i}});
+    if(best<0)break;const price=props[best][1];
+    if(p.money-price<sty.reserve){const need=r1000(price+sty.reserve-p.money);p.debt=debtOf(p)+need;p.money+=need;ST(p).maxDebt=Math.max(ST(p).maxDebt,p.debt);log(`${p.name}が銀行から${yen(need)}を借りた。`)}
+    buy(p,st,best);got.push(best)}return got}
 function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),mine=new Set();setScene("buy",`${st}駅に着きました。物件を買えます。`);
   const draw=()=>{const own=S.owners[st];body.innerHTML=`${sceneHTML("buy")}<h2>${esc(st)}駅の物件</h2><p>所持金 <b>${yen(p.money)}</b></p>`+P(st).map((pr,i)=>{const o=own[i];
     const right=o==null?`<button class="btn primary" data-buy="${i}" ${p.money<pr[1]?"disabled":""}>買う</button>`:mine.has(i)?`<button class="btn danger" data-undo="${i}">取り消す</button>`:`<span class="own" style="background:${pcol(o)}">${esc(S.players[o].name)}</span>`;
@@ -1060,7 +1356,7 @@ function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),min
   modal("",[["購入を終える",1,"primary"]]).then(()=>{body.onclick=null;res()});
   draw();body.onclick=e=>{const b=e.target.closest("[data-buy]"),u=e.target.closest("[data-undo]");
     if(b){const i=+b.dataset.buy;if(buy(p,st,i)){mine.add(i);Snd.sfx("buy")}}
-    else if(u){const i=+u.dataset.undo,pr=P(st)[i];if(S.owners[st][i]===p.idx){S.owners[st][i]=null;p.money+=pr[1];mine.delete(i);log(`${p.name}が「${pr[0]}」の購入を取り消した。`);Snd.sfx("click")}}
+    else if(u){const i=+u.dataset.undo,pr=P(st)[i];if(S.owners[st][i]===p.idx){S.owners[st][i]=null;p.money+=pr[1];mine.delete(i);{const s=ST(p);s.bought--;s.boughtValue-=pr[1];s.boughtList=s.boughtList.filter(x=>x!==st+"|"+pr[0])}log(`${p.name}が「${pr[0]}」の購入を取り消した。`);Snd.sfx("click")}}
     draw()};
 })}
 /* card shop: no money cards on sale */
@@ -1094,7 +1390,7 @@ async function quiz(p){if(p.cpu||!S.rules.quiz||Math.random()>=1/3)return;
     body.onclick=e=>{const b=e.target.closest("[data-q]");if(!b||b.disabled)return;result=opts[+b.dataset.q]===ans;
       body.querySelectorAll(".qopt").forEach((x,i)=>{x.disabled=true;if(opts[i]===ans)x.classList.add("ok");else if(x===b)x.classList.add("ng")});
       $("#qres").textContent=result?"正解です！":`残念、正解は「${ans}」でした。`;$("#qex").textContent="解説："+ex;$("#qex").hidden=false;Snd.sfx(result?"plus":"minus");$("#modalBtns").hidden=false;$("#modalBtns button").focus()}});
-  log(`${p.name}がクイズ（${genre}）に${ok?"正解":"不正解"}。`);
+  {const s=ST(p);s.quizN++;if(ok)s.quizOk++}log(`${p.name}がクイズ（${genre}）に${ok?"正解":"不正解"}。`);
   if(ok)await award(p,rw[0])}
 async function award(p,k){let m;
   if(k==="yield"&&!ownedList(p.idx).length)k="money";
@@ -1117,21 +1413,21 @@ async function attack(from,k,to){const p=S.players[from],t=S.players[to];log(`${
 function pickTarget(from,k){const others=S.players.filter(q=>q.idx!==from);if(!others.length)return null;
   if(k==="buttobashi"){const d=distTo(S.dest);return others.sort((a,b)=>d[a.pos]-d[b.pos])[0].idx}
   if(k==="goudatsu"){const w=others.filter(q=>q.cards.length);if(w.length)return w.sort((a,b)=>b.cards.length-a.cards.length)[0].idx}
-  return others.sort((a,b)=>(b.money+assets(b.idx))-(a.money+assets(a.idx)))[0].idx}
+  return others.sort((a,b)=>netWorth(b.idx)-netWorth(a.idx))[0].idx}
 function chooseTarget(k){return new Promise(res=>{const p=cp(),others=S.players.filter(q=>q.idx!==p.idx),d=distTo(S.dest);
   modal(`${sceneHTML("attack")}<h2>${CARDS[k].n}</h2><p>${CARDS[k].d}。だれに使いますか？</p>${others.map(q=>`<div class="row"><span class="pn"><span class="dot" style="background:${pcol(q.idx)};display:inline-block;vertical-align:middle;margin-right:6px"></span>${esc(q.name)}<br><small style="font-weight:400;color:var(--muted)">${yen(q.money)}・目的地まで${d[q.pos]}マス・カード${q.cards.length}枚</small></span><span></span><button class="btn primary" data-t="${q.idx}">使う</button></div>`).join("")}<p class="hint" style="margin-top:10px">相手がお守りカードを持っていると防がれます。</p>`,[["やめる",-1]]).then(()=>res(null));
   $("#modalBody").onclick=e=>{const b=e.target.closest("[data-t]");if(!b)return;$("#modal").hidden=true;$("#modalBody").onclick=null;res(+b.dataset.t)}})}
 async function useCard(p,i){const c=p.cards[i];
   if(CARDS[c]&&CARDS[c].t==="attack"){const target=p.cpu?pickTarget(p.idx,c):await chooseTarget(c);
-    if(target==null)return null;p.cards.splice(p.cards.indexOf(c),1);await attack(p.idx,c,target);render();return null}
-  p.cards.splice(i,1);log(`${p.name}が${CARDS[c].n}を使った。`);Snd.sfx("card");
+    if(target==null)return null;useKind(p,c);ST(p).attacks++;p.cards.splice(p.cards.indexOf(c),1);await attack(p.idx,c,target);render();return null}
+  p.cards.splice(i,1);useKind(p,c);log(`${p.name}が${CARDS[c].n}を使った。`);Snd.sfx("card");
   if(c==="kyuko")S.dice=2;else if(c==="tokkyu")S.dice=3;
   if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");log(`${p.name}に${yen(amt)}の臨時収入。`);render();await say(`臨時収入カード　${p.name}に${yen(amt)}の臨時収入！`,"plus")}
   else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`);render();await say(`お祓い成功！${nm}が${p.name}のもとから去っていきました。`,"oharai")}else toast("取り憑いている妖怪がいませんでした")}
   else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");log(`${p.name}が${to}駅へワープ。`);await say(`ぶっとびカード　${p.name}は${to}駅へぶっとんだ！`,"warp");return "warp"}
-  else if(c==="kyuko"||c==="tokkyu")await say(`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みます。`,"roll");
+  else if(c==="kyuko"||c==="tokkyu"){const m=`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みます。`;if(p.cpu)await say(m,"roll");else setScene("roll",m)}
   render();return null}
-async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];
+async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];cpuRepay(p);
   let ri=p.cards.indexOf("rinji");while(ri>=0){await useCard(p,ri);ri=p.cards.indexOf("rinji")}
   const oi=p.cards.indexOf("oharai");if(oi>=0&&possessed())await useCard(p,oi);
   const ni=p.cards.indexOf("nasuri");if(ni>=0&&possessed())await useCard(p,ni);
@@ -1148,69 +1444,77 @@ async function forceSell(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);
   let sold=0;while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が借金返済のため${s}の「${P(s)[k][0]}」を売却。`)}
   if(sold){render();await say(`${p.name}は借金返済のため物件を${sold}件売却しました。`,"minus")}}
 async function endTurn(){const p=cp();
-  if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await say(`${p.name}がもう一度サイコロを振ります。`,"roll");return startTurn()}
+  if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await checkTitles();await say(`${p.name}がもう一度サイコロを振ります。`,"roll");return startTurn()}
   if(possessed())await mischief(p);if(p.money<0)await forceSell(p);
   S.cur=(S.cur+1)%S.players.length;
-  if(S.cur===0){S.month++;if(S.month>=12){await settle();S.month=0;S.year++;if(S.year>S.years)return gameOver()}}
-  startTurn()}
-async function settle(){render();const rows=S.players.map((p,i)=>{let inc=0,mono=0;for(const s in S.owners){const m=isMono(s,i);if(m)mono++;S.owners[s].forEach((o,k)=>{if(o===i){const[,pr,rt]=P(s)[k];inc+=pr*rt/100*(m?2:1)}})}inc=r100(inc);p.money+=inc;return{p,inc,mono}});
-  log(`${S.year}年目の決算が終わりました。`);setScene("settle",`${S.year}年目の決算です。`);render();Snd.sfx("settle");
-  await modal(`${sceneHTML("settle")}<h2>${S.year}年目 決算</h2><p>物件の収益が入りました。独占した駅は収益2倍です。</p><table><tr><th>社長</th><th>独占駅</th><th>収益</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}</td><td>${r.mono}</td><td>＋${yen(r.inc)}</td></tr>`).join("")}</table>`,[["つづける",1,"primary"]])}
-async function gameOver(){S.year=S.years;S.month=11;S.phase="over";render();autosave();Snd.sfx("over");
-  const rank=S.players.map((p,i)=>({p,t:p.money+assets(i)})).sort((a,b)=>b.t-a.t);setScene("win",`${rank[0].p.name}の優勝です！`);
-  const r=await modal(`${sceneHTML("win")}<h2>${esc(rank[0].p.name)}の優勝！</h2><p>${S.years}年間の総資産ランキングです。</p><table><tr><th>順位</th><th>社長</th><th>総資産</th></tr>${rank.map((x,i)=>`<tr><td>${i+1}位</td><td>${esc(x.p.name)}</td><td>${yen(x.t)}</td></tr>`).join("")}</table>`,[["地図を見る",0],["もう一度あそぶ",1,"primary"]]);
-  if(r)setup()}
+  if(S.cur===0){S.month++;if(S.month===6)await settle(false);if(S.month>=12){await settle(true);S.month=0;S.year++;if(S.year>S.years){await checkTitles();return gameOver()}}await monthEvents();snapshot(`${S.year}年${MONTHS[S.month]}`)}
+  await checkTitles();startTurn()}
 
 /* ---------- title & setup ---------- */
 const VERSION="ver 1.0";
 async function showTitle(){$("#title").hidden=false;setView();$("#tVisual").innerHTML=artHTML("title");
   const saved=S&&S.phase!=="over"?S:await Store.get("auto");const ok=saved&&saved.phase!=="over"&&validState(saved);
   $("#tCont").disabled=!ok;$("#tContInfo").textContent=ok?`${MAPS[saved.map||"kanto"].name}・${saved.year}年目 ${MONTHS[saved.month]}`:"保存されたゲームはありません";
-  $("#tNew").focus()}
+  $("#tSingle").focus()}
 function hideTitle(){$("#title").hidden=true;setView();applyZoom()}
-async function setup(){hideTitle();
-  const order=["east","kanto"],cur=GP.map||"east";
-  const pr=modal(`<h2>出発の準備</h2><p>駅をサイコロで巡り、目的地への一番乗りと物件の独占で総資産トップを目指します。</p>
+async function setup(mode){mode=mode==="single"?"single":"multi";hideTitle();
+  const order=["east","kanto"],cur=GP.map||"east",single=mode==="single";
+  const seatsHTML=single?`<h3>あなたの名前</h3><div class="prow"><span class="dot" style="background:${COLORS[0]}"></span><input id="seatN0" maxlength="8" value="${esc(GP.name||"あなた")}" aria-label="あなたの名前"><span></span></div>
+    <div class="field" style="margin-top:8px"><label for="fCpu">対戦するCPU</label><select id="fCpu"><option value="1">1人</option><option value="2" selected>2人</option><option value="3">3人</option></select></div>
+    <h3>CPUの名前</h3>${[1,2,3].map(i=>`<div class="prow cpurow" data-i="${i}"><span class="dot" style="background:${COLORS[i]}"></span><input id="cpuN${i}" maxlength="8" value="${esc((GP.cpuNames||[])[i]||CPU_NAMES[i])}" aria-label="CPU${i}の名前"><span class="hint" style="margin:0;white-space:nowrap">${CPU_STYLE_N[i]}</span></div>`).join("")}
+    <p style="margin:4px 0 0"><button type="button" class="btn" id="cpuReset" style="padding:4px 12px;font-size:13px">名前を元に戻す</button></p>
+    <p class="hint">積極派は借金してでも物件を買い攻め、堅実派は借金をしません。ほどほど派はその中間です。名前は自由に変えられます。ひとりで遊ぶモードの成績は「記録」に残ります。</p>`
+   :`<h3>参加するオーナー</h3><p class="hint">1台の端末を交代で使って、2〜4人で遊びます。CPUを混ぜることもできます。<b>みんなで遊ぶモードでは、記録（通算成績・実績・図鑑）は残りません。</b></p>
+    ${DEFAULT_SEATS.map(([nm,ty],i)=>{const t=i<2?"human":"none",n=i===0?"あなた":"プレイヤー"+(i+1);return `<div class="prow"><span class="dot" style="background:${COLORS[i]}"></span><input id="seatN${i}" maxlength="8" value="${esc(n)}" aria-label="${i+1}人目の名前"><select id="seatT${i}" aria-label="${i+1}人目の種類"><option value="human" ${t==="human"?"selected":""}>人間</option><option value="cpu">CPU</option><option value="none" ${t==="none"?"selected":""}>参加しない</option></select></div>`}).join("")}`;
+  const pr=modal(`<h2>${single?"ひとりで遊ぶ":"みんなで遊ぶ"}</h2><p>駅をサイコロで巡り、目的地への一番乗りと物件の独占で総資産トップを目指します。</p>
   <div class="field"><label for="fMap">遊ぶ地図</label><select id="fMap">${order.map(k=>`<option value="${k}" ${cur===k?"selected":""}>${MAPS[k].name}</option>`).join("")}</select><small class="hint" id="fMapDesc" style="margin:0">${MAPS[cur].desc}</small></div>
-  <h3>参加する社長</h3><p class="hint">1台の端末を交代で使えば、人間同士でも遊べます。</p>
-  ${DEFAULT_SEATS.map(([nm,ty],i)=>`<div class="prow"><span class="dot" style="background:${COLORS[i]}"></span><input id="seatN${i}" maxlength="8" value="${esc(nm)}" aria-label="${i+1}人目の名前"><select id="seatT${i}" aria-label="${i+1}人目の種類"><option value="human" ${ty==="human"?"selected":""}>人間</option><option value="cpu" ${ty==="cpu"?"selected":""}>CPU</option><option value="none" ${ty==="none"?"selected":""}>参加しない</option></select></div>`).join("")}
+  ${seatsHTML}
   <div class="field" style="margin-top:12px"><label for="fYears">プレイ年数</label><select id="fYears"><option value="1">1年</option><option value="3" selected>3年</option><option value="5">5年</option><option value="10">10年</option></select></div>
   <div class="field"><label for="fSpeed">メッセージの速さ</label><select id="fSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
   <label class="check"><input type="checkbox" id="fSound" ${Snd.prefs.on?"checked":""}><span>音を出す（BGM・効果音）<small>オフにすると無音で遊べます。ゲーム中も画面上部の「音」ボタンで切り替えられます。</small></span></label>
   <h3>ルール</h3>
   <label class="check"><input type="checkbox" id="fExact" checked><span>ぴったり到着<small>目的地には、出た目とちょうど同じマス数で止まったときだけ到着できます。オフにすると通過する目でも到着できます。</small></span></label>
-  <label class="check"><input type="checkbox" id="fYokai" checked><span>妖怪「${YOKAI[0].n}」<small>誰かが目的地に着くたびに、いちばん遠い社長へ取り憑いて毎ターン悪さをします。ほかの社長のいるマスを通ると押し付けられます。</small></span></label>
-  <label class="check"><input type="checkbox" id="fQuiz" checked><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。全ジャンル・難しめ。正解すると特典があります。出題は人間の社長だけです。</small></span></label>
-  <label class="check"><input type="checkbox" id="fAssist"><span>追い上げサポート<small>総資産が最下位の社長は、大きい目が少し出やすくなります。CPUにも同じように働きます。</small></span></label>
+  <label class="check"><input type="checkbox" id="fYokai" checked><span>妖怪「${YOKAI[0].n}」<small>誰かが目的地に着くたびに、いちばん遠いオーナーへ取り憑いて毎ターン悪さをします。ほかのオーナーのいるマスを通ると押し付けられます。</small></span></label>
+  <label class="check"><input type="checkbox" id="fQuiz" checked><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。全ジャンル・難しめ。正解すると特典があります。出題は人間のプレイヤーだけです。</small></span></label>
+  <label class="check"><input type="checkbox" id="fAssist"><span>追い上げサポート<small>総資産が最下位のオーナーは、大きい目が少し出やすくなります。CPUにも同じように働きます。</small></span></label>
   <p class="err" id="setupErr"></p>`,
-  [["タイトルへ",0],["出発する",1,"primary",()=>{const n=DEFAULT_SEATS.filter((_,i)=>$("#seatT"+i).value!=="none").length;if(n<2){$("#setupErr").textContent="2人以上の社長を参加させてください。";return false}}]]);
+  [["タイトルへ",0],["出発する",1,"primary",()=>{if(single)return;const ts=DEFAULT_SEATS.map((_,i)=>$("#seatT"+i).value);if(ts.filter(t=>t!=="none").length<2){$("#setupErr").textContent="2人以上を参加させてください。";return false}if(ts.filter(t=>t==="human").length<2){$("#setupErr").textContent="みんなで遊ぶモードでは、人間のプレイヤーを2人以上にしてください。CPUと1対1で遊ぶときは「ひとりで遊ぶ」を選んでください。";return false}}]]);
   const applySound=()=>{Snd.prefs.on=$("#fSound").checked;Snd.savePrefs();Snd.apply();updSndBtn()};
-  $("#modalBody").onchange=e=>{if(e.target.id==="fSound"){applySound();Snd.sfx("click")}if(e.target.id==="fMap")$("#fMapDesc").textContent=MAPS[e.target.value].desc};
+  $("#modalBody").onchange=e=>{if(e.target.id==="fSound"){applySound();Snd.sfx("click")}if(e.target.id==="fMap")$("#fMapDesc").textContent=MAPS[e.target.value].desc;
+    if(e.target.id==="fCpu")cpuRows();
+    const m=/^seatT(\d)$/.exec(e.target.id);if(m){const i=+m[1],inp=$("#seatN"+i),v=inp.value.trim(),hum=i===0?"あなた":"プレイヤー"+(i+1);
+      if(e.target.value==="cpu"&&(!v||v===hum))inp.value=CPU_NAMES[i];else if(e.target.value==="human"&&(!v||CPU_NAMES.includes(v)))inp.value=hum}};
+  const cpuRows=()=>{const f=$("#fCpu");if(!f)return;document.querySelectorAll(".cpurow").forEach(r=>r.hidden=+r.dataset.i>+f.value)};cpuRows();
+  if($("#cpuReset"))$("#cpuReset").onclick=()=>{[1,2,3].forEach(i=>$("#cpuN"+i).value=CPU_NAMES[i])};
   const r=await pr;applySound();
   if(r!==1){showTitle();return}
-  const seats=[];DEFAULT_SEATS.forEach(([nm],i)=>{const t=$("#seatT"+i).value;if(t!=="none")seats.push({name:$("#seatN"+i).value.trim()||nm,cpu:t==="cpu",color:i})});
+  let seats=[];
+  if(single){const nm=$("#seatN0").value.trim()||"あなた";GP.name=nm;seats.push({name:nm,cpu:false,color:0});GP.cpuNames=[null,1,2,3].map(i=>i&&($("#cpuN"+i).value.trim()||CPU_NAMES[i]));for(let i=1;i<=+$("#fCpu").value;i++)seats.push({name:GP.cpuNames[i],cpu:true,color:i})}
+  else DEFAULT_SEATS.forEach(([nm],i)=>{const t=$("#seatT"+i).value;if(t!=="none")seats.push({name:$("#seatN"+i).value.trim()||nm,cpu:t==="cpu",color:i})});
   GP.speed=$("#fSpeed").value;GP.map=$("#fMap").value;saveGP();
-  newGame(seats,+$("#fYears").value,$("#fAssist").checked,{exact:$("#fExact").checked,yokai:$("#fYokai").checked,quiz:$("#fQuiz").checked},GP.map)}
-function resume(state){hideTitle();useMap(state.map||"kanto");S=state;S.map=CUR_MAP;CAND=null;S.players.forEach(p=>{if(!N[p.pos])p.pos="東京"});if(!N[S.dest])S.dest="東京";
+  newGame(seats,+$("#fYears").value,$("#fAssist").checked,{exact:$("#fExact").checked,yokai:$("#fYokai").checked,quiz:$("#fQuiz").checked},GP.map,mode)}
+function resume(state){hideTitle();useMap(state.map||"kanto");S=state;if(!S.mode)S.mode=S.players.filter(q=>!q.cpu).length===1?"single":"multi";S.map=CUR_MAP;CAND=null;S.players.forEach(p=>{if(!N[p.pos])p.pos="東京"});if(!N[S.dest])S.dest="東京";
   if(!S.rules)S.rules={exact:false,yokai:false};if(S.rules.quiz==null)S.rules.quiz=true;if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
   if(!S.props){S.props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(DEFAULT_PROPS[s[0]])]))}
-  S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i;p.slow=p.slow||0;p.rest=p.rest||0});
+  S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i;p.slow=p.slow||0;p.rest=p.rest||0;p.debt=p.debt||0;p.title=p.title||0;if(p.cpu&&!p.style)p.style=["aggressive","cautious","normal","normal"][(i+3)%4]});if(S.rate==null)S.rate=ECON.rateStart;
   buildTokens();render();startTurn()}
 async function howTo(){await modal(`<h2>遊び方</h2>
-  <h3>目的</h3><p>決められた年数のあいだ駅をめぐり、最後に総資産（お金＋物件の価値）がいちばん多い社長の勝ちです。</p>
+  <h3>目的</h3><p>決められた年数のあいだ駅をめぐり、最後に総資産（お金＋物件の価値）がいちばん多いオーナーの勝ちです。</p>
   <h3>進み方</h3><p>自分の番にサイコロを振り、地図で光るマスから止まる場所を選びます。目的地にぴったり止まると援助金がもらえ、ルーレットで次の目的地が決まります。</p>
   <h3>マス</h3><p><b style="color:var(--plus)">青</b>はお金が入り、<b style="color:var(--minus)">赤</b>は出費です。冬の北国では大雪で出費が増えます。<b style="color:var(--card)">黄</b>はカードがもらえますが、ときどき災難カード（鈍行・運休・罰金・紛失）を引きます。<b style="color:var(--shop)">ピンクのひし形</b>はカード売り場です。駅では物件を買えます。駅の物件をすべて持つと独占になり、毎年3月の決算で収益が2倍になります。</p>
   <h3>カード</h3><p>急行・特急・ぶっとびなどの移動カードのほか、相手を1回休みにする足止め、サイコロを半分にする鈍行押し付け、カード強奪、ぶっとばし、妖怪なすりつけといった邪魔カードがあります。お守りカードを持っていると、邪魔カードを1回防げます。</p>
-  <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠い社長に妖怪「${YOKAI[0].n}」が取り憑きます。ほかの社長のいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
+  <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠いオーナーに妖怪「${YOKAI[0].n}」が取り憑きます。ほかのオーナーのいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
+  <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
+  <h3>称号</h3><p>総資産が増えると称号が上がります。駆け出し → 小金持ち（2億円）→ 資産家（4億円）→ 大地主（8億円）→ 大富豪（15億円）→ 億万長者（30億円）。一度上がった称号は、総資産が減っても下がりません。</p>
   <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
   <p class="hint">物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>`,[["閉じる",0,"primary"]])}
 function openMenu(){modal(`<h2>メニュー</h2><div class="menu">
-  <button class="btn" data-m="players">社長一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件編集</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
+  <button class="btn" data-m="players">オーナー一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件編集</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="rec">記録</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
   $("#modalBody").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;const m=b.dataset.m;
     if((m==="save"||m==="edit"||m==="title")&&busy()){toast("手番が終わるまでお待ちください");return}
     $("#modal").hidden=true;$("#modalBody").onclick=null;
-    ({players:showPlayers,save:openSaves,edit:openEditor,set:openSettings,how:howTo,title:showTitle})[m]()}}
-async function showPlayers(){await modal(`<h2>社長一覧</h2>${playersHTML()}`,[["閉じる",0,"primary"]])}
+    ({players:showPlayers,save:openSaves,edit:openEditor,set:openSettings,rec:recordsModal,how:howTo,title:showTitle})[m]()}}
+async function showPlayers(){await modal(`<h2>オーナー一覧</h2>${playersHTML()}`,[["閉じる",0,"primary"]])}
 
 /* ---------- save slots ---------- */
 const busy=()=>S&&S.phase==="busy";
@@ -1220,7 +1524,7 @@ async function openSaves(){
   const slots=await Promise.all([1,2,3].map(i=>Store.get("slot"+i)));
   const body=$("#modalBody");let armed=null,codeOut="";
   const draw=()=>{body.innerHTML=`<h2>セーブとロード</h2>
-    <p class="hint">${Store.cloud?"セーブはこの端末とあなたのアカウントに保存され、ほかの端末からも続きができます。":"セーブはこの端末のブラウザに保存されます。別の端末で続けるときはセーブコードを使ってください。"}${canSave?"":"<br>セーブは人間の社長がサイコロを振る前にできます。"}</p>
+    <p class="hint">${Store.cloud?"セーブはこの端末とあなたのアカウントに保存され、ほかの端末からも続きができます。":"セーブはこの端末のブラウザに保存されます。別の端末で続けるときはセーブコードを使ってください。"}${canSave?"":"<br>セーブは人間のプレイヤーがサイコロを振る前にできます。"}</p>
     ${[1,2,3].map(i=>{const s=slots[i-1];const info=s?`${MAPS[s.map||"kanto"].name}・${s.year}年目 ${MONTHS[s.month]}・${s.players.map(x=>esc(x.name)).join("、")}`:"空き";const when=s&&s.savedAt?new Date(s.savedAt).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
       return `<div class="slot"><span><b>スロット${i}</b><small>${info}${when?"・"+when:""}</small></span><button class="btn sm ${armed===i?"danger":""}" data-save="${i}" ${canSave?"":"disabled"}>${armed===i?"上書きする":"セーブ"}</button><button class="btn sm" data-load="${i}" ${s&&validState(s)?"":"disabled"}>ロード</button></div>`}).join("")}
     <h3>セーブコード</h3><p class="hint">コードをメモ帳などに保存しておけば、別の端末やブラウザでも続きができます。</p>
@@ -1280,7 +1584,7 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
   <label class="check"><input type="checkbox" id="sBgm" ${Snd.prefs.bgm?"checked":""}><span>BGM<small>ゲームのために作ったオリジナル曲です。</small></span></label>
   <label class="check"><input type="checkbox" id="sSe" ${Snd.prefs.se?"checked":""}><span>効果音<small>サイコロ、移動、マス、購入、到着、決算の音です。</small></span></label>
   <div class="vol"><label for="sVol">音量</label><input type="range" id="sVol" min="0" max="1" step="0.05" value="${Snd.prefs.vol}"></div>
-  ${S&&S.phase!=="over"?`<h3>このゲームのルール</h3><label class="check"><input type="checkbox" id="sAssist" ${S.assist?"checked":""}><span>追い上げサポート<small>総資産が最下位の社長は、大きい目が少し出やすくなります。オフのときサイコロは完全にランダムです。</small></span></label>
+  ${S&&S.phase!=="over"?`<h3>このゲームのルール</h3><label class="check"><input type="checkbox" id="sAssist" ${S.assist?"checked":""}><span>追い上げサポート<small>総資産が最下位のオーナーは、大きい目が少し出やすくなります。オフのときサイコロは完全にランダムです。</small></span></label>
   <label class="check"><input type="checkbox" id="sExact" ${S.rules.exact?"checked":""}><span>ぴったり到着<small>目的地にはちょうどの目で止まったときだけ到着できます。</small></span></label>
   <label class="check"><input type="checkbox" id="sYokai" ${S.rules.yokai?"checked":""}><span>妖怪「${YOKAI[0].n}」<small>オフにすると、取り憑いている妖怪もいなくなります。</small></span></label>
   <label class="check"><input type="checkbox" id="sQuiz" ${S.rules.quiz?"checked":""}><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。</small></span></label>`:""}`,[["閉じる",0,"primary"]]);
@@ -1295,11 +1599,13 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
   await p}
 
 /* ---------- events ---------- */
-$("#action").addEventListener("click",async e=>{if(!S)return;const p=cp();
+$("#action").addEventListener("click",async e=>{if(!S||document.body.dataset.wait)return;const p=cp();
   const a=e.target.closest("[data-act]"),c=e.target.closest("[data-card]"),g=e.target.closest("[data-go]");
   if(a&&a.dataset.act==="roll"&&S.phase==="roll")humanRoll();
-  else if(a&&a.dataset.act==="new")setup();
+  else if(a&&a.dataset.act==="new")setup(S.mode);
+  else if(a&&a.dataset.act==="stats")statsModal();
   else if(a&&a.dataset.act==="title")showTitle();
+  else if(a&&a.dataset.act==="bank"&&S.phase==="roll"&&!usingCard){usingCard=true;await bankModal();usingCard=false;render()}
   else if(c&&S.phase==="roll"&&!usingCard){usingCard=true;const res=await useCard(p,+c.dataset.card);usingCard=false;if(res==="warp"){S.phase="busy";render();await land();await endTurn()}else render()}
   else if(g)choose(g.dataset.go)});
 let usingCard=false;
@@ -1311,7 +1617,9 @@ $("#howBtn").onclick=()=>{if(!modalOpen())howTo()};
 $("#menuBtn").onclick=()=>{if(!modalOpen())openMenu()};
 $("#sndBtn").onclick=()=>{if(!Snd.wasRunning)Snd.prefs.on=true;else Snd.prefs.on=!Snd.prefs.on;Snd.savePrefs();Snd.apply();Snd.sfx("click");updSndBtn()};
 $("#setBtn").onclick=()=>{if(!modalOpen())openSettings()};
-$("#tNew").onclick=()=>{if(!modalOpen())setup()};
+$("#tSingle").onclick=()=>{if(!modalOpen())setup("single")};
+$("#tMulti").onclick=()=>{if(!modalOpen())setup("multi")};
+$("#tRec").onclick=()=>{if(!modalOpen())recordsModal()};
 $("#tCont").onclick=async()=>{if(modalOpen())return;if(S&&S.phase!=="over"){hideTitle();render();return}const s=await Store.get("auto");if(s&&validState(s))resume(s)};
 $("#tLoad").onclick=()=>{if(!modalOpen())openSaves()};
 $("#tHow").onclick=()=>{if(!modalOpen())howTo()};
@@ -1327,7 +1635,7 @@ async function boot(data){Snd.loadPrefs();useMap(GP.map||"east");probeImages();$
   $("#title").hidden=false;setView();
   await Promise.race([Store.init(),sleep(4000)]);
   try{CUSTOM=(await Store.get("props"))||{}}catch(e){CUSTOM={}}
-  showTitle()}
+  await loadRec();showTitle()}
 window.claude?.hot?.snapshot?.(()=>({S:S&&S.phase!=="over"?S:null}));
 window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
 </script>
