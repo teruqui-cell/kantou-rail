@@ -831,18 +831,36 @@ function validState(o){const m=o&&MAPS[o.map||"kanto"];return !!m&&Array.isArray
 
 /* ---------- sound (synthesized, original) ---------- */
 const NOTE={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
-const midi=n=>12*(+n.slice(-1)+1)+NOTE[n[0]];
+const midi=n=>12*(+n.slice(-1)+1)+NOTE[n[0]]+(n.includes("#")?1:n[1]==="b"?-1:0);
 const hz=m=>440*Math.pow(2,(m-69)/12);
-const MEL_BARS=["C5:1 E5:1 G5:2 A5:1 G5:1 E5:2","F5:1 E5:1 D5:2 E5:1 D5:1 C5:2","D5:1 E5:1 F5:2 A5:1 G5:1 F5:2","E5:2 G5:2 G5:4",
- "C5:1 E5:1 G5:2 C6:1 B5:1 A5:2","A5:1 B5:1 C6:2 G5:1 E5:1 C5:2","D5:1 F5:1 A5:2 G5:1 F5:1 D5:2","C5:2 E5:1 D5:1 C5:4"];
-const ROOTS=[["C3","G3"],["F2","C3"],["D3","A3"],["G2","D3"],["C3","G3"],["A2","E3"],["G2","D3"],["C3","G3"]];
-const MEL=[],BASS=[];
-MEL_BARS.forEach((bar,bi)=>{let pos=bi*8;bar.split(" ").forEach(tk=>{const[n,l]=tk.split(":");MEL[pos]=[midi(n),+l];pos+=+l});
-  const[r,f]=ROOTS[bi];for(let i=0;i<8;i++)BASS[bi*8+i]=i%4===2?midi(r)+12:i%2?midi(f):midi(r)});
+// BGM tracks (original compositions). 8 bars × 8 eighth-note steps; "R" = rest.
+// bass: pop / drone / roll / drive
+const TRACKS={
+ spring:{n:"春",bpm:138,lead:"square",lv:.12,bass:"pop",hat:1,bars:["C5:1 E5:1 G5:2 A5:1 G5:1 E5:2","F5:1 E5:1 D5:2 E5:1 D5:1 C5:2","D5:1 E5:1 F5:2 A5:1 G5:1 F5:2","E5:2 G5:2 G5:4","C5:1 E5:1 G5:2 C6:1 B5:1 A5:2","A5:1 B5:1 C6:2 G5:1 E5:1 C5:2","D5:1 F5:1 A5:2 G5:1 F5:1 D5:2","C5:2 E5:1 D5:1 C5:4"],
+   roots:[["C3","G3"],["F2","C3"],["D3","A3"],["G2","D3"],["C3","G3"],["A2","E3"],["G2","D3"],["C3","G3"]]},
+ summer:{n:"夏",bpm:156,lead:"square",lv:.11,bass:"drive",hat:1,bars:["G5:1 G5:1 B5:1 D6:1 B5:2 G5:2","A5:1 A5:1 C6:1 E6:1 D6:4","B5:1 A5:1 G5:1 E5:1 D5:2 G5:2","A5:2 B5:1 A5:1 G5:4","E5:1 G5:1 C6:2 B5:1 A5:1 G5:2","D5:1 F#5:1 A5:2 C6:1 B5:1 A5:2","B5:1 C6:1 D6:2 B5:1 G5:1 E5:2","D5:2 F#5:1 A5:1 G5:4"],
+   roots:[["G2","D3"],["A2","E3"],["G2","D3"],["D3","A3"],["C3","G3"],["D3","A3"],["E2","B2"],["G2","D3"]]},
+ autumn:{n:"秋",bpm:108,lead:"triangle",lv:.3,bass:"roll",hat:0,bars:["A4:2 C5:1 E5:1 D5:2 C5:2","B4:1 C5:1 D5:2 E5:4","F5:2 E5:1 D5:1 C5:2 A4:2","B4:2 G4:2 A4:4","C5:2 E5:1 G5:1 F5:2 E5:2","D5:1 E5:1 F5:2 A5:4","G5:2 F5:1 E5:1 D5:2 B4:2","C5:2 B4:1 G#4:1 A4:4"],
+   roots:[["A2","E3"],["E2","B2"],["F2","C3"],["E2","B2"],["C3","G3"],["D3","A3"],["G2","D3"],["A2","E3"]]},
+ winter:{n:"冬",bpm:96,lead:"sine",lv:.22,bass:"drone",hat:0,bell:1,bars:["D5:2 F5:2 A5:2 G5:2","F5:1 E5:1 D5:2 C5:4","Bb4:2 D5:2 F5:2 E5:2","D5:2 C#5:2 D5:4","F5:2 A5:2 C6:2 Bb5:2","A5:1 G5:1 F5:2 E5:4","D5:2 F5:1 E5:1 D5:2 A4:2","Bb4:2 C#5:2 D5:4"],
+   roots:[["D3","A3"],["F2","C3"],["Bb2","F3"],["A2","E3"],["F2","C3"],["C3","G3"],["D3","A3"],["A2","E3"]]},
+ title:{n:"タイトル",bpm:116,lead:"square",lv:.12,bass:"pop",hat:1,bars:["C5:2 F5:2 A5:3 G5:1","F5:2 E5:1 F5:1 G5:4","A5:2 Bb5:2 C6:3 A5:1","G5:2 F5:1 G5:1 A5:4","C6:2 A5:2 F5:3 G5:1","A5:2 G5:1 F5:1 D5:4","C5:2 E5:2 G5:2 Bb5:2","A5:2 G5:2 F5:4"],
+   roots:[["F2","C3"],["C3","G3"],["F2","C3"],["C3","G3"],["F2","C3"],["D3","A3"],["C3","G3"],["F2","C3"]]},
+ yokai:{n:"妖怪",bpm:88,lead:"sawtooth",lv:.06,bass:"drone",hat:0,bars:["E5:2 F5:2 E5:2 R:2","B4:2 C5:2 B4:2 R:2","E5:1 D#5:1 E5:1 F5:1 G#5:4","F5:2 E5:2 R:4","A4:2 C5:2 D#5:2 R:2","E5:1 F5:1 E5:1 D#5:1 E5:4","C5:2 B4:2 G#4:2 R:2","A4:4 R:4"],
+   roots:[["A2","E3"],["E2","B2"],["E2","B2"],["A2","E3"],["F2","C3"],["E2","B2"],["F2","C3"],["A2","E3"]]},
+ ferry:{n:"航路",bpm:100,lead:"triangle",lv:.3,bass:"roll",hat:0,bars:["G5:3 E5:1 D5:2 C5:2","D5:3 E5:1 G5:4","A5:3 G5:1 E5:2 D5:2","E5:6 R:2","G5:3 A5:1 C6:2 A5:2","G5:3 E5:1 D5:4","C5:2 D5:2 E5:2 G5:2","C5:6 R:2"],
+   roots:[["C3","G3"],["G2","D3"],["A2","E3"],["C3","G3"],["F2","C3"],["C3","G3"],["G2","D3"],["C3","G3"]]},
+ final:{n:"最終年",bpm:168,lead:"square",lv:.11,bass:"drive",hat:1,bars:["E5:1 E5:1 G5:1 E5:1 A5:2 G5:2","F#5:1 E5:1 D5:1 E5:1 B4:4","E5:1 E5:1 G5:1 B5:1 C6:2 B5:2","A5:1 G5:1 F#5:1 G5:1 E5:4","C6:1 B5:1 A5:1 G5:1 A5:2 E5:2","B5:1 A5:1 G5:1 F#5:1 G5:2 D5:2","E5:1 G5:1 B5:1 E6:1 D6:2 B5:2","C6:1 B5:1 A5:1 B5:1 E5:4"],
+   roots:[["E2","B2"],["B1","F#2"],["E2","B2"],["E2","B2"],["A2","E3"],["G2","D3"],["E2","B2"],["E2","B2"]]}};
+for(const T of Object.values(TRACKS)){T.mel=[];T.bs=[];
+  T.bars.forEach((bar,bi)=>{let pos=bi*8;bar.split(" ").forEach(tk=>{const[n,l]=tk.split(":");if(n!=="R")T.mel[pos]=[midi(n),+l];pos+=+l});
+    const r=midi(T.roots[bi][0]),f=midi(T.roots[bi][1]);
+    for(let i=0;i<8;i++){const k=bi*8+i;T.bs[k]=T.bass==="drone"?(i%4===0?[r,4]:null):T.bass==="roll"?[[r,f,r+12,f][i%4],1]:T.bass==="drive"?[i%2?r+12:r,1]:[i%4===2?r+12:i%2?f:r,1]}})}
+const fileHost=()=>/github\.io$/.test(location.hostname)||location.protocol==="capacitor:";
 function silentWav(){const n=4000,b=new Uint8Array(44+n),v=new DataView(b.buffer);const w=(o,s)=>[...s].forEach((c,i)=>b[o+i]=c.charCodeAt(0));
   w(0,"RIFF");v.setUint32(4,36+n,true);w(8,"WAVEfmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,8000,true);v.setUint32(28,8000,true);v.setUint16(32,1,true);v.setUint16(34,8,true);w(36,"data");v.setUint32(40,n,true);b.fill(128,44);
   let s="";b.forEach(x=>s+=String.fromCharCode(x));return "data:audio/wav;base64,"+btoa(s)}
-const Snd={ctx:null,master:null,bgmG:null,seG:null,prefs:{on:true,bgm:true,se:true,vol:.6},timer:null,step:0,next:0,nb:null,el:null,armed:false,
+const Snd={ctx:null,master:null,bgmG:null,seG:null,prefs:{on:true,bgm:true,se:true,vol:.6},timer:null,step:0,next:0,nb:null,el:null,armed:false,cur:"spring",pending:null,swAt:0,thin:false,files:{},src:null,
   loadPrefs(){try{Object.assign(this.prefs,JSON.parse(localStorage.getItem("kks-sound"))||{})}catch(e){}},
   savePrefs(){try{localStorage.setItem("kks-sound",JSON.stringify(this.prefs))}catch(e){}},
   running(){return !!this.ctx&&this.ctx.state==="running"},
@@ -871,15 +889,32 @@ const Snd={ctx:null,master:null,bgmG:null,seG:null,prefs:{on:true,bgm:true,se:tr
   noiseHit(start,vol,dur){const c=this.ctx,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=this.nb;s.loop=true;f.type="bandpass";f.frequency.value=1800;g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(.0001,start+dur);s.connect(f);f.connect(g);g.connect(this.seG);s.start(start);s.stop(start+dur+.02)},
   hat(start,vol){const c=this.ctx,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=this.nb;f.type="highpass";f.frequency.value=7000;
     g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(.0001,start+.05);s.connect(f);f.connect(g);g.connect(this.bgmG);s.start(start);s.stop(start+.06)},
-  startBgm(){if(!this.ctx||this.timer)return;this.bgmG.gain.setTargetAtTime(.3,this.ctx.currentTime,.1);this.next=this.ctx.currentTime+.1;this.step=0;this.timer=setInterval(()=>this.sched(),25)},
-  stopBgm(){if(this.timer){clearInterval(this.timer);this.timer=null}if(this.ctx)this.bgmG.gain.setTargetAtTime(0,this.ctx.currentTime,.05)},
-  sched(){const c=this.ctx,E=60/138/2;if(this.next<c.currentTime-.2)this.next=c.currentTime+.05;
-    while(this.next<c.currentTime+.12){const i=this.step%64,m=MEL[i];
-      if(m)this.tone(hz(m[0]),this.next,m[1]*E*.9,"square",.12,this.bgmG);
-      this.tone(hz(BASS[i]),this.next,E*.85,"triangle",.32,this.bgmG);
-      if(i%2)this.hat(this.next,.05);
+  lvl(){return this.thin?.18:.3},
+  startBgm(){if(!this.ctx||this.timer)return;this.bgmG.gain.setTargetAtTime(this.lvl(),this.ctx.currentTime,.1);this.next=this.ctx.currentTime+.1;this.step=0;this.timer=setInterval(()=>this.sched(),25);this.startFile()},
+  stopBgm(){if(this.timer){clearInterval(this.timer);this.timer=null}this.stopFile();if(this.ctx)this.bgmG.gain.setTargetAtTime(0,this.ctx.currentTime,.05)},
+  // situation/season music: crossfade to another track
+  setTrack(name,thin){if(!TRACKS[name])name="spring";thin=!!thin;
+    if(thin!==this.thin){this.thin=thin;if(this.ctx&&this.timer&&!this.pending)this.bgmG.gain.setTargetAtTime(this.lvl(),this.ctx.currentTime,.4)}
+    this.loadFile(name);if(name===(this.pending||this.cur))return;
+    if(!this.ctx||!this.timer){this.cur=name;this.pending=null;return}
+    const t=this.ctx.currentTime;this.bgmG.gain.cancelScheduledValues(t);this.bgmG.gain.setTargetAtTime(.0001,t,.18);this.pending=name;this.swAt=t+.7},
+  // optional real music: bgm/<track>.mp3 (or .m4a) on the published site / in the app replaces the synthesized track
+  loadFile(name){if(!fileHost()||name in this.files||!this.ctx)return;this.files[name]=null;
+    const tryExt=exts=>{if(!exts.length){this.files[name]=false;return}fetch(`bgm/${name}.${exts[0]}`).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((ok,ng)=>this.ctx.decodeAudioData(b,ok,ng)))
+      .then(buf=>{this.files[name]=buf;if(this.cur===name&&!this.pending&&this.timer){this.stopFile();this.startFile()}}).catch(()=>tryExt(exts.slice(1)))};tryExt(["mp3","m4a"])},
+  startFile(){const buf=this.files[this.cur];if(!buf||this.src||!this.ctx)return;const s=this.ctx.createBufferSource();s.buffer=buf;s.loop=true;const g=this.ctx.createGain();g.gain.value=2.4;s.connect(g);g.connect(this.bgmG);s.start();this.src=s},
+  stopFile(){if(this.src){try{this.src.stop()}catch(e){}this.src=null}},
+  sched(){const c=this.ctx;if(this.next<c.currentTime-.2)this.next=c.currentTime+.05;
+    while(this.next<c.currentTime+.12){
+      if(this.pending){if(this.next<this.swAt){this.next=this.swAt;continue}this.stopFile();this.cur=this.pending;this.pending=null;this.step=0;this.bgmG.gain.setTargetAtTime(this.lvl(),this.next,.25);this.startFile()}
+      const T=TRACKS[this.cur],E=60/T.bpm/2;
+      if(!this.src){const i=this.step%64,m=T.mel[i],b=T.bs[i];
+        if(m)this.tone(hz(m[0]),this.next,m[1]*E*.9,T.lead,T.lv*(this.thin?.45:1),this.bgmG);
+        if(m&&T.bell&&!this.thin)this.tone(hz(m[0]+12),this.next+E*.5,E*1.6,"sine",.05,this.bgmG);
+        if(b)this.tone(hz(b[0]),this.next,b[1]*E*.85,"triangle",.32,this.bgmG);
+        if(T.hat&&!this.thin&&i%2)this.hat(this.next,.05)}
       this.step++;this.next+=E}},
-  duck(sec){if(!this.ctx||!this.timer)return;const t=this.ctx.currentTime;this.bgmG.gain.setTargetAtTime(.06,t,.03);this.bgmG.gain.setTargetAtTime(.3,t+sec,.2)},
+  duck(sec){if(!this.ctx||!this.timer||this.pending)return;const t=this.ctx.currentTime;this.bgmG.gain.setTargetAtTime(.06,t,.03);this.bgmG.gain.setTargetAtTime(this.lvl(),t+sec,.2)},
   seq(notes,type,vol,gap,len){const t=this.ctx.currentTime+.01;notes.forEach((n,i)=>this.tone(hz(midi(n)),t+i*gap,len||gap*1.4,type,vol,this.seG))},
   sfx(name){if(!this.running()||!this.prefs.se||!this.prefs.on)return;const t=this.ctx.currentTime+.005,d=this.seG;
     switch(name){
@@ -1232,6 +1267,11 @@ async function statsModal(){
   const pr=modal(`<h2>${S.phase==="over"?"成績":"途中経過"}</h2><h3>総資産の推移</h3>${chartSVG()||`<p class="hint">グラフは1か月が過ぎると表示されます。</p>`}<p class="hint">グラフをなぞると、その時点の総資産が見られます。</p><h3>詳しい成績</h3><div class="stat-wrap"><table class="stat"><tr><th></th>${S.players.map((p,i)=>`<th><span class="dot" style="background:${pcol(i)};display:inline-block;margin-right:4px"></span>${esc(p.name)}</th>`).join("")}</tr>${rows.map(([n,f])=>`<tr><td>${n}</td>${S.players.map((_,i)=>`<td>${f(i)}</td>`).join("")}</tr>`).join("")}</table></div>`,[["閉じる",0,"primary"]],true);
   bindChart();await pr}
 
+/* ---------- music selection ---------- */
+function pickBgm(){if(!$("#title").hidden||!S){Snd.setTrack("title");return}
+  const p=cp();let t=S.season||seasonKey(S.month);
+  if(S.phase!=="over"){if(S.year>=S.years&&S.years>1)t="final";if(N[p.pos]&&N[p.pos].sea)t="ferry";if(S.rules&&S.rules.yokai&&S.yokai&&S.yokai.owner===S.cur)t="yokai"}
+  Snd.setTrack(t,p.cpu&&S.phase!=="over")}
 /* ---------- seasons ---------- */
 const SEASON_N={spring:"春",summer:"夏",autumn:"秋",winter:"冬"};
 const seasonOfMonth=m=>m>=3&&m<=5?"spring":m>=6&&m<=8?"summer":m>=9&&m<=11?"autumn":"winter"; // m = calendar month 1-12
@@ -1344,7 +1384,7 @@ function humanStatus(){const hs=S.players.filter(p=>!p.cpu),d=distTo(S.dest),one
   return hs.map(p=>{const i=p.idx;return `<div class="hs ${i===S.cur&&!one?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><b class="hs-nm">${esc(p.name)}</b>${ttlTag(p)}<span class="sb-money ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sb-dist">総資産${yen(netWorth(i))}・${esc(S.dest)}まで${d[p.pos]}マス・カード${p.cards.length}枚</span>${statusTags(p)}</div>`}).join("")}
 function statusTags(p){const t=[];if(p.slow>0)t.push(`<span class="tag bad">鈍行 残り${p.slow}回</span>`);if(p.rest>0)t.push(`<span class="tag bad">運休</span>`);
   if(S.rules.yokai&&S.yokai.owner===p.idx)t.push(`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`);if(p.cards.includes("omamori"))t.push(`<span class="tag">お守り</span>`);if(debtOf(p)>0)t.push(`<span class="tag">借入${yen(debtOf(p))}</span>`);return t.join("")}
-function render(){if(!S)return;applySeason();
+function render(){if(!S)return;applySeason();pickBgm();
   $("#when").textContent=`${S.year}年目 ${MONTHS[S.month]}　(全${S.years}年)`;
   $("#goalName").textContent=S.dest;
   const p=cp(),d=distTo(S.dest)[p.pos];
@@ -1600,11 +1640,11 @@ async function endTurn(){const p=cp();
 
 /* ---------- title & setup ---------- */
 const VERSION="ver 1.0";
-async function showTitle(){$("#title").hidden=false;applySeason();setView();$("#tVisual").innerHTML=artHTML("title");
+async function showTitle(){$("#title").hidden=false;applySeason();Snd.setTrack("title");setView();$("#tVisual").innerHTML=artHTML("title");
   const saved=S&&S.phase!=="over"?S:await Store.get("auto");const ok=saved&&saved.phase!=="over"&&validState(saved);
   $("#tCont").disabled=!ok;$("#tContInfo").textContent=ok?`${MAPS[saved.map||"kanto"].name}・${saved.year}年目 ${MONTHS[saved.month]}`:"保存されたゲームはありません";
   $("#tSingle").focus()}
-function hideTitle(){$("#title").hidden=true;setView();applyZoom()}
+function hideTitle(){$("#title").hidden=true;if(S)pickBgm();setView();applyZoom()}
 async function setup(mode){mode=mode==="single"?"single":"multi";hideTitle();
   const order=["east","kanto"],cur=GP.map||"east",single=mode==="single";
   const seatsHTML=single?`<h3>あなたの名前</h3><div class="prow"><span class="dot" style="background:${COLORS[0]}"></span><input id="seatN0" maxlength="8" value="${esc(GP.name||"あなた")}" aria-label="あなたの名前"><span></span></div>
@@ -1653,7 +1693,7 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>カード</h3><p>急行・特急・ぶっとびなどの移動カードのほか、相手を1回休みにする足止め、サイコロを半分にする鈍行押し付け、カード強奪、ぶっとばし、妖怪なすりつけといった邪魔カードがあります。お守りカードを持っていると、邪魔カードを1回防げます。</p>
   <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠いオーナーに妖怪「${YOKAI[0].n}」が取り憑きます。ほかのオーナーのいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
   <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場・夜の街・金融学術）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
-  <h3>季節</h3><p>春（3〜5月）・夏（6〜8月）・秋（9〜11月）・冬（12〜2月）で、画面の色や絵が変わります。季節の変わり目にはお知らせが出ます。</p>
+  <h3>季節</h3><p>春（3〜5月）・夏（6〜8月）・秋（9〜11月）・冬（12〜2月）で、画面の色や絵、BGMが変わります。妖怪に取り憑かれているとき、フェリー航路の上、最終年にも専用の曲が流れます。CPUの番は控えめな演奏になります。季節の変わり目にはお知らせが出ます。</p>
   <h3>称号</h3><p>総資産が増えると称号が上がり、そのたびに昇格ボーナス（クイズ正解の賞金と同じくらい）がもらえます。CPUも同じです。駆け出し → 小金持ち（2億円）→ 資産家（4億円）→ 大地主（8億円）→ 大富豪（15億円）→ 億万長者（30億円）。一度上がった称号は、総資産が減っても下がりません。</p>
   <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
   <p class="hint">物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>`,[["閉じる",0,"primary"]])}
