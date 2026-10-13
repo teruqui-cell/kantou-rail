@@ -18,20 +18,45 @@
 /* Layout: one-screen game — route map (scrollable, zoomable) beside a control column; stacks map-over-controls on phones */
 :root{
   --bg:#E4EAEE; --panel:#FFFFFF; --ink:#18212B; --muted:#5A6977; --line:#C6D1D9;
-  --land:#F2F5F1; --rail:#2B3540; --plus:#2C6BE0; --minus:#DE3F34; --card:#E5AC12;
+  --land:#F1E8D2; --rail:#2B3540; --plus:#2C6BE0; --minus:#DE3F34; --card:#E5AC12;
   --accent:#0C8565; --accent-ink:#FFFFFF; --goal:#DE3F34; --pref:#8FA3B3; --yokai:#6B3FA0; --shop:#C2418F;
+  --sea:#D6E5E8; --wave:#A9C3C7; --coast:#8C7A5B; --seaink:#7D9DA3;
   --f-display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
   --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
 }
+/* seasons (light) */
+:root[data-season="spring"]{--land:#F5E9E1;--sea:#D5E6EA;--accent:#C2457A;--accent-ink:#FFFFFF}
+:root[data-season="summer"]{--land:#EEEDD3;--sea:#C9E4EC;--accent:#0C8565;--accent-ink:#FFFFFF}
+:root[data-season="autumn"]{--land:#F2E2C4;--sea:#D3E0DD;--accent:#B4531A;--accent-ink:#FFFFFF}
+:root[data-season="winter"]{--land:#EDEFEF;--sea:#D3DEE8;--accent:#2F5CA6;--accent-ink:#FFFFFF}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0E141A; --panel:#17212A; --ink:#E6ECF1; --muted:#93A2AF; --line:#2B3946;
-  --land:#131C24; --rail:#AFBECB; --plus:#5A93FF; --minus:#FF6A5C; --card:#F2C443;
+  --land:#221F1B; --sea:#121C24; --wave:#1F3341; --coast:#5E5444; --seaink:#3C5666; --rail:#AFBECB; --plus:#5A93FF; --minus:#FF6A5C; --card:#F2C443;
   --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; --shop:#F07CC0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0E141A; --panel:#17212A; --ink:#E6ECF1; --muted:#93A2AF; --line:#2B3946;
-  --land:#131C24; --rail:#AFBECB; --plus:#5A93FF; --minus:#FF6A5C; --card:#F2C443;
+  --land:#221F1B; --sea:#121C24; --wave:#1F3341; --coast:#5E5444; --seaink:#3C5666; --rail:#AFBECB; --plus:#5A93FF; --minus:#FF6A5C; --card:#F2C443;
   --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; --shop:#F07CC0; color-scheme:dark}
+/* seasons (dark) */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-season="spring"]{--land:#2A2124;--accent:#F08DB2;--accent-ink:#3A0B1E}}
+:root[data-theme="dark"][data-season="spring"]{--land:#2A2124;--accent:#F08DB2;--accent-ink:#3A0B1E}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-season="summer"]{--land:#1F2419;--accent:#2CC696;--accent-ink:#06261C}}
+:root[data-theme="dark"][data-season="summer"]{--land:#1F2419;--accent:#2CC696;--accent-ink:#06261C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-season="autumn"]{--land:#2A2118;--accent:#F0A160;--accent-ink:#3A1A05}}
+:root[data-theme="dark"][data-season="autumn"]{--land:#2A2118;--accent:#F0A160;--accent-ink:#3A1A05}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-season="winter"]{--land:#1E2228;--accent:#8FB4F0;--accent-ink:#0B1E3A}}
+:root[data-theme="dark"][data-season="winter"]{--land:#1E2228;--accent:#8FB4F0;--accent-ink:#0B1E3A}
 [hidden]{display:none!important}
+body[data-map="east"] #mapWrap,body[data-map="east"] .fm-wrap{background:var(--sea)}
+.mapsea{fill:var(--sea)}.mapland{fill:var(--land);stroke:var(--coast);stroke-width:2.5;stroke-linejoin:round}
+.mapshade{fill:none;stroke:var(--wave);stroke-width:14;stroke-linejoin:round;opacity:.55}
+.mapwave{fill:none;stroke:var(--wave);stroke-width:2}
+.mapmt{fill:none;stroke:var(--coast);stroke-width:2.2;stroke-linejoin:round;opacity:.55}
+.mapsealbl{font-family:var(--f-display);fill:var(--seaink);opacity:.55;letter-spacing:.4em}
+.mapframe{fill:none;stroke:var(--coast);opacity:.6}
+.compass{stroke:var(--coast);fill:none;stroke-width:2;opacity:.7}.compass .cf{fill:var(--coast);stroke:none}
+.sglyph{pointer-events:none}
+.sea-kanji{font-family:var(--f-display);font-size:88px;text-align:center;line-height:1;margin:4px 0 6px;color:var(--accent)}
 .fm-tools{display:flex;gap:6px;margin-bottom:8px}.fm-tools select{flex:1}
 .fm-wrap{overflow:auto;max-height:min(52vh,560px);border:1px solid var(--line);border-radius:10px;background:var(--land);-webkit-overflow-scrolling:touch}
 .fm-wrap svg{display:block;cursor:pointer}
@@ -472,6 +497,8 @@ const EXTRA_PROPS={
 "金沢":[["加賀の骨董商",4000,6]],
 "盛岡":[["大学発の研究ベンチャー",6000,6]]};
 for(const st in EXTRA_PROPS){const k=KANTO_ST.find(x=>x[0]===st),arr=EAST_PROPS[st]||(k&&k[4]);arr.push(...EXTRA_PROPS[st])}
+const EAST_LAND="M57 -40L39 -32L35 -25L30 -23L31 -16L27 -7L21 1L8 6L5 14L-4 21L-3 33L-7 39L-10 51L-25 59L-26 67L-29 70L-31 78L-37 71L-39 72L-38 81L-39 84L-35 84L-36 88L-29 86L-29 88L-35 98L-40 104L-40 -40ZM-40 1992L-40 1999L-36 2002L-37 2010L-33 2010L-31 2004L-31 2015L-20 2017L-5 2005L-1 2007L-7 2010L-10 2018L-6 2019L9 2017L13 2012L13 2007L8 2010L6 2006L3 2005L5 2001L11 1999L15 2004L19 2003L22 2008L25 2009L29 2007L23 1999L24 1998L28 1999L33 1997L25 1982L27 1982L35 1988L42 1986L45 1990L51 1985L57 1985L57 1982L53 1979L55 1971L55 1969L52 1969L52 1962L63 1954L69 1968L65 1974L69 1979L73 1978L77 1965L79 1951L73 1940L59 1927L59 1915L52 1906L53 1900L60 1894L68 1875L82 1854L85 1848L83 1842L90 1842L97 1839L115 1820L131 1810L179 1748L187 1732L202 1695L202 1690L199 1687L202 1675L193 1657L195 1641L191 1636L189 1639L185 1638L184 1636L186 1624L191 1617L189 1615L196 1605L193 1595L199 1588L216 1578L223 1576L233 1578L253 1567L259 1566L266 1558L300 1548L308 1551L310 1554L308 1558L311 1566L305 1569L298 1568L292 1571L291 1575L289 1582L291 1588L295 1588L293 1598L288 1603L276 1601L265 1605L258 1615L258 1620L251 1623L248 1628L235 1620L238 1616L232 1619L223 1637L226 1638L225 1643L221 1645L219 1652L222 1654L233 1652L238 1658L241 1659L246 1657L249 1648L254 1647L255 1678L250 1684L250 1690L243 1700L246 1708L260 1718L274 1725L306 1725L316 1716L320 1706L324 1688L328 1685L337 1680L371 1673L411 1657L440 1640L448 1631L460 1633L475 1628L490 1617L511 1596L532 1583L537 1577L552 1549L568 1533L580 1495L583 1487L589 1480L628 1450L639 1450L659 1439L671 1430L691 1410L695 1401L701 1354L706 1335L726 1291L731 1283L747 1269L758 1252L780 1179L785 1150L787 1144L793 1141L799 1135L809 1094L811 1043L805 1020L794 1008L785 1003L777 1005L771 1012L755 1013L746 998L745 993L748 991L745 989L745 979L763 989L767 989L775 984L782 976L796 951L798 936L802 926L805 899L790 884L789 855L787 849L784 845L773 844L774 840L781 832L786 831L789 826L793 824L799 809L809 803L823 809L837 799L841 801L848 797L859 761L859 744L869 753L871 753L869 745L871 743L875 744L874 741L865 741L863 739L861 740L859 731L855 725L846 721L845 719L852 718L856 719L859 716L863 689L873 695L885 708L889 708L895 704L897 699L901 698L910 699L917 705L919 711L917 728L925 774L930 784L939 788L948 787L958 777L961 770L960 768L961 763L955 761L959 760L959 756L965 747L969 751L976 752L982 759L981 765L996 769L1000 776L1008 779L1012 778L1019 770L1027 753L1030 725L1036 714L1032 701L1023 689L1019 686L1015 686L1010 693L1012 694L1014 691L1012 696L996 708L981 705L975 710L960 712L951 720L942 717L942 705L944 702L949 674L953 666L955 654L967 639L968 626L969 624L984 637L997 639L1005 643L1021 661L1036 669L1044 669L1056 664L1070 651L1071 657L1069 659L1070 661L1063 678L1057 713L1058 721L1056 743L1057 765L1066 826L1076 851L1084 858L1092 855L1094 860L1100 865L1118 885L1119 890L1122 892L1129 907L1141 928L1135 936L1138 940L1145 943L1147 948L1140 958L1141 964L1155 978L1161 981L1163 991L1160 997L1165 1007L1171 1032L1172 1037L1167 1047L1164 1073L1172 1064L1177 1063L1175 1073L1182 1082L1183 1086L1173 1098L1161 1104L1164 1108L1170 1107L1177 1099L1181 1103L1178 1106L1177 1113L1166 1115L1159 1121L1164 1124L1152 1134L1156 1135L1166 1129L1167 1135L1154 1142L1158 1147L1152 1147L1152 1153L1160 1153L1160 1158L1157 1161L1148 1162L1150 1167L1156 1167L1154 1171L1150 1174L1141 1175L1153 1185L1154 1187L1150 1189L1140 1186L1136 1189L1146 1196L1137 1197L1137 1199L1142 1202L1143 1204L1142 1205L1123 1204L1120 1201L1124 1213L1120 1213L1117 1216L1121 1219L1120 1221L1115 1221L1111 1217L1110 1214L1113 1211L1106 1211L1103 1214L1104 1228L1110 1244L1106 1241L1103 1235L1094 1237L1094 1252L1082 1263L1091 1275L1090 1278L1086 1277L1082 1281L1070 1288L1075 1293L1084 1293L1081 1301L1072 1309L1080 1317L1083 1314L1086 1321L1086 1329L1083 1329L1080 1323L1076 1334L1079 1337L1072 1341L1075 1350L1081 1347L1084 1348L1086 1351L1081 1350L1078 1354L1082 1357L1083 1367L1086 1370L1082 1379L1076 1373L1070 1371L1072 1366L1064 1361L1066 1354L1064 1353L1058 1353L1046 1346L1022 1351L1018 1354L1016 1366L1013 1366L1009 1354L1006 1356L1003 1354L997 1360L994 1369L1000 1368L1000 1372L994 1376L982 1393L971 1429L970 1448L972 1466L984 1486L988 1500L989 1508L986 1514L990 1521L992 1583L986 1618L986 1639L982 1649L980 1669L978 1678L971 1684L955 1691L949 1696L949 1703L937 1723L929 1758L915 1784L913 1800L916 1816L914 1822L905 1835L907 1863L919 1897L946 1944L956 1959L962 1962L959 1972L953 1966L933 1973L933 1969L923 1972L889 2000L879 2017L871 2042L877 2061L873 2085L870 2089L865 2089L859 2100L856 2099L855 2096L851 2100L847 2099L844 2104L825 2102L819 2108L819 2113L798 2125L793 2136L793 2144L787 2151L771 2153L767 2150L767 2145L755 2140L754 2138L754 2136L762 2136L768 2132L774 2133L776 2130L773 2125L769 2124L772 2114L769 2107L770 2099L767 2094L767 2084L775 2078L775 2073L772 2068L772 2062L759 2057L763 2057L767 2054L767 2050L771 2043L780 2046L783 2043L781 2033L801 2021L813 2005L817 2006L819 2000L816 2000L815 1991L801 1978L799 1979L797 1976L791 1975L785 1978L789 1984L781 1989L772 1983L770 1989L767 1983L764 1983L761 1991L758 1988L759 1982L757 1980L755 1985L763 2006L761 2012L747 2023L738 2022L734 2026L742 2031L742 2038L735 2036L733 2038L737 2043L735 2061L737 2064L738 2061L740 2063L743 2068L751 2069L753 2073L749 2076L751 2079L749 2082L743 2082L738 2085L739 2093L742 2098L729 2099L729 2090L726 2083L731 2081L727 2078L715 2059L705 2061L701 2058L691 2057L658 2064L649 2069L642 2076L641 2088L644 2099L637 2096L632 2105L629 2118L635 2119L631 2130L633 2136L639 2138L641 2143L641 2160L633 2163L625 2181L615 2191L612 2203L614 2210L610 2212L604 2208L584 2223L573 2211L574 2207L568 2201L568 2192L574 2187L568 2173L571 2165L570 2158L574 2152L576 2151L573 2146L571 2135L576 2124L588 2126L596 2125L598 2123L579 2102L559 2098L548 2103L538 2104L532 2108L528 2118L522 2123L522 2130L524 2132L524 2127L528 2126L525 2135L498 2149L491 2163L493 2170L484 2184L470 2196L466 2212L467 2217L472 2218L474 2221L473 2223L465 2222L439 2209L424 2207L410 2207L392 2213L372 2206L346 2204L324 2207L271 2224L263 2224L248 2227L255 2211L259 2207L265 2216L267 2213L293 2198L297 2192L300 2193L301 2202L302 2193L308 2193L302 2191L305 2184L296 2174L295 2175L287 2172L283 2176L281 2174L280 2183L277 2184L277 2180L271 2179L261 2181L259 2179L255 2181L249 2180L237 2169L242 2153L241 2148L233 2165L229 2182L233 2188L238 2191L240 2200L229 2196L219 2190L216 2183L220 2168L216 2160L213 2160L212 2144L214 2136L223 2120L224 2109L221 2109L217 2121L216 2113L213 2112L215 2123L211 2124L210 2119L208 2119L208 2125L194 2124L182 2134L179 2142L183 2144L179 2146L178 2156L159 2184L156 2203L161 2210L160 2218L162 2222L177 2224L185 2233L199 2242L211 2248L218 2248L223 2259L229 2260L231 2263L230 2273L225 2272L222 2275L224 2278L229 2278L223 2285L226 2291L226 2299L215 2303L207 2302L203 2300L203 2297L210 2297L216 2300L215 2296L217 2297L219 2292L217 2289L209 2289L209 2294L203 2289L195 2293L190 2292L194 2284L185 2285L180 2288L183 2289L181 2294L173 2299L169 2299L166 2296L164 2300L157 2297L153 2303L155 2307L147 2305L137 2313L131 2313L122 2318L115 2325L115 2331L119 2335L116 2340L111 2340L107 2335L103 2340L-40 2340ZM1760 259L1750 260L1747 265L1748 270L1756 272L1754 274L1746 275L1739 282L1726 280L1730 288L1728 292L1706 295L1700 293L1696 288L1695 281L1688 279L1685 281L1676 295L1677 298L1685 305L1677 307L1651 302L1637 303L1632 305L1626 304L1611 299L1607 290L1600 290L1574 295L1548 307L1519 326L1501 346L1473 368L1461 381L1419 446L1416 456L1415 467L1417 490L1411 514L1409 519L1404 523L1402 533L1399 537L1389 529L1385 522L1376 514L1347 496L1310 484L1271 462L1255 458L1222 436L1201 414L1182 412L1166 403L1156 392L1136 382L1119 378L1103 379L1086 382L1064 390L1034 412L1002 430L985 450L980 451L976 450L972 445L980 445L982 442L971 436L968 432L967 423L936 390L927 387L911 389L893 387L885 390L877 396L860 420L853 439L852 450L854 460L859 466L879 476L901 496L932 489L943 497L946 503L958 518L965 522L980 540L987 544L1004 549L1022 566L1020 568L1008 571L993 584L986 586L953 573L943 573L931 579L929 575L936 568L935 563L931 560L922 560L917 566L912 581L897 589L884 593L880 602L882 620L880 628L874 632L851 639L845 645L839 658L825 653L817 654L809 650L805 644L796 616L803 590L813 575L815 566L822 565L824 561L823 551L827 548L828 540L825 528L827 524L805 496L787 488L779 475L771 472L761 463L757 448L770 422L772 402L769 385L771 376L777 367L785 364L807 362L819 350L825 348L834 334L837 333L848 345L852 346L856 343L858 332L863 328L873 311L897 291L897 286L890 271L881 259L863 241L861 232L867 215L881 215L884 212L887 204L899 210L918 224L927 233L941 239L947 245L968 243L987 237L989 239L986 246L989 250L1016 258L1027 255L1054 232L1063 217L1066 207L1066 196L1052 170L1052 165L1057 157L1047 126L1051 116L1059 105L1082 97L1093 89L1104 74L1107 64L1109 45L1106 -4L1108 -12L1124 -40L1400 -40L1410 -31L1420 -28L1423 -20L1430 -13L1457 2L1499 17L1499 18L1483 16L1481 18L1487 25L1490 34L1493 32L1500 37L1529 38L1537 30L1540 29L1562 30L1572 36L1563 41L1559 53L1569 55L1575 48L1580 34L1585 32L1589 35L1587 42L1591 51L1595 53L1601 64L1613 71L1646 77L1677 79L1686 78L1694 73L1734 32L1760 14L1760 59L1748 79L1744 88L1746 92L1738 112L1746 132L1760 146ZM707 2340L712 2334L718 2334L721 2339L721 2340ZM717 464L719 467L711 480L709 497L699 508L697 507L695 503L691 480L699 471L709 468L717 464ZM1521 24L1535 26L1529 28L1505 21L1510 20L1521 24ZM665 2269L671 2264L670 2275L665 2286L662 2282L665 2269ZM254 1635L252 1642L235 1648L227 1637L229 1635L232 1638L240 1635L245 1638L250 1634L254 1635ZM692 2181L696 2182L699 2190L699 2204L693 2204L681 2198L680 2195L681 2177L692 2181ZM515 1424L536 1423L535 1436L527 1448L520 1465L498 1480L479 1487L471 1485L470 1479L482 1475L483 1462L494 1448L488 1441L476 1445L473 1438L475 1424L488 1401L509 1381L518 1367L525 1366L526 1369L520 1398L511 1421L512 1428L515 1424Z"; // Natural Earth 1:10m land (public domain), projected with LL()
+const MOUNTAINS=[[138.73,35.36],[138.52,36.40],[140.05,39.10],[141.00,39.85],[142.85,43.66],[140.07,37.60],[137.62,36.57],[139.49,36.77],[140.88,40.66],[140.81,42.83],[140.02,38.55],[140.44,38.14],[138.11,36.89],[140.10,36.23]];
 const LL=(lon,lat)=>[Math.round((lon-136)*185+60),Math.round((44-lat)*230+60)];
 const MAPS={
   kanto:{name:"関東甲信越編",title:"大人の鉄道すごろく 関東甲信越編",w:1060,h:1120,stations:KANTO_ST,edges:KANTO_EDGES,prefs:KANTO_PREFS,prefSize:58,
@@ -729,7 +756,7 @@ function buildGraph(id){CUR_MAP=id;MAP=MAPS[id];STATIONS=MAP.stations;VW=MAP.w;V
     addChain(a,b,pts,Math.max(4,Math.round(lands[li]*.75)),ei,kind,srand,meta)});
   MAP.shops.forEach(([a,b])=>{const r=RAILS.find(r=>(r.pts[0]===a&&r.pts.at(-1)===b)||(r.pts[0]===b&&r.pts.at(-1)===a));if(r)N[r.pts[Math.floor(r.pts.length/2)]].type="shop"});
 }
-function useMap(id){id=MAPS[id]?id:"east";if(CUR_MAP!==id){buildGraph(id);initMap();scale=innerWidth<=820?.62:.72;applyZoom()}$("h1").textContent=MAP.title}
+function useMap(id){id=MAPS[id]?id:"east";document.body.dataset.map=id;if(CUR_MAP!==id){buildGraph(id);initMap();scale=innerWidth<=820?.62:.72;applyZoom()}$("h1").textContent=MAP.title}
 function bfs(src){const d={[src]:0},q=[src];while(q.length){const u=q.shift();for(const v of ADJ[u])if(d[v]==null){d[v]=d[u]+1;q.push(v)}}return d}
 const distTo=id=>distCache[id]||(distCache[id]=bfs(id));
 function reach(start,steps,dest,exact){
@@ -881,6 +908,7 @@ function el(tag,attrs,parent,text){const e=document.createElementNS(NS,tag);for(
 let gDyn,gTok,gOwn;
 function initMap(){
   const svg=$("#map");svg.innerHTML="";svg.setAttribute("viewBox",`0 0 ${VW} ${VH}`);svg.setAttribute("aria-label",MAP.name+"の路線図");
+  drawMapBg(svg);
   const gP=el("g",{},svg);MAP.prefs.forEach(([n,x,y])=>el("text",{x,y,class:"pref","text-anchor":"middle","font-size":MAP.prefSize},gP,n));
   const gR=el("g",{},svg);
   RAILS.forEach(r=>{const d="M"+r.pts.map(id=>N[id].x+" "+N[id].y).join(" L");el("path",{d,class:["rail","ferry","ferry long","tunnel"][r.kind]},gR);
@@ -896,6 +924,30 @@ function initMap(){
   });
   gOwn=el("g",{},svg);gTok=el("g",{},svg);
 }
+let gSeason=null,landEl=null,mapSeason=null;
+function drawMapBg(svg){const g=el("g",{"aria-hidden":"true"},svg),east=CUR_MAP==="east";landEl=null;
+  if(east){const defs=el("defs",{},g);const pat=el("pattern",{id:"seigaiha",width:60,height:30,patternUnits:"userSpaceOnUse"},defs);
+    [[30,30],[0,15],[60,15]].forEach(([cx,cy])=>[26,18,10].forEach(r=>el("circle",{cx,cy,r,class:"mapwave"},pat)));
+    el("rect",{x:0,y:0,width:VW,height:VH,class:"mapsea"},g);el("rect",{x:0,y:0,width:VW,height:VH,fill:"url(#seigaiha)",opacity:.35},g);
+    el("path",{d:EAST_LAND,class:"mapshade"},g);landEl=el("path",{d:EAST_LAND,class:"mapland"},g);
+    MOUNTAINS.forEach(([lo,la])=>{const[x,y]=LL(lo,la);el("path",{d:`M${x-22} ${y+10} L${x-8} ${y-12} L${x} ${y-2} L${x+8} ${y-14} L${x+24} ${y+10}`,class:"mapmt"},g)});
+    [["日本海",137.15,41.4],["太平洋",143.4,37.6],["津軽海峡",139.2,41.5]].forEach(([n,lo,la],k)=>{const[x,y]=LL(lo,la);el("text",{x,y,class:"mapsealbl","font-size":k===2?30:56,"text-anchor":"middle"},g,n)});
+    const[cx,cy]=LL(144.15,35.4);const c=el("g",{class:"compass",transform:`translate(${cx} ${cy})`},g);el("circle",{r:52},c);el("circle",{r:44},c);
+    el("path",{d:"M0 -64 L10 0 L0 64 L-10 0Z M-64 0 L0 10 L64 0 L0 -10Z"},c);el("path",{d:"M0 -64 L10 0 L-10 0Z",class:"cf"},c);el("text",{y:-72,"text-anchor":"middle","font-size":22,class:"cf"},c,"北")}
+  else el("rect",{x:0,y:0,width:VW,height:VH,fill:"var(--land)"},g);
+  el("rect",{x:6,y:6,width:VW-12,height:VH-12,class:"mapframe","stroke-width":5},g);el("rect",{x:16,y:16,width:VW-32,height:VH-32,class:"mapframe","stroke-width":1.5},g);
+  gSeason=el("g",{class:"sglyph"},g);mapSeason=null;drawSeasonGlyphs()}
+const GLYPH={spring:`<g fill="#F3A6C0" stroke="#D97A9C" stroke-width=".8">${[0,72,144,216,288].map(a=>`<ellipse rx="3.2" ry="5.5" transform="rotate(${a}) translate(0 -5)"/>`).join("")}<circle r="2" fill="#F7D46A" stroke="none"/></g>`,
+  summer:`<g fill="#7DBF6A" stroke="#4E8F45" stroke-width=".8"><path d="M0 8 C-8 0 -6 -9 0 -10 C6 -9 8 0 0 8Z"/><path d="M0 8 L0 -6" fill="none"/></g>`,
+  autumn:`<g fill="#E07A2E" stroke="#B4531A" stroke-width=".8"><path d="M0 -10 L3 -4 L9 -6 L6 0 L10 3 L4 4 L5 10 L0 6 L-5 10 L-4 4 L-10 3 L-6 0 L-9 -6 L-3 -4Z"/></g>`,
+  winter:`<g stroke="#8FAFD0" stroke-width="2" stroke-linecap="round">${[0,60,120].map(a=>`<path d="M0 -8 L0 8" transform="rotate(${a})"/>`).join("")}</g>`};
+function drawSeasonGlyphs(){if(!gSeason)return;const k=document.documentElement.dataset.season||"spring";if(mapSeason===k)return;mapSeason=k;gSeason.innerHTML="";
+  let seed=k.length*7919+13;const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};let n=0;
+  for(let t=0;t<900&&n<70;t++){const x=40+rr()*(VW-80),y=40+rr()*(VH-80);
+    if(landEl&&landEl.isPointInFill&&!landEl.isPointInFill(new DOMPoint(x,y)))continue;
+    if(k==="winter"&&MAP.snowY&&y>MAP.snowY&&rr()<.7)continue;
+    if(STATIONS.some(st=>Math.abs(st[1]-x)<40&&Math.abs(st[2]-y)<40))continue;
+    const g=el("g",{transform:`translate(${x.toFixed(0)} ${y.toFixed(0)}) rotate(${(rr()*360).toFixed(0)}) scale(${(1+rr()*.6).toFixed(2)})`,opacity:.55},gSeason);g.innerHTML=GLYPH[k];n++}}
 function renderDyn(){
   if(!S)return;gDyn.innerHTML="";gOwn.innerHTML="";
   STATIONS.forEach(([n,x,y])=>{const own=S.owners[n],c=own.length,sp=8,x0=x-(c-1)*sp/2;
@@ -927,7 +979,7 @@ function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
 
 /* ---------- scene illustrations (placeholders; img/<key>.png or .webp on the site replaces them) ---------- */
-const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面"};
+const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
 const SCENE_IMG={};
 let SVGID=0;
 const BG={sky:["#8CCDF0","#E6F5FD","#7CC26B"],sea:["#9BD3F2","#E3F3FC","#2F7FB8"],night:["#1B2440","#3B3F70","#283055"],snow:["#C9DDEA","#F2F8FB","#FFFFFF"],
@@ -1000,9 +1052,19 @@ const SCENES={
   bank:["sky",()=>`<g transform="translate(90,30)"><path d="M0 34 L70 4 L140 34Z" fill="#E9E2D3" stroke="#2B3540" stroke-width="3"/><text x="70" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#0C8565">¥</text><rect x="6" y="34" width="128" height="8" fill="#E9E2D3" stroke="#2B3540" stroke-width="3"/>${[16,44,72,100].map(x=>`<rect x="${x}" y="44" width="14" height="60" fill="#F7F7F2" stroke="#2B3540" stroke-width="3"/>`).join("")}<rect x="0" y="104" width="140" height="12" fill="#E9E2D3" stroke="#2B3540" stroke-width="3"/></g>`],
   ceremony:["night",()=>`<path d="M0 0 H70 Q60 90 80 180 H0Z" fill="#B3261E"/><path d="M320 0 H250 Q260 90 240 180 H320Z" fill="#B3261E"/><path d="M110 0 L80 180 H240 L210 0Z" fill="#F8E7A1" opacity=".25"/><rect x="0" y="0" width="320" height="16" fill="#8A1C15"/>`+IC.trophy(160,100)],
   lose:["night",()=>`<g fill="#9AA6B2"><ellipse cx="150" cy="44" rx="56" ry="24"/><ellipse cx="200" cy="50" rx="40" ry="20"/><ellipse cx="110" cy="54" rx="34" ry="16"/></g>${[110,140,170,200,125,185].map((x,i)=>`<path d="M${x} ${78+i%2*14} l-6 16" stroke="#8CCDF0" stroke-width="3" stroke-linecap="round"/>`).join("")}`+IC.tanuki(250,118,.55)+IC.arrow(80,118,false,"#B3261E")],
+  s_spring:["sky",()=>tree(160,150,"#F3A6C0","#E58AAE")+tree(70,160,"#F7C1D3","#E58AAE",.7)+tree(255,158,"#F7C1D3","#E58AAE",.75)],
+  s_summer:["sea",()=>`<circle cx="250" cy="44" r="22" fill="#FFD84A"/>${Array.from({length:10},(_,i)=>{const a=i*Math.PI/5;return `<path d="M${250+30*Math.cos(a)} ${44+30*Math.sin(a)} L${250+40*Math.cos(a)} ${44+40*Math.sin(a)}" stroke="#FFD84A" stroke-width="4" stroke-linecap="round"/>`}).join("")}<g fill="#fff"><circle cx="70" cy="80" r="26"/><circle cx="100" cy="66" r="30"/><circle cx="132" cy="84" r="24"/><rect x="50" y="84" width="100" height="24" rx="12"/></g>`],
+  s_autumn:["sunset",()=>tree(160,150,"#E07A2E","#B4531A")+tree(70,160,"#F2B33D","#C9851A",.7)+tree(255,158,"#D9472E","#A8321F",.75)],
+  s_winter:["snow",()=>`<path d="M0 150 L70 70 L120 120 L190 50 L260 115 L320 80 L320 180 L0 180Z" fill="#E8F0F6" stroke="#9FB7CC" stroke-width="3"/><path d="M175 66 L190 50 L205 64 L196 70 L186 62Z" fill="#fff"/><g fill="#5E8AB8"><circle cx="150" cy="140" r="16" fill="#fff" stroke="#9FB7CC" stroke-width="3"/><circle cx="150" cy="112" r="11" fill="#fff" stroke="#9FB7CC" stroke-width="3"/><circle cx="146" cy="110" r="1.6"/><circle cx="154" cy="110" r="1.6"/></g>`],
   title:["sunset",()=>`<path d="M0 118 L55 72 L100 104 L165 46 L232 108 L282 78 L320 98 V180 H0Z" fill="#7B5E8C" opacity=".55"/><path d="M152 58 L165 46 L178 58 L172 62 L165 56 L158 62Z" fill="#fff"/><rect y="132" width="320" height="48" fill="#2F7FB8"/><path d="M0 142 q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#fff" stroke-width="2" fill="none" opacity=".5"/><rect x="0" y="120" width="320" height="6" fill="#4A3A2E"/>${[20,70,120,170,220,270].map(x=>`<rect x="${x}" y="126" width="6" height="18" fill="#4A3A2E"/>`).join("")}`+IC.train(96,62,.72)]
 };
-function sceneSVG(key){const[bg,fn]=SCENES[key]||SCENES.move;const id=++SVGID;return `<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${SCENE_KEYS[key]||""}" preserveAspectRatio="xMidYMid slice">${bgSVG(bg,id)}${fn()}</svg>`}
+function tree(x,y,c1,c2,s=1){return `<g transform="translate(${x} ${y}) scale(${s})"><rect x="-6" y="-40" width="12" height="44" fill="#7A5236"/><g fill="${c1}" stroke="${c2}" stroke-width="2"><circle cx="0" cy="-62" r="30"/><circle cx="-26" cy="-46" r="20"/><circle cx="26" cy="-46" r="20"/></g></g>`}
+function seasonOverlay(){const k=document.documentElement.dataset.season;if(!k)return "";let seed=SVGID*97+k.length;const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+  if(k==="summer")return `<g fill="#fff" opacity=".55"><circle cx="18" cy="16" r="16"/><circle cx="40" cy="10" r="14"/><circle cx="300" cy="150" r="0"/></g>`;
+  const col={spring:"#F6B3C9",autumn:"#E9803A",winter:"#FFFFFF"}[k];
+  return `<g opacity=".85">${Array.from({length:k==="winter"?22:11},()=>{const x=(rr()*320).toFixed(0),y=(rr()*170).toFixed(0),r=(rr()*360).toFixed(0);
+    return k==="winter"?`<circle cx="${x}" cy="${y}" r="${(1.5+rr()*2.2).toFixed(1)}" fill="${col}" stroke="#B8CDE0" stroke-width=".6"/>`:k==="spring"?`<ellipse cx="${x}" cy="${y}" rx="3" ry="5" fill="${col}" transform="rotate(${r} ${x} ${y})"/>`:`<path d="M0 -6 L2 -2 L6 -3 L4 1 L6 3 L2 3 L2 6 L0 4 L-2 6 L-2 3 L-6 3 L-4 1 L-6 -3 L-2 -2Z" fill="${col}" transform="translate(${x} ${y}) rotate(${r})"/>`}).join("")}</g>`}
+function sceneSVG(key){const[bg,fn]=SCENES[key]||SCENES.move;const id=++SVGID;return `<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${SCENE_KEYS[key]||""}" preserveAspectRatio="xMidYMid slice">${bgSVG(bg,id)}${fn()}${seasonOverlay()}</svg>`}
 function artHTML(key){return SCENE_IMG[key]?`<img src="${SCENE_IMG[key]}" alt="${SCENE_KEYS[key]||""}">`:sceneSVG(key)}
 const sceneHTML=key=>`<div class="scene-pic">${artHTML(key)}</div>`;
 // on the published site, pick up img/<key>.webp or .png automatically
@@ -1164,6 +1226,16 @@ async function statsModal(){
   const pr=modal(`<h2>${S.phase==="over"?"成績":"途中経過"}</h2><h3>総資産の推移</h3>${chartSVG()||`<p class="hint">グラフは1か月が過ぎると表示されます。</p>`}<p class="hint">グラフをなぞると、その時点の総資産が見られます。</p><h3>詳しい成績</h3><div class="stat-wrap"><table class="stat"><tr><th></th>${S.players.map((p,i)=>`<th><span class="dot" style="background:${pcol(i)};display:inline-block;margin-right:4px"></span>${esc(p.name)}</th>`).join("")}</tr>${rows.map(([n,f])=>`<tr><td>${n}</td>${S.players.map((_,i)=>`<td>${f(i)}</td>`).join("")}</tr>`).join("")}</table></div>`,[["閉じる",0,"primary"]],true);
   bindChart();await pr}
 
+/* ---------- seasons ---------- */
+const SEASON_N={spring:"春",summer:"夏",autumn:"秋",winter:"冬"};
+const seasonOfMonth=m=>m>=3&&m<=5?"spring":m>=6&&m<=8?"summer":m>=9&&m<=11?"autumn":"winter"; // m = calendar month 1-12
+const seasonKey=idx=>seasonOfMonth((idx+3)%12+1); // game month index (0 = April)
+function applySeason(k){k=k||(S&&$("#title").hidden?seasonKey(S.month):seasonOfMonth(new Date().getMonth()+1));if(document.documentElement.dataset.season!==k){document.documentElement.dataset.season=k;drawSeasonGlyphs();if(curScene){const c=curScene;curScene=null;setScene(c)}}}
+const SEASON_MSG={spring:"桜前線が北上中。旅にも商売にもいい季節です。",summer:"海も山もにぎわう、書き入れどきの季節です。",autumn:"紅葉と実りの季節。食欲の秋がやってきました。",winter:"北国は雪、航路は荒れ模様。温泉とスキー場の出番です。"};
+async function seasonTurn(){const k=seasonKey(S.month);if(S.season===k)return;const first=S.season==null;S.season=k;applySeason(k);if(first)return;
+  log(`${SEASON_N[k]}になりました。`);Snd.sfx("settle");setScene("s_"+k,`${SEASON_N[k]}が来ました`);
+  await modal(`${sceneHTML("s_"+k)}<div class="sea-kanji">${SEASON_N[k]}</div><h2 style="text-align:center">${SEASON_N[k]}が来ました</h2><p style="text-align:center">${SEASON_MSG[k]}</p>`,[["つづける",1,"primary"]])}
+
 /* ---------- titles (promotion by net worth) ---------- */
 const TITLES=[{n:"駆け出し",min:-Infinity},{n:"小金持ち",min:20000},{n:"資産家",min:40000},{n:"大地主",min:80000},{n:"大富豪",min:150000},{n:"億万長者",min:300000}];
 const titleOf=nw=>{let t=0;TITLES.forEach((x,k)=>{if(nw>=x.min)t=k});return t};
@@ -1266,7 +1338,7 @@ function humanStatus(){const hs=S.players.filter(p=>!p.cpu),d=distTo(S.dest),one
   return hs.map(p=>{const i=p.idx;return `<div class="hs ${i===S.cur&&!one?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><b class="hs-nm">${esc(p.name)}</b>${ttlTag(p)}<span class="sb-money ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sb-dist">総資産${yen(netWorth(i))}・${esc(S.dest)}まで${d[p.pos]}マス・カード${p.cards.length}枚</span>${statusTags(p)}</div>`}).join("")}
 function statusTags(p){const t=[];if(p.slow>0)t.push(`<span class="tag bad">鈍行 残り${p.slow}回</span>`);if(p.rest>0)t.push(`<span class="tag bad">運休</span>`);
   if(S.rules.yokai&&S.yokai.owner===p.idx)t.push(`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`);if(p.cards.includes("omamori"))t.push(`<span class="tag">お守り</span>`);if(debtOf(p)>0)t.push(`<span class="tag">借入${yen(debtOf(p))}</span>`);return t.join("")}
-function render(){if(!S)return;
+function render(){if(!S)return;applySeason();
   $("#when").textContent=`${S.year}年目 ${MONTHS[S.month]}　(全${S.years}年)`;
   $("#goalName").textContent=S.dest;
   const p=cp(),d=distTo(S.dest)[p.pos];
@@ -1313,7 +1385,7 @@ const possessed=()=>S.rules.yokai&&S.yokai.owner===S.cur;
 const passes=path=>path.slice(1).some(id=>S.players.some((q,j)=>j!==S.cur&&q.pos===id));
 function newGame(seats,years,assist,rules,mapId,mode){useMap(mapId);
   const props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(master(s[0]))]));
-  S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"],slow:0,rest:0,debt:0,title:0,style:s.cpu?["aggressive","cautious","normal","normal"][(s.color+3)%4]:null})),rate:ECON.rateStart,cur:0,year:1,month:0,years,assist,rules,map:CUR_MAP,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"busy",dice:1,lastDice:null};
+  S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"],slow:0,rest:0,debt:0,title:0,style:s.cpu?["aggressive","cautious","normal","normal"][(s.color+3)%4]:null})),rate:ECON.rateStart,season:"spring",cur:0,year:1,month:0,years,assist,rules,map:CUR_MAP,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"busy",dice:1,lastDice:null};
   STATIONS.forEach(([n])=>S.owners[n]=props[n].map(()=>null));
   S.mode=mode||"multi";S.players.forEach(p=>p.st=newSt());S.destFrom="東京";S.dest="東京";snapshot("開始");const first=pickDest("東京");
   buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);setScene("title",`${years}年間の旅が東京駅から始まります。`);render();
@@ -1517,12 +1589,12 @@ async function endTurn(){const p=cp();
   if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await checkTitles();await say(`${p.name}がもう一度サイコロを振ります。`,"roll");return startTurn()}
   if(possessed())await mischief(p);if(p.money<0)await forceSell(p);
   S.cur=(S.cur+1)%S.players.length;
-  if(S.cur===0){S.month++;if(S.month===6)await settle(false);if(S.month>=12){await settle(true);S.month=0;S.year++;if(S.year>S.years){await checkTitles();return gameOver()}}await monthEvents();snapshot(`${S.year}年${MONTHS[S.month]}`)}
+  if(S.cur===0){S.month++;if(S.month===6)await settle(false);if(S.month>=12){await settle(true);S.month=0;S.year++;if(S.year>S.years){await checkTitles();return gameOver()}}await seasonTurn();await monthEvents();snapshot(`${S.year}年${MONTHS[S.month]}`)}
   await checkTitles();startTurn()}
 
 /* ---------- title & setup ---------- */
 const VERSION="ver 1.0";
-async function showTitle(){$("#title").hidden=false;setView();$("#tVisual").innerHTML=artHTML("title");
+async function showTitle(){$("#title").hidden=false;applySeason();setView();$("#tVisual").innerHTML=artHTML("title");
   const saved=S&&S.phase!=="over"?S:await Store.get("auto");const ok=saved&&saved.phase!=="over"&&validState(saved);
   $("#tCont").disabled=!ok;$("#tContInfo").textContent=ok?`${MAPS[saved.map||"kanto"].name}・${saved.year}年目 ${MONTHS[saved.month]}`:"保存されたゲームはありません";
   $("#tSingle").focus()}
@@ -1566,7 +1638,7 @@ async function setup(mode){mode=mode==="single"?"single":"multi";hideTitle();
 function resume(state){hideTitle();useMap(state.map||"kanto");S=state;if(!S.mode)S.mode=S.players.filter(q=>!q.cpu).length===1?"single":"multi";S.map=CUR_MAP;CAND=null;S.players.forEach(p=>{if(!N[p.pos])p.pos="東京"});if(!N[S.dest])S.dest="東京";
   if(!S.rules)S.rules={exact:false,yokai:false};if(S.rules.quiz==null)S.rules.quiz=true;if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
   if(!S.props){S.props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(DEFAULT_PROPS[s[0]])]))}
-  S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i;p.slow=p.slow||0;p.rest=p.rest||0;p.debt=p.debt||0;p.title=p.title||0;if(p.cpu&&!p.style)p.style=["aggressive","cautious","normal","normal"][(i+3)%4]});if(S.rate==null)S.rate=ECON.rateStart;
+  S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i;p.slow=p.slow||0;p.rest=p.rest||0;p.debt=p.debt||0;p.title=p.title||0;if(p.cpu&&!p.style)p.style=["aggressive","cautious","normal","normal"][(i+3)%4]});if(S.rate==null)S.rate=ECON.rateStart;if(S.season==null)S.season=seasonKey(S.month);
   buildTokens();render();startTurn()}
 async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>目的</h3><p>決められた年数のあいだ駅をめぐり、最後に総資産（お金＋物件の価値）がいちばん多いオーナーの勝ちです。</p>
@@ -1575,6 +1647,7 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>カード</h3><p>急行・特急・ぶっとびなどの移動カードのほか、相手を1回休みにする足止め、サイコロを半分にする鈍行押し付け、カード強奪、ぶっとばし、妖怪なすりつけといった邪魔カードがあります。お守りカードを持っていると、邪魔カードを1回防げます。</p>
   <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠いオーナーに妖怪「${YOKAI[0].n}」が取り憑きます。ほかのオーナーのいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
   <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場・夜の街・金融学術）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
+  <h3>季節</h3><p>春（3〜5月）・夏（6〜8月）・秋（9〜11月）・冬（12〜2月）で、画面の色や絵が変わります。季節の変わり目にはお知らせが出ます。</p>
   <h3>称号</h3><p>総資産が増えると称号が上がり、そのたびに昇格ボーナス（クイズ正解の賞金と同じくらい）がもらえます。CPUも同じです。駆け出し → 小金持ち（2億円）→ 資産家（4億円）→ 大地主（8億円）→ 大富豪（15億円）→ 億万長者（30億円）。一度上がった称号は、総資産が減っても下がりません。</p>
   <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
   <p class="hint">物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>`,[["閉じる",0,"primary"]])}
