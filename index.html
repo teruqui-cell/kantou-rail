@@ -246,7 +246,7 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
   .goal{padding:3px 8px;font-size:13px}
   .goal b{font-size:13px}
   .hbtns .btn{padding:6px 9px;font-size:12px}
-  .hbtns .btn:not(#sndBtn):not(#menuBtn){display:none}
+  .hbtns .btn:not(#sndBtn):not(#menuBtn):not(#statsBtn){display:none}
   #menuBtn{display:inline-block}
   .layout{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0}
   #mapWrap,#action,#log{min-width:0;width:100%}
@@ -284,7 +284,7 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
   <div class="hbtns">
     <button class="btn sm primary" id="sndBtn">音を出す</button>
     <button class="btn sm" id="mapBtn">全体マップ</button>
-    <button class="btn sm" id="statsBtn">途中経過</button>
+    <button class="btn sm" id="statsBtn">成績</button>
     <button class="btn sm" id="saveBtn">セーブ</button>
     <button class="btn sm" id="editBtn">物件編集</button>
     <button class="btn sm" id="setBtn">設定・音</button>
@@ -765,7 +765,7 @@ let toastT;function toast(t,ms=1800){const el=$("#toast");el.textContent=t;el.hi
 const GP={speed:"normal"};
 try{Object.assign(GP,JSON.parse(localStorage.getItem("kks-game"))||{})}catch(e){}
 const saveGP=()=>{try{localStorage.setItem("kks-game",JSON.stringify(GP))}catch(e){}};
-const SPEEDS={tap:{n:"タップで進む",k:1},slow:{n:"ゆっくり",k:1.7,base:2300,per:165},normal:{n:"ふつう",k:1.15,base:1500,per:100},fast:{n:"はやい",k:.7,base:850,per:50}};
+const SPEEDS={tap:{n:"タップで進む",k:1},slow:{n:"ゆっくり",k:1.6,base:1500,per:110},normal:{n:"ふつう",k:1,base:1000,per:65},fast:{n:"はやい",k:.6,base:550,per:32}};
 const wait=ms=>sleep(ms*(SPEEDS[GP.speed]||SPEEDS.normal).k);
 function setScene(key,text){if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}if(text!=null)$("#sceneText").textContent=text}
 function say(text,key){return new Promise(res=>{setScene(key||curScene||"move",text);document.body.dataset.wait="1";const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
