@@ -1579,7 +1579,7 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
   <p class="hint">物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>`,[["閉じる",0,"primary"]])}
 function openMenu(){modal(`<h2>メニュー</h2><div class="menu">
-  <button class="btn" data-m="map">全体マップ・駅の物件</button><button class="btn" data-m="stats">途中経過（全員のグラフ）</button><button class="btn" data-m="players">オーナー一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件編集</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="rec">記録</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
+  <button class="btn" data-m="map">全体マップ・駅の物件</button><button class="btn" data-m="players">オーナー一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件編集</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="rec">記録</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
   $("#modalBody").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;const m=b.dataset.m;
     if((m==="save"||m==="edit"||m==="title"||m==="map"||m==="stats")&&busy()){toast("手番が終わるまでお待ちください");return}
     $("#modal").hidden=true;$("#modalBody").onclick=null;
