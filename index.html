@@ -205,8 +205,9 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
 .tag.yk{color:var(--yokai);border-color:var(--yokai)}
 .tag.bad{color:var(--minus);border-color:var(--minus)}
 .cardbtn.atk{border-color:var(--minus);background:color-mix(in srgb,var(--minus) 10%,transparent)}
-#statusBar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px;min-height:34px}
+#statusBar{display:flex;flex-direction:column;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px;min-height:34px}
 #statusBar:empty{display:none}
+.hs{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;border-radius:6px}.hs.on{outline:2px solid var(--accent);outline-offset:2px}.hs .tag{margin-left:0}
 #statusBar .sb-money{font-weight:700;font-variant-numeric:tabular-nums}
 #statusBar .sb-money.neg{color:var(--minus)}
 #statusBar .sb-dist{color:var(--muted)}
@@ -283,6 +284,7 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
   <div class="hbtns">
     <button class="btn sm primary" id="sndBtn">音を出す</button>
     <button class="btn sm" id="mapBtn">全体マップ</button>
+    <button class="btn sm" id="statsBtn">途中経過</button>
     <button class="btn sm" id="saveBtn">セーブ</button>
     <button class="btn sm" id="editBtn">物件編集</button>
     <button class="btn sm" id="setBtn">設定・音</button>
@@ -763,15 +765,14 @@ let toastT;function toast(t,ms=1800){const el=$("#toast");el.textContent=t;el.hi
 const GP={speed:"normal"};
 try{Object.assign(GP,JSON.parse(localStorage.getItem("kks-game"))||{})}catch(e){}
 const saveGP=()=>{try{localStorage.setItem("kks-game",JSON.stringify(GP))}catch(e){}};
-const SPEEDS={tap:{n:"タップで進む",k:1},slow:{n:"ゆっくり",k:1.6,base:1500,per:110},normal:{n:"ふつう",k:1,base:1000,per:65},fast:{n:"はやい",k:.6,base:550,per:32}};
+const SPEEDS={tap:{n:"タップで進む",k:1},slow:{n:"ゆっくり",k:1.7,base:2300,per:165},normal:{n:"ふつう",k:1.15,base:1500,per:100},fast:{n:"はやい",k:.7,base:850,per:50}};
 const wait=ms=>sleep(ms*(SPEEDS[GP.speed]||SPEEDS.normal).k);
 function setScene(key,text){if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}if(text!=null)$("#sceneText").textContent=text}
 function say(text,key){return new Promise(res=>{setScene(key||curScene||"move",text);document.body.dataset.wait="1";const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
   const done=()=>{clearTimeout(t);delete document.body.dataset.wait;box.classList.remove("active");h.textContent="";h.className="scene-hint";layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",kd);res()};
   const kd=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();done()}};
-  addEventListener("keydown",kd);box.onclick=done;
-  if(GP.speed==="tap"){h.textContent="タップで次へ";h.className="scene-hint tap";layer.hidden=false;layer.onclick=done}
-  else{const sp=SPEEDS[GP.speed]||SPEEDS.normal;h.textContent="タップで早送り";t=setTimeout(done,sp.base+sp.per*text.length)}})}
+  if(GP.speed==="tap"){addEventListener("keydown",kd);box.onclick=done;h.textContent="タップで次へ";h.className="scene-hint tap";layer.hidden=false;layer.onclick=done}
+  else{const sp=SPEEDS[GP.speed]||SPEEDS.normal;t=setTimeout(done,sp.base+sp.per*text.length)}})}
 
 /* ---------- storage: browser + (signed-in) account ---------- */
 const Store={cloud:null,q:Promise.resolve(),
@@ -1144,7 +1145,7 @@ function chartSVG(){const H=S.hist||[];if(H.length<2)return "";const W=640,Ht=28
   const all=H.flatMap(h=>h.v);let mn=Math.min(0,...all),mx=Math.max(...all,1);const st=niceStep((mx-mn)/4);mn=Math.floor(mn/st)*st;mx=Math.ceil(mx/st)*st;if(mx===mn)mx=mn+st;
   const X=i=>ml+(W-ml-mr)*i/(H.length-1),Y=v=>mt+(Ht-mt-mb)*(1-(v-mn)/(mx-mn));
   let g="";for(let v=mn;v<=mx+1;v+=st)g+=`<line x1="${ml}" x2="${W-mr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="${v===0?1.5:1}"/><text x="${ml-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${yShort(v)}</text>`;
-  H.forEach((h,i)=>{if(i===0||i===H.length-1||/年4月$/.test(h.l))g+=`<text x="${X(i)}" y="${Ht-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${i===0?"開始":i===H.length-1?"終了":h.l.replace("4月","")}</text>`});
+  H.forEach((h,i)=>{if(i===0||i===H.length-1||/年4月$/.test(h.l))g+=`<text x="${X(i)}" y="${Ht-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${i===0?"開始":i===H.length-1?(S.phase==="over"?"終了":"現在"):h.l.replace("4月","")}</text>`});
   const ends=S.players.map((p,pi)=>({pi,y:Y(H.at(-1).v[pi])})).sort((a,b)=>a.y-b.y);for(let k=1;k<ends.length;k++)if(ends[k].y-ends[k-1].y<15)ends[k].y=ends[k-1].y+15;
   const lines=S.players.map((p,pi)=>{const c=pcol(pi),d="M"+H.map((h,i)=>`${X(i).toFixed(1)} ${Y(h.v[pi]).toFixed(1)}`).join(" L");const ly=ends.find(e=>e.pi===pi).y;
     return `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="${DASH[pi%4]}"/>${marker(X(H.length-1),Y(H.at(-1).v[pi]),pi%4,c)}<text x="${W-mr+10}" y="${ly+4}" font-size="12" font-weight="700" fill="var(--ink)">${esc(p.name.slice(0,6))}</text>`}).join("");
@@ -1160,7 +1161,7 @@ async function statsModal(){
     ["目的地への一番乗り",i=>ST(S.players[i]).arrivals+"回"],["進んだマス",i=>ST(S.players[i]).steps+"マス"],["立ち寄った駅",i=>ST(S.players[i]).stations.length+"駅"],["航路を進んだマス",i=>ST(S.players[i]).sea+"マス"],
     ["青マス",i=>ST(S.players[i]).plus+"回"],["赤マス",i=>ST(S.players[i]).minus+"回"],["災難カード",i=>ST(S.players[i]).bad+"回"],["使ったカード",i=>ST(S.players[i]).cardsUsed+"枚"],["邪魔カードを使った",i=>ST(S.players[i]).attacks+"回"],
     ["クイズ",i=>S.players[i].cpu?"—":`${ST(S.players[i]).quizOk}/${ST(S.players[i]).quizN}問正解`],["妖怪に取り憑かれた",i=>ST(S.players[i]).yokaiTurns+"回"],["1回の最大収入",i=>yen(ST(S.players[i]).maxGain)],["1回の最大損失",i=>yen(ST(S.players[i]).maxLoss)],["最大借入額",i=>yen(ST(S.players[i]).maxDebt)]];
-  const pr=modal(`<h2>成績</h2><h3>総資産の推移</h3>${chartSVG()}<p class="hint">グラフをなぞると、その時点の総資産が見られます。</p><h3>詳しい成績</h3><div class="stat-wrap"><table class="stat"><tr><th></th>${S.players.map((p,i)=>`<th><span class="dot" style="background:${pcol(i)};display:inline-block;margin-right:4px"></span>${esc(p.name)}</th>`).join("")}</tr>${rows.map(([n,f])=>`<tr><td>${n}</td>${S.players.map((_,i)=>`<td>${f(i)}</td>`).join("")}</tr>`).join("")}</table></div>`,[["閉じる",0,"primary"]],true);
+  const pr=modal(`<h2>${S.phase==="over"?"成績":"途中経過"}</h2><h3>総資産の推移</h3>${chartSVG()||`<p class="hint">グラフは1か月が過ぎると表示されます。</p>`}<p class="hint">グラフをなぞると、その時点の総資産が見られます。</p><h3>詳しい成績</h3><div class="stat-wrap"><table class="stat"><tr><th></th>${S.players.map((p,i)=>`<th><span class="dot" style="background:${pcol(i)};display:inline-block;margin-right:4px"></span>${esc(p.name)}</th>`).join("")}</tr>${rows.map(([n,f])=>`<tr><td>${n}</td>${S.players.map((_,i)=>`<td>${f(i)}</td>`).join("")}</tr>`).join("")}</table></div>`,[["閉じる",0,"primary"]],true);
   bindChart();await pr}
 
 /* ---------- titles (promotion by net worth) ---------- */
@@ -1261,13 +1262,15 @@ function setView(){const b=document.body;let v="title";
   if(S&&$("#title").hidden){const p=cp();v=S.phase==="over"?"roll":p.cpu?"cpu":S.phase==="roll"?"roll":"map"}
   const prev=b.dataset.view;b.dataset.view=v;b.dataset.phase=S?S.phase:"";
   if(prev!==v&&(v==="map"||v==="cpu")){applyZoom();requestAnimationFrame(()=>S&&focus(cp().pos,false))}}
+function humanStatus(){const hs=S.players.filter(p=>!p.cpu),d=distTo(S.dest),one=hs.length===1;
+  return hs.map(p=>{const i=p.idx;return `<div class="hs ${i===S.cur&&!one?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><b class="hs-nm">${esc(p.name)}</b>${ttlTag(p)}<span class="sb-money ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sb-dist">総資産${yen(netWorth(i))}・${esc(S.dest)}まで${d[p.pos]}マス・カード${p.cards.length}枚</span>${statusTags(p)}</div>`}).join("")}
 function statusTags(p){const t=[];if(p.slow>0)t.push(`<span class="tag bad">鈍行 残り${p.slow}回</span>`);if(p.rest>0)t.push(`<span class="tag bad">運休</span>`);
   if(S.rules.yokai&&S.yokai.owner===p.idx)t.push(`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`);if(p.cards.includes("omamori"))t.push(`<span class="tag">お守り</span>`);if(debtOf(p)>0)t.push(`<span class="tag">借入${yen(debtOf(p))}</span>`);return t.join("")}
 function render(){if(!S)return;
   $("#when").textContent=`${S.year}年目 ${MONTHS[S.month]}　(全${S.years}年)`;
   $("#goalName").textContent=S.dest;
   const p=cp(),d=distTo(S.dest)[p.pos];
-  $("#statusBar").innerHTML=`<span class="dot" style="background:${pcol(S.cur)}"></span><b>${esc(p.name)}</b><span class="sb-money ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sb-dist">${esc(S.dest)}まで ${d}マス</span>${statusTags(p)}`;
+  $("#statusBar").innerHTML=humanStatus();
   renderPlayers();renderAction();renderLog();renderDyn();placeTokens();setView();
 }
 function assets(i){let v=0;for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)v+=P(s)[k][1]});return v}
@@ -1576,11 +1579,11 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
   <p class="hint">物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>`,[["閉じる",0,"primary"]])}
 function openMenu(){modal(`<h2>メニュー</h2><div class="menu">
-  <button class="btn" data-m="map">全体マップ・駅の物件</button><button class="btn" data-m="players">オーナー一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件編集</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="rec">記録</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
+  <button class="btn" data-m="map">全体マップ・駅の物件</button><button class="btn" data-m="stats">途中経過（全員のグラフ）</button><button class="btn" data-m="players">オーナー一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件編集</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="rec">記録</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
   $("#modalBody").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;const m=b.dataset.m;
-    if((m==="save"||m==="edit"||m==="title"||m==="map")&&busy()){toast("手番が終わるまでお待ちください");return}
+    if((m==="save"||m==="edit"||m==="title"||m==="map"||m==="stats")&&busy()){toast("手番が終わるまでお待ちください");return}
     $("#modal").hidden=true;$("#modalBody").onclick=null;
-    ({map:fullMap,players:showPlayers,save:openSaves,edit:openEditor,set:openSettings,rec:recordsModal,how:howTo,title:showTitle})[m]()}}
+    ({stats:statsModal,map:fullMap,players:showPlayers,save:openSaves,edit:openEditor,set:openSettings,rec:recordsModal,how:howTo,title:showTitle})[m]()}}
 async function fullMap(start){if(!S)return;if(busy()){toast("手番が終わるまでお待ちください");return}
   let sel=start||cp().pos,z=1;if(!STATIONS.some(s=>s[0]===sel))sel=S.dest;
   const pr=modal(`<h2>全体マップ</h2><p class="hint" style="margin-bottom:6px">駅をタップすると、その駅の物件が見られます。</p>
@@ -1666,7 +1669,7 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
   const p=modal(`<h2>設定</h2>
   <h3>メッセージの進み方</h3>
   <div class="field"><label for="sSpeed">表示の速さ</label><select id="sSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
-  <p class="hint">「タップで進む」にすると、CPUの番も含めてメッセージはタップするまで止まります。ほかの速さでも、メッセージをタップすれば早送りできます。</p>
+  <p class="hint">「タップで進む」にすると、CPUの番も含めてメッセージはタップするまで止まります。ほかの速さでは、メッセージは時間がたつと自動で進みます（タップでの早送りはしません）。</p>
   <h3>サウンド</h3>
   <label class="check"><input type="checkbox" id="sOn" ${Snd.prefs.on?"checked":""}><span>音を出す<small>オフにするとBGMも効果音も止まります。iPhoneでは消音モードでも鳴るようにしています。</small></span></label>
   <label class="check"><input type="checkbox" id="sBgm" ${Snd.prefs.bgm?"checked":""}><span>BGM<small>ゲームのために作ったオリジナル曲です。</small></span></label>
@@ -1701,6 +1704,7 @@ const guard=fn=>()=>{if(modalOpen())return;if(busy()){toast("手番が終わる�
 $("#newBtn").onclick=guard(showTitle);
 $("#saveBtn").onclick=guard(openSaves);
 $("#mapBtn").onclick=guard(()=>fullMap());
+$("#statsBtn").onclick=guard(()=>{if(S)statsModal()});
 $("#editBtn").onclick=guard(openEditor);
 $("#howBtn").onclick=()=>{if(!modalOpen())howTo()};
 $("#menuBtn").onclick=()=>{if(!modalOpen())openMenu()};
