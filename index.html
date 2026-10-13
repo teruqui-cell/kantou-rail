@@ -32,6 +32,12 @@
   --land:#131C24; --rail:#AFBECB; --plus:#5A93FF; --minus:#FF6A5C; --card:#F2C443;
   --accent:#2CC696; --accent-ink:#06261C; --goal:#FF6A5C; --pref:#3D4F5E; --yokai:#A77BE0; --shop:#F07CC0; color-scheme:dark}
 [hidden]{display:none!important}
+.fm-tools{display:flex;gap:6px;margin-bottom:8px}.fm-tools select{flex:1}
+.fm-wrap{overflow:auto;max-height:min(52vh,560px);border:1px solid var(--line);border-radius:10px;background:var(--land);-webkit-overflow-scrolling:touch}
+.fm-wrap svg{display:block;cursor:pointer}
+.fm-ring{fill:color-mix(in srgb,var(--accent) 25%,transparent);stroke:var(--accent);stroke-width:6;pointer-events:none}
+.sheet .fm-name{font-family:var(--f-display);font-weight:400;font-size:20px;margin:14px 0 4px}
+.fm-tab td,.fm-tab th{font-size:13px;white-space:nowrap}.fm-tab td:first-child{white-space:normal;min-width:8em}.fm-tab td:last-child{white-space:normal}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;display:grid;grid-template-rows:auto auto minmax(0,1fr);grid-template-columns:minmax(0,1fr);padding-inline:16px;padding-block:10px;gap:10px;box-sizing:border-box;overflow:hidden}
 *{box-sizing:border-box}
@@ -185,8 +191,15 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
 @keyframes pulse{50%{stroke-width:9;opacity:.55}}
 .cand{fill:color-mix(in srgb,var(--accent) 30%,transparent);stroke:var(--accent);stroke-width:4;cursor:pointer}
 .tok{transition:transform .13s linear}
-.tokc{stroke:var(--panel);stroke-width:3}
+.tokc{stroke:var(--panel);stroke-width:3;stroke-linejoin:round}
+.tokout{fill:none;stroke:var(--ink);stroke-width:7;stroke-linejoin:round;opacity:.55}
 .tokt{font-family:var(--f-display);font-size:13px;fill:#fff;text-anchor:middle;pointer-events:none}
+.pint{font-size:19px}
+.tok .tokin{transition:transform .2s}
+.tok.cur .tokin{transform:scale(1.28)}
+.tokring{fill:none;stroke:var(--card);stroke-width:5;opacity:0}
+.tok.cur .tokring{animation:ring 1.3s ease-in-out infinite}
+@keyframes ring{0%,100%{opacity:.95}50%{opacity:.25}}
 .yok{fill:var(--yokai);stroke:var(--panel);stroke-width:2.5}
 .yokt{font-size:11px}
 .tag.yk{color:var(--yokai);border-color:var(--yokai)}
@@ -257,7 +270,7 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
   body[data-view="map"] #log .scene-text,body[data-view="cpu"] #log .scene-text{font-size:14px;align-self:center}
   body[data-view="map"] #log .loglabel,body[data-view="map"] #log ol,body[data-view="cpu"] #log .loglabel,body[data-view="cpu"] #log ol{display:none}
 }
-@media (prefers-reduced-motion:reduce){.tok{transition:none}.goalring{animation:none}.scene-hint.tap::after,.roulette.hit{animation:none}}
+@media (prefers-reduced-motion:reduce){.tok,.tok .tokin{transition:none}.tok.cur .tokring{animation:none;opacity:.9}.goalring{animation:none}.scene-hint.tap::after,.roulette.hit{animation:none}}
 </style>
 
 </head>
@@ -269,6 +282,7 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
   <span class="spacer"></span>
   <div class="hbtns">
     <button class="btn sm primary" id="sndBtn">音を出す</button>
+    <button class="btn sm" id="mapBtn">全体マップ</button>
     <button class="btn sm" id="saveBtn">セーブ</button>
     <button class="btn sm" id="editBtn">物件編集</button>
     <button class="btn sm" id="setBtn">設定・音</button>
@@ -423,6 +437,39 @@ const EAST_EDGES=[
 ["新潟","小樽",2,[[138.9,38.7],[139.3,39.9],[139.4,41.3],[139.7,42.5],[140.3,43.45]],{name:"新潟―小樽フェリー航路",sub:"（物件なし・冬は大しけ）",winter:1}]
 ];
 const EAST_PREFS=[["北海道",143.55,43.6],["東北",137.8,39.2],["関東",141.4,35.25],["甲信越",137.55,37.75],["北陸",136.55,37.25],["東海",137.2,35.3]];
+// 大人の物件（夜の街・娯楽、金融・学術、世相）— 各駅の物件に追加
+const EXTRA_PROPS={
+"新宿":[["歌舞伎町のホストクラブ",8000,9],["横丁のスナック",600,15]],
+"上野":[["電気街のメイドカフェ",1500,12],["インバウンド向け民泊",3000,8]],
+"東京":[["銀座のナイトクラブ",12000,7],["外資系ヘッジファンド",50000,3]],
+"品川":[["特許事務所",5000,6],["湾岸のタワーマンション",60000,2]],
+"横浜":[["関内のキャバレー",5000,8],["怪しい投資セミナー会社",3000,14]],
+"大宮":[["駅裏のパチンコ店",8000,7],["行列のタピオカ店",500,16]],
+"千葉":[["競輪場",25000,4],["推し活グッズ店",1200,10]],
+"つくば":[["加速器研究所の見学館",6000,5],["AIスタートアップ",8000,6]],
+"宇都宮":[["競輪場",15000,5]],
+"前橋":[["競輪場",15000,5]],
+"川越":[["蔵造りの古書店",800,11]],
+"高崎":[["税理士事務所",2000,8]],
+"甲府":[["駅前の質屋",2000,9]],
+"松本":[["電波望遠鏡の見学館",5000,6]],
+"軽井沢":[["森のサウナ",5000,6]],
+"長野":[["門前の占いの館",600,14]],
+"日光":[["温泉街のスナック",700,14]],
+"熱海":[["温泉街の秘宝館",4000,9]],
+"浜松":[["湖畔のボートレース場",25000,4]],
+"札幌":[["すすきののナイトクラブ",10000,7]],
+"函館":[["夏競馬の競馬場",30000,3]],
+"仙台":[["国分町のスナック街",1500,12]],
+"福島":[["競馬場",25000,4]],
+"郡山":[["消費者金融の無人店舗",1500,10]],
+"会津若松":[["古文書の修復工房",2500,7]],
+"日立":[["量子コンピュータ研究所",20000,4]],
+"新潟":[["古町の芸妓置屋",3000,8]],
+"八王子":[["大学街の予備校",6000,6]],
+"金沢":[["加賀の骨董商",4000,6]],
+"盛岡":[["大学発の研究ベンチャー",6000,6]]};
+for(const st in EXTRA_PROPS){const k=KANTO_ST.find(x=>x[0]===st),arr=EAST_PROPS[st]||(k&&k[4]);arr.push(...EXTRA_PROPS[st])}
 const LL=(lon,lat)=>[Math.round((lon-136)*185+60),Math.round((44-lat)*230+60)];
 const MAPS={
   kanto:{name:"関東甲信越編",title:"大人の鉄道すごろく 関東甲信越編",w:1060,h:1120,stations:KANTO_ST,edges:KANTO_EDGES,prefs:KANTO_PREFS,prefSize:58,
@@ -860,11 +907,20 @@ function renderDyn(){
     c.addEventListener("click",()=>choose(id));c.addEventListener("keydown",e=>{if(e.key==="Enter")choose(id)})}
 }
 let yokEl=null;
-function buildTokens(){gTok.innerHTML="";tokEls=S.players.map((p,i)=>{const g=el("g",{class:"tok"},gTok);el("circle",{r:13,class:"tokc",fill:COLORS[p.color??i]},g);el("text",{y:5,class:"tokt"},g,p.name.slice(0,1));return g});
-  yokEl=el("g",{class:"tok"},gTok);el("circle",{r:11,class:"yok"},yokEl);el("text",{y:4,class:"tokt yokt"},yokEl,"狸");placeTokens()}
-function placeTokens(){if(!S)return;const pts=[];S.players.forEach((p,i)=>{const n=N[p.pos],same=S.players.filter(q=>q.pos===p.pos).length>1;const o=same?[[-9,-9],[9,-9],[-9,9],[9,9]][i]:[0,0];pts[i]=[n.x+o[0],n.y+o[1]];tokEls[i].style.transform=`translate(${pts[i][0]}px,${pts[i][1]}px)`;if(i===S.cur)gTok.appendChild(tokEls[i])});
+const PIN_L=46,PIN_R=21,pinPath=`M0 0 L${-PIN_R*.6} ${-PIN_L+PIN_R*.8} A${PIN_R} ${PIN_R} 0 1 1 ${PIN_R*.6} ${-PIN_L+PIN_R*.8}Z`;
+const PIN_FAN={1:[0],2:[-28,28],3:[-50,0,50],4:[-66,-22,22,66]};
+function buildTokens(){gTok.innerHTML="";tokEls=S.players.map((p,i)=>{const g=el("g",{class:"tok"},gTok),inn=el("g",{class:"tokin"},g);
+    el("path",{d:pinPath,class:"tokout"},inn);el("path",{d:pinPath,class:"tokc",fill:COLORS[p.color??i]},inn);el("circle",{cx:0,cy:-PIN_L,r:PIN_R+6,class:"tokring"},inn);
+    const lab=el("g",{},inn);el("text",{y:7,class:"tokt pint"},lab,p.name.slice(0,1));g._lab=lab;return g});
+  yokEl=el("g",{class:"tok"},gTok);el("circle",{r:12,class:"yok"},yokEl);el("text",{y:4,class:"tokt yokt"},yokEl,"狸");placeTokens()}
+function placeTokens(){if(!S)return;const heads=[],groups={};S.players.forEach((p,i)=>(groups[p.pos]=groups[p.pos]||[]).push(i));
+  S.players.forEach((p,i)=>{const n=N[p.pos],grp=groups[p.pos],ang=PIN_FAN[Math.min(grp.length,4)][grp.indexOf(i)]||0,rad=ang*Math.PI/180,sc=i===S.cur?1.28:1;
+    heads[i]=[n.x+Math.sin(rad)*PIN_L*sc,n.y-Math.cos(rad)*PIN_L*sc];
+    tokEls[i].style.transform=`translate(${n.x}px,${n.y}px) rotate(${ang}deg)`;tokEls[i]._lab.setAttribute("transform",`translate(0 ${-PIN_L}) rotate(${-ang})`);
+    tokEls[i].classList.toggle("cur",i===S.cur)});
+  S.players.forEach((p,i)=>{if(i===S.cur)gTok.appendChild(tokEls[i])});
   if(yokEl){const y=S.yokai,on=S.rules&&S.rules.yokai&&y&&y.owner!=null;yokEl.style.display=on?"":"none";
-    if(on){yokEl.lastChild.textContent=YOKAI[y.form].s;yokEl.style.transform=`translate(${pts[y.owner][0]+15}px,${pts[y.owner][1]-15}px)`;gTok.appendChild(yokEl)}}}
+    if(on){yokEl.lastChild.textContent=YOKAI[y.form].s;yokEl.style.transform=`translate(${heads[y.owner][0]+20}px,${heads[y.owner][1]-20}px)`;gTok.appendChild(yokEl)}}}
 function baseW(){const w=$("#mapWrap");return Math.min(w.clientWidth,w.clientHeight*VW/VH)}
 function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.width=W+"px";svg.style.height=W*VH/VW+"px"}
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
@@ -954,12 +1010,14 @@ function probeImages(){if(!/github\.io$/.test(location.hostname))return;
 
 /* ---------- economy: categories, news, seasons, settlements, bank, tax ---------- */
 const ECON={incomeHalf:1,taxRate:.014,loanRatio:.5,rateStart:5,rateMin:2,rateMax:9,newsChance:.35};
-const CAT_NAME={food:"飲食",lodging:"宿泊・温泉",ski:"スキー場",industry:"工場・工房",farm:"農園・漁業・市場",tourism:"観光・お店"};
+const CAT_NAME={night:"夜の街・娯楽",pro:"金融・学術",food:"飲食",lodging:"宿泊・温泉",ski:"スキー場",industry:"工場・工房",farm:"農園・漁業・市場",tourism:"観光・お店"};
 const CAT_KW=[
+  ["night",["ホストクラブ","スナック","メイドカフェ","ナイトクラブ","キャバレー","パチンコ","競輪","競馬","ボートレース","秘宝館","置屋","占い"]],
+  ["pro",["ファンド","特許","税理士","セミナー","質屋","消費者金融","古書","古文書","骨董","予備校","加速器","望遠鏡","量子","AI","大学","スタートアップ"]],
   ["tourism",["売店","土産","雑貨","劇場","資料館","美術館","水族館","遊覧船","観光船","デパート","アウトレット","ビル","グッズ","ミュージアム","マンガ館","渡し","オルゴール","家電"]],
   ["ski",["スキー"]],
-  ["food",["ラーメン","そば","うどん","丼","餃子","食堂","寿司","焼","料亭","レストラン","カフェ","フレンチ","屋台","バー","弁当","まんじゅう","菓子","団子","ずんだ","もち","おでん","プリン","肉まん","カレー","かまぼこ","冷麺","きりたんぽ","せんべい","炉端","うなぎ","茶屋","たまご","おやき","七味","ほうとう","しらす","干物","鍋","牛たん","芋煮","ジャム","羊羹","ようかん","納豆","パスタ","パン","海鮮","がに","白えび","鱒","湯葉","わらじ","笹","餅","唐揚げ","寿司","試飲","ずし"]],
-  ["lodging",["ホテル","旅館","宿","温泉","民宿","ペンション","別荘","スパ","リゾート"]],
+  ["food",["タピオカ","ラーメン","そば","うどん","丼","餃子","食堂","寿司","焼","料亭","レストラン","カフェ","フレンチ","屋台","バー","弁当","まんじゅう","菓子","団子","ずんだ","もち","おでん","プリン","肉まん","カレー","かまぼこ","冷麺","きりたんぽ","せんべい","炉端","うなぎ","茶屋","たまご","おやき","七味","ほうとう","しらす","干物","鍋","牛たん","芋煮","ジャム","羊羹","ようかん","納豆","パスタ","パン","海鮮","がに","白えび","鱒","湯葉","わらじ","笹","餅","唐揚げ","寿司","試飲","ずし"]],
+  ["lodging",["民泊","サウナ","タワーマンション","ホテル","旅館","宿","温泉","民宿","ペンション","別荘","スパ","リゾート"]],
   ["industry",["工場","製鉄","製紙","工房","倉庫","研究所","採石","精密","電機","酒蔵","醤油蔵","ワイナリー","ビール","加工","ベンチャー","問屋","オフィス","本社","ホール"]],
   ["farm",["園","田","農場","牧場","漁場","養殖","網元","畑","市場","漁港","梅林","米蔵"]]];
 function propCat(name){for(const[c,kws]of CAT_KW)if(kws.some(k=>name.includes(k)))return c;return "tourism"}
@@ -975,6 +1033,12 @@ const NEWS=[
   {t:"工場で設備トラブルが続発…",d:"工場・工房の物件を持つオーナーに修理費。",cat:"industry",pct:-.06},
   {t:"不作・不漁で仕入れが苦しい…",d:"農園・漁業・市場の物件を持つオーナーに損失。",cat:"farm",pct:-.06},
   {t:"長雨で観光客が減少…",d:"観光・お店の物件を持つオーナーに損失。",cat:"tourism",pct:-.05},
+  {t:"インバウンドで夜の街がにぎわう！",d:"夜の街・娯楽の物件を持つオーナーに臨時収入。",cat:"night",pct:.14},
+  {t:"風営法の取り締まりが強化…",d:"夜の街・娯楽の物件を持つオーナーに損失。",cat:"night",pct:-.09},
+  {t:"週刊誌のスキャンダル報道で客足が遠のく…",d:"夜の街・娯楽の物件を持つオーナーに損失。",cat:"night",pct:-.07},
+  {t:"株価が史上最高値を更新！",d:"金融・学術の物件を持つオーナーに臨時収入。",cat:"pro",pct:.12},
+  {t:"大型の研究予算がついた！",d:"金融・学術の物件を持つオーナーに臨時収入。",cat:"pro",pct:.08},
+  {t:"金融不安で投資マネーが逃げ出す…",d:"金融・学術の物件を持つオーナーに損失。",cat:"pro",pct:-.08},
   {t:"日銀が利上げを発表",d:"借入金の年利が1%上がります。",rate:1},
   {t:"日銀が利下げを発表",d:"借入金の年利が1%下がります。",rate:-1}];
 const SEASONS={4:{t:"夏休みの観光シーズン！",d:"海辺・湖畔の物件と、宿泊・観光の物件に夏のボーナス。",fn:(name,cat)=>COAST_KW.some(k=>name.includes(k))?.10:(cat==="lodging"||cat==="tourism")?.05:0},
@@ -1104,11 +1168,14 @@ const TITLES=[{n:"駆け出し",min:-Infinity},{n:"小金持ち",min:20000},{n:"
 const titleOf=nw=>{let t=0;TITLES.forEach((x,k)=>{if(nw>=x.min)t=k});return t};
 const ttlTag=p=>`<span class="tag ttl t${p.title||0}">${TITLES[p.title||0].n}</span>`;
 function ladderHTML(t){return `<div class="ladder">${TITLES.map((x,k)=>`<span class="${k===t?"on":k<t?"done":""}">${x.n}</span>`).join('<i aria-hidden="true">›</i>')}</div>`}
-async function checkTitles(){for(const p of S.players){const t=titleOf(netWorth(p.idx));if(t<=(p.title||0))continue;p.title=t;const T=TITLES[t],nx=TITLES[t+1];
-    log(`${p.name}の称号が「${T.n}」に上がった！`);render();Snd.sfx("arrive");setScene("promote",`${p.name}が「${T.n}」に昇格！`);
+async function checkTitles(){for(const p of S.players){const old=p.title||0,t=titleOf(netWorth(p.idx));if(t<=old)continue;p.title=t;const T=TITLES[t],nx=TITLES[t+1];
+    const bonus=r100(3000*yf())*(t-old);p.money+=bonus;gain(p,bonus);
+    log(`${p.name}の称号が「${T.n}」に上がった！昇格ボーナス${yen(bonus)}。`);render();
+    if(p.cpu)continue;
+    Snd.sfx("arrive");setScene("promote",`${p.name}が「${T.n}」に昇格！`);
     const msg=`総資産が${yen(T.min)}を超えました。`+(nx?`次の「${nx.n}」は総資産${yen(nx.min)}からです。`:"これ以上の称号はありません。名実ともに頂点です！");
-    const pr=modal(`${sceneHTML("promote")}<div class="cer-rank r1 arr">称号が上がった！</div><h2 class="cer-name"><span class="dot" style="background:${pcol(p.idx)}"></span>${esc(p.name)}は「${T.n}」に</h2><p>${msg}</p>${ladderHTML(t)}`,[["つづける",1,"primary"]]);
-    confetti(p.cpu?30:t>=4?140:80);await pr}}
+    const pr=modal(`${sceneHTML("promote")}<div class="cer-rank r1 arr">称号が上がった！</div><h2 class="cer-name"><span class="dot" style="background:${pcol(p.idx)}"></span>${esc(p.name)}は「${T.n}」に</h2><div class="big-money">＋${yen(bonus)}</div><p>昇格ボーナスを受け取りました。${msg}</p>${ladderHTML(t)}`,[["つづける",1,"primary"]]);
+    confetti(t>=4?140:80);await pr}}
 
 /* ---------- lifetime records (single-player mode only) ---------- */
 const HOK=["函館","長万部","東室蘭","苫小牧","札幌","小樽","旭川","富良野","帯広","釧路"];
@@ -1504,16 +1571,37 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>マス</h3><p><b style="color:var(--plus)">青</b>はお金が入り、<b style="color:var(--minus)">赤</b>は出費です。冬の北国では大雪で出費が増えます。<b style="color:var(--card)">黄</b>はカードがもらえますが、ときどき災難カード（鈍行・運休・罰金・紛失）を引きます。<b style="color:var(--shop)">ピンクのひし形</b>はカード売り場です。駅では物件を買えます。駅の物件をすべて持つと独占になり、毎年3月の決算で収益が2倍になります。</p>
   <h3>カード</h3><p>急行・特急・ぶっとびなどの移動カードのほか、相手を1回休みにする足止め、サイコロを半分にする鈍行押し付け、カード強奪、ぶっとばし、妖怪なすりつけといった邪魔カードがあります。お守りカードを持っていると、邪魔カードを1回防げます。</p>
   <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠いオーナーに妖怪「${YOKAI[0].n}」が取り憑きます。ほかのオーナーのいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
-  <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
-  <h3>称号</h3><p>総資産が増えると称号が上がります。駆け出し → 小金持ち（2億円）→ 資産家（4億円）→ 大地主（8億円）→ 大富豪（15億円）→ 億万長者（30億円）。一度上がった称号は、総資産が減っても下がりません。</p>
+  <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場・夜の街・金融学術）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
+  <h3>称号</h3><p>総資産が増えると称号が上がり、そのたびに昇格ボーナス（クイズ正解の賞金と同じくらい）がもらえます。CPUも同じです。駆け出し → 小金持ち（2億円）→ 資産家（4億円）→ 大地主（8億円）→ 大富豪（15億円）→ 億万長者（30億円）。一度上がった称号は、総資産が減っても下がりません。</p>
   <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
   <p class="hint">物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>`,[["閉じる",0,"primary"]])}
 function openMenu(){modal(`<h2>メニュー</h2><div class="menu">
-  <button class="btn" data-m="players">オーナー一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件編集</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="rec">記録</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
+  <button class="btn" data-m="map">全体マップ・駅の物件</button><button class="btn" data-m="players">オーナー一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件編集</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="rec">記録</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
   $("#modalBody").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;const m=b.dataset.m;
-    if((m==="save"||m==="edit"||m==="title")&&busy()){toast("手番が終わるまでお待ちください");return}
+    if((m==="save"||m==="edit"||m==="title"||m==="map")&&busy()){toast("手番が終わるまでお待ちください");return}
     $("#modal").hidden=true;$("#modalBody").onclick=null;
-    ({players:showPlayers,save:openSaves,edit:openEditor,set:openSettings,rec:recordsModal,how:howTo,title:showTitle})[m]()}}
+    ({map:fullMap,players:showPlayers,save:openSaves,edit:openEditor,set:openSettings,rec:recordsModal,how:howTo,title:showTitle})[m]()}}
+async function fullMap(start){if(!S)return;if(busy()){toast("手番が終わるまでお待ちください");return}
+  let sel=start||cp().pos,z=1;if(!STATIONS.some(s=>s[0]===sel))sel=S.dest;
+  const pr=modal(`<h2>全体マップ</h2><p class="hint" style="margin-bottom:6px">駅をタップすると、その駅の物件が見られます。</p>
+    <div class="fm-tools"><select id="fmSel" aria-label="駅を選ぶ">${STATIONS.map(s=>`<option ${s[0]===sel?"selected":""}>${s[0]}</option>`).join("")}</select><button class="btn sm" id="fmOut" aria-label="縮小">－</button><button class="btn sm" id="fmIn" aria-label="拡大">＋</button></div>
+    <div class="fm-wrap" id="fmWrap"></div><div id="fmInfo"></div>`,[["閉じる",0,"primary"]],true);
+  const wrap=$("#fmWrap"),svg=$("#map").cloneNode(true);svg.removeAttribute("id");svg.querySelectorAll(".cand").forEach(e=>e.remove());svg.querySelectorAll(".tok").forEach(t=>t.style.transition="none");wrap.appendChild(svg);
+  const ring=el("circle",{r:30,class:"fm-ring"},svg);
+  const size=()=>{const W=wrap.clientWidth*z;svg.style.width=W+"px";svg.style.height=W*VH/VW+"px"};
+  const center=()=>{const n=N[sel],sc=svg.clientWidth/VW;wrap.scrollTo({left:n.x*sc-wrap.clientWidth/2,top:n.y*sc-wrap.clientHeight/2})};
+  const info=()=>{const n=N[sel];ring.setAttribute("cx",n.x);ring.setAttribute("cy",n.y);$("#fmSel").value=sel;
+    const own=S.owners[sel],props=P(sel),mono=own.length&&own.every(o=>o!=null&&o===own[0]);const d=distTo(S.dest)[sel];
+    const here=S.players.filter(p=>p.pos===sel).map(p=>esc(p.name)).join("・");
+    $("#fmInfo").innerHTML=`<h3 class="fm-name">${esc(sel)}駅${sel===S.dest?'<span class="tag" style="color:var(--goal);border-color:var(--goal)">目的地</span>':""}${mono?`<span class="tag">${esc(S.players[own[0]].name)}が独占</span>`:""}</h3>
+      <p class="hint" style="margin:0 0 6px">${sel===S.dest?"いまの目的地です。":`目的地（${esc(S.dest)}）まで${d}マス。`}${here?`いまここにいる：${here}`:""}</p>
+      <div class="stat-wrap"><table class="fm-tab"><tr><th>物件</th><th>価格</th><th>利回り</th><th>持ち主</th></tr>${props.map((pp,k)=>{const o=own[k];return `<tr><td>${esc(pp[0])}<br><small style="color:var(--muted)">${CAT_NAME[propCat(pp[0])]}</small></td><td>${yen(pp[1])}</td><td>${pp[2]}%</td><td>${o==null?'<span style="color:var(--muted)">空き</span>':`<span class="dot" style="background:${pcol(o)};display:inline-block;vertical-align:middle;margin-right:4px"></span>${esc(S.players[o].name)}`}</td></tr>`}).join("")}</table></div>`};
+  size();info();requestAnimationFrame(center);
+  svg.addEventListener("click",e=>{const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(svg.getScreenCTM().inverse());
+    let best=null,bd=1e9;STATIONS.forEach(([n,x,y])=>{const dd=(x-q.x)**2+(y-q.y)**2;if(dd<bd){bd=dd;best=n}});if(bd<75*75){sel=best;info();Snd.sfx("click")}});
+  $("#fmSel").onchange=e=>{sel=e.target.value;info();center()};
+  $("#fmIn").onclick=()=>{z=Math.min(4,z*1.5);size();center()};$("#fmOut").onclick=()=>{z=Math.max(1,z/1.5);size();center()};
+  await pr}
 async function showPlayers(){await modal(`<h2>オーナー一覧</h2>${playersHTML()}`,[["閉じる",0,"primary"]])}
 
 /* ---------- save slots ---------- */
@@ -1612,6 +1700,7 @@ let usingCard=false;
 const guard=fn=>()=>{if(modalOpen())return;if(busy()){toast("手番が終わるまでお待ちください");return}fn()};
 $("#newBtn").onclick=guard(showTitle);
 $("#saveBtn").onclick=guard(openSaves);
+$("#mapBtn").onclick=guard(()=>fullMap());
 $("#editBtn").onclick=guard(openEditor);
 $("#howBtn").onclick=()=>{if(!modalOpen())howTo()};
 $("#menuBtn").onclick=()=>{if(!modalOpen())openMenu()};
