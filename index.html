@@ -56,6 +56,9 @@ body[data-map="east"] #mapWrap,body[data-map="east"] .fm-wrap{background:var(--s
 .mapframe{fill:none;stroke:var(--coast);opacity:.6}
 .compass{stroke:var(--coast);fill:none;stroke-width:2;opacity:.7}.compass .cf{fill:var(--coast);stroke:none}
 .sglyph{pointer-events:none}
+.reward{border:2px solid var(--card);background:color-mix(in srgb,var(--card) 14%,transparent);border-radius:12px;padding:10px 12px 6px;margin:8px 0 12px;text-align:center}
+.reward .rw-h{display:inline-block;background:var(--card);color:#2B3540;font-weight:700;font-size:12px;border-radius:999px;padding:1px 10px;margin:0 0 4px}
+.reward .rw-n{font-weight:700;margin:0}.reward .big-money{margin:0}.reward .rw-s{font-size:13px;color:var(--muted);margin:0 0 4px}
 .sea-kanji{font-family:var(--f-display);font-size:88px;text-align:center;line-height:1;margin:4px 0 6px;color:var(--accent)}
 .fm-tools{display:flex;gap:6px;margin-bottom:8px}.fm-tools select{flex:1}
 .fm-wrap{overflow:auto;max-height:min(52vh,560px);border:1px solid var(--line);border-radius:10px;background:var(--land);-webkit-overflow-scrolling:touch}
@@ -1247,7 +1250,7 @@ async function checkTitles(){for(const p of S.players){const old=p.title||0,t=ti
     if(p.cpu)continue;
     Snd.sfx("arrive");setScene("promote",`${p.name}が「${T.n}」に昇格！`);
     const msg=`総資産が${yen(T.min)}を超えました。`+(nx?`次の「${nx.n}」は総資産${yen(nx.min)}からです。`:"これ以上の称号はありません。名実ともに頂点です！");
-    const pr=modal(`${sceneHTML("promote")}<div class="cer-rank r1 arr">称号が上がった！</div><h2 class="cer-name"><span class="dot" style="background:${pcol(p.idx)}"></span>${esc(p.name)}は「${T.n}」に</h2><div class="big-money">＋${yen(bonus)}</div><p>昇格ボーナスを受け取りました。${msg}</p>${ladderHTML(t)}`,[["つづける",1,"primary"]]);
+    const pr=modal(`${sceneHTML("promote")}<div class="cer-rank r1 arr">称号が上がった！</div><h2 class="cer-name"><span class="dot" style="background:${pcol(p.idx)}"></span>${esc(p.name)}は「${T.n}」に</h2><div class="reward"><p class="rw-h">ごほうび</p><p class="rw-n">昇格ボーナス（賞金）${t-old>1?`×${t-old}段階分`:""}</p><div class="big-money">＋${yen(bonus)}</div><p class="rw-s">所持金　${yen(p.money-bonus)} → <b>${yen(p.money)}</b></p></div><p>${msg}</p>${ladderHTML(t)}<p class="hint" style="text-align:center;margin-top:6px">称号が1段階上がるごとに、クイズ正解と同じくらいの賞金がもらえます。</p>`,[["つづける",1,"primary"]]);
     confetti(t>=4?140:80);await pr}}
 
 /* ---------- lifetime records (single-player mode only) ---------- */
