@@ -857,7 +857,7 @@ const DEFAULT_SEATS=[["あなた","human"],["鷹山オーナー","cpu"],["亀井
 const CPU_NAMES=["福富オーナー","鷹山オーナー","亀井オーナー","真中オーナー"],CPU_STYLE_N=["ほどほど派","積極派","堅実派","ほどほど派"];
 const MONTHS=["4月","5月","6月","7月","8月","9月","10月","11月","12月","1月","2月","3月"];
 const CARDS={
-  kyuko:{n:"急行カード",d:"サイコロ2個で進む",t:"move"},tokkyu:{n:"特急カード",d:"サイコロ3個で進む",t:"move"},buttobi:{n:"ぶっとびカード",d:"どこかの駅へワープ",t:"move"},
+  kyuko:{n:"急行カード",d:"サイコロ2個で進む",t:"move"},chouhan:{n:"丁半カード",d:"次の目を丁（偶数）か半（奇数）に限定",t:"move"},tokkyu:{n:"特急カード",d:"サイコロ3個で進む",t:"move"},buttobi:{n:"ぶっとびカード",d:"どこかの駅へワープ",t:"move"},
   rinji:{n:"臨時収入カード",d:"すぐにお金が入る",t:"money"},oharai:{n:"お祓いカード",d:"取り憑いた妖怪を追い払う",t:"yokai",yokai:1},
   ashidome:{n:"足止めカード",d:"相手1人を1回休みにする",t:"attack"},donko:{n:"鈍行押し付けカード",d:"相手のサイコロを2回分、半分にする",t:"attack"},
   goudatsu:{n:"カード強奪カード",d:"相手のカードを1枚奪う",t:"attack"},buttobashi:{n:"ぶっとばしカード",d:"相手をどこかの駅へ飛ばす",t:"attack"},
@@ -1390,7 +1390,7 @@ function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
 
 /* ---------- scene illustrations (placeholders; img/<key>.png or .webp on the site replaces them) ---------- */
-const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",fuku:"福だぬき",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
+const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",chouhan:"丁半カード",fuku:"福だぬき",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
 const SCENE_IMG={};let CER_N=4;
 let SVGID=0;
 const BG={sky:["#8CCDF0","#E6F5FD","#7CC26B"],sea:["#9BD3F2","#E3F3FC","#2F7FB8"],night:["#1B2440","#3B3F70","#283055"],snow:["#C9DDEA","#F2F8FB","#FFFFFF"],
@@ -1468,6 +1468,7 @@ const SCENES={
   lose:["night",()=>`<g fill="#9AA6B2"><ellipse cx="150" cy="44" rx="56" ry="24"/><ellipse cx="200" cy="50" rx="40" ry="20"/><ellipse cx="110" cy="54" rx="34" ry="16"/></g>${[110,140,170,200,125,185].map((x,i)=>`<path d="M${x} ${78+i%2*14} l-6 16" stroke="#8CCDF0" stroke-width="3" stroke-linecap="round"/>`).join("")}`+IC.tanuki(250,118,.55)+IC.arrow(80,118,false,"#B3261E")+`<g transform="translate(160,138) rotate(-6)"><rect x="-34" y="-20" width="68" height="34" rx="4" fill="#F7F1E3" stroke="#4A2E18" stroke-width="3"/><text x="0" y="8" text-anchor="middle" font-size="22" font-weight="700" fill="#B3261E">${CER_N}位</text></g>`],
   yaku:["gold",()=>`<g transform="translate(160,92)">${[-70,0,70].map((x,k)=>`<g transform="translate(${x} 0) rotate(${(k-1)*12})"><rect x="-26" y="-40" width="52" height="80" rx="6" fill="#F7F1E3" stroke="#7A1E14" stroke-width="4"/><rect x="-20" y="-34" width="40" height="68" rx="3" fill="${["#DE3F34","#2B4C9B","#0C8565"][k]}"/><circle cx="0" cy="-6" r="13" fill="#F2C443"/><rect x="-14" y="14" width="28" height="6" fill="#F7F1E3"/></g>`).join("")}</g>`],
   fuku:["gold",()=>`<g transform="translate(160,96)"><circle r="44" fill="#F2C443" stroke="#7A5200" stroke-width="4"/><circle r="34" fill="none" stroke="#FFF3C4" stroke-width="3" stroke-dasharray="4 6"/></g>`+IC.tanuki(160,100,.75)+IC.coins(70,120,.8)+IC.coins(250,120,.8)+IC.sparkle(90,46,1.2)+IC.sparkle(236,40)],
+  chouhan:["night",()=>`<rect x="40" y="120" width="240" height="60" fill="#7A1E14"/><rect x="40" y="120" width="240" height="8" fill="#E9E2D3"/><g transform="translate(160,92)"><path d="M-36 30 Q-40 -30 0 -36 Q40 -30 36 30Z" fill="#8A5A33" stroke="#4A2E18" stroke-width="4"/><path d="M-30 -8 H30" stroke="#4A2E18" stroke-width="3"/></g><g transform="translate(92,140) rotate(-12)"><rect x="-14" y="-14" width="28" height="28" rx="5" fill="#fff" stroke="#2B3540" stroke-width="3"/><circle r="4" fill="#DE3F34"/></g><g transform="translate(232,142) rotate(10)"><rect x="-14" y="-14" width="28" height="28" rx="5" fill="#fff" stroke="#2B3540" stroke-width="3"/><circle cx="-6" cy="-6" r="3" fill="#2B3540"/><circle cx="6" cy="6" r="3" fill="#2B3540"/></g><text x="70" y="62" font-size="34" font-weight="700" fill="#F2C443">丁</text><text x="226" y="62" font-size="34" font-weight="700" fill="#F2C443">半</text>`],
   s_spring:["sky",()=>tree(160,150,"#F3A6C0","#E58AAE")+tree(70,160,"#F7C1D3","#E58AAE",.7)+tree(255,158,"#F7C1D3","#E58AAE",.75)],
   s_summer:["sea",()=>`<circle cx="250" cy="44" r="22" fill="#FFD84A"/>${Array.from({length:10},(_,i)=>{const a=i*Math.PI/5;return `<path d="M${250+30*Math.cos(a)} ${44+30*Math.sin(a)} L${250+40*Math.cos(a)} ${44+40*Math.sin(a)}" stroke="#FFD84A" stroke-width="4" stroke-linecap="round"/>`}).join("")}<g fill="#fff"><circle cx="70" cy="80" r="26"/><circle cx="100" cy="66" r="30"/><circle cx="132" cy="84" r="24"/><rect x="50" y="84" width="100" height="24" rx="12"/></g>`],
   s_autumn:["sunset",()=>tree(160,150,"#E07A2E","#B4531A")+tree(70,160,"#F2B33D","#C9851A",.7)+tree(255,158,"#D9472E","#A8321F",.75)],
@@ -1797,7 +1798,7 @@ function playersHTML(){const d=distTo(S.dest),lp=lastPlace();
     return `<div class="pl ${i===S.cur?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><span class="nm">${esc(p.name)}<small>${p.cpu?"CPU":"人"}</small>${ttlTag(p)}${i===lp?'<span class="tag">追い上げ中</span>':""}${statusTags(p)}</span><span class="mo ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sub">総資産${yen(netWorth(i))}・物件${cnt}件・${sqName(p.pos)}・あと${d[p.pos]}マス・カード${p.cards.length}枚</span></div>`}).join("")}
 function renderPlayers(){$("#players").innerHTML=playersHTML()}
 function diceHTML(v){return `<div class="dice" id="dice">${(v||[]).map(x=>`<span class="die">${x}</span>`).join("")}</div>`}
-function cardDisabled(c){const p=cp();return (S.dice>1&&(c==="kyuko"||c==="tokkyu"))||((c==="oharai"||c==="nasuri")&&!possessed())||c==="omamori"}
+function cardDisabled(c){const p=cp();return ((S.dice>1||S.parity)&&(c==="kyuko"||c==="tokkyu"||c==="chouhan"))||((c==="oharai"||c==="nasuri")&&!possessed())||c==="omamori"}
 function renderAction(){const a=$("#action"),p=cp();const d=distTo(S.dest)[p.pos];
   if(S.phase==="over"){a.innerHTML=`<p class="label">ゲーム終了</p><button class="btn primary big" data-act="new">もう一度あそぶ</button><button class="btn" data-act="stats" style="width:100%;margin-top:8px">成績を見る</button><button class="btn" data-act="title" style="width:100%;margin-top:8px">タイトルへ</button>`;return}
   if(S.phase==="roll"&&!p.cpu){
@@ -1831,7 +1832,7 @@ const blessed=()=>S.rules.yokai&&S.yokai.owner===S.cur&&!!S.yokai.good;
 const yfM=()=>1+.15*(S.year-1); // mischief / blessing amounts: grow slower than the economy
 // 福だぬき: very rarely the tanuki reforms and only does good things for a few turns (more likely for players who are behind)
 function fukuChance(i){const nw=S.players.map((_,k)=>netWorth(k)),me=nw[i],rank=nw.filter(v=>v>me).length;return me<0||rank===nw.length-1?.045:rank>=nw.length/2?.025:.01}
-const FUKU_CARDS=["tokkyu","kyuko","omamori","buttobi","rinji"];
+const FUKU_CARDS=["tokkyu","kyuko","chouhan","omamori","buttobi","rinji"];
 async function fukuStart(p){const y=S.yokai;y.good=rnd(3,5);y.form=0;y.turns=0;ST(p).fuku=(ST(p).fuku||0)+1;log(`${YOKAI[0].n}が改心して福だぬきになった！`);render();Snd.sfx("arrive");
   if(p.cpu){await say(`${p.name}に取り憑いていた${YOKAI[0].n}が改心し、福だぬきになりました。同じマスに止まると奪えます。`,"fuku","board");return}
   setScene("fuku","狸が改心した！");
@@ -1855,15 +1856,17 @@ function newGame(seats,years,assist,rules,mapId,mode){useMap(mapId);
   buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);render();
   (async()=>{await say(`ご乗車ありがとうございます！ ${years}年間の旅、東京駅から出発進行です。`,"title");await revealDest(first,"最初の目的地は……");startTurn()})();
 }
-async function startTurn(){CAND=null;S.dice=1;const p=cp();
+async function startTurn(){CAND=null;S.dice=1;S.parity=null;const p=cp();
   if(p.rest>0){p.rest--;S.phase="busy";render();focus(p.pos);log(`${p.name}は運休で1回休み。`);await say(V(`${p.name}は運休中です。今回はお休みですね。`,`${p.name}は運休のため、1回休みです。`),"rest");return endTurn()}
   if(p.cpu){S.phase="busy";setScene("cpu",`${p.name}の番です。`);render();autosave();focus(p.pos);await wait(500);await cpuTurn()}
   else{S.phase="roll";setScene("roll",`${p.name}の番です。さあ、サイコロをどうぞ！`);render();autosave();
     if(S.players.filter(q=>!q.cpu).length>1)Snd.sfx("turn")}
 }
 async function rollDice(){const p=cp(),n=S.dice,boost=S.cur===lastPlace();let v;
+  const face=()=>S.parity&&n===1?(S.parity==="even"?[2,4,6]:[1,3,5])[rnd(0,2)]:rnd(1,6);
   for(let i=0;i<9;i++){v=Array.from({length:n},()=>rnd(1,6));showDice(v);Snd.sfx("dice");await sleep(55)}
-  if(boost)v=v.map(x=>Math.random()<.5?Math.max(x,rnd(1,6)):x);
+  if(S.parity&&n===1)v=[face()];else if(boost)v=v.map(x=>Math.random()<.5?Math.max(x,rnd(1,6)):x);
+  if(S.parity){log(`${p.name}の目は${v[0]}（${v[0]%2?"半":"丁"}）。`);S.parity=null}
   showDice(v);let t=v.reduce((a,b)=>a+b,0);
   if(p.slow>0){const t0=t;t=Math.max(1,Math.ceil(t/2));p.slow--;log(`${p.name}は鈍行中のため${t0}マスが${t}マスに。`);await say(V(`鈍行運転中のため、${t0}マスが半分の${t}マスになりますよ。${p.slow?`（鈍行はあと${p.slow}回）`:"（鈍行はこれでおしまいです）"}`,`${p.name}は鈍行運転中のため、${t0}マスが${t}マスになりました。${p.slow?`（残り${p.slow}回）`:"（鈍行は終了）"}`),"bad")}
   return t}
@@ -1899,7 +1902,7 @@ async function mischief(p){const y=S.yokai;y.turns++;ST(p).yokaiTurns++;let pre=
   if(p.cpu)await say(`${p.name}のもとで、${msg}`,key);
   else{setScene(key,msg);await modal(`${sceneHTML(key)}<h2>${nm}のしわざ</h2><p>${esc(msg)}</p><p class="hint">ほかのオーナーのいるマスを通るか同じマスに止まると、${nm}を押し付けられます。お祓いカードや妖怪なすりつけカードでも追い払えます。</p>`,[["つづける",1,"primary"]])}}
 /* cards */
-const GOOD_W={kyuko:20,tokkyu:12,buttobi:10,rinji:14,oharai:6,ashidome:8,donko:7,goudatsu:7,buttobashi:5,nasuri:4,omamori:7};
+const GOOD_W={chouhan:12,kyuko:20,tokkyu:12,buttobi:10,rinji:14,oharai:6,ashidome:8,donko:7,goudatsu:7,buttobashi:5,nasuri:4,omamori:7};
 function randomCard(){const ks=Object.keys(GOOD_W).filter(k=>S.rules.yokai||!CARDS[k].yokai);let tot=ks.reduce((a,k)=>a+GOOD_W[k],0),r=Math.random()*tot;for(const k of ks){r-=GOOD_W[k];if(r<0)return k}return "kyuko"}
 async function badCard(p){const ks=Object.keys(BAD),k=ks[rnd(0,ks.length-1)];let m;ST(p).bad++;
   if(k==="slow"){p.slow=3;m="3回の間、サイコロの目が半分になります。"}
@@ -1919,7 +1922,7 @@ async function land(){await stealFuku();const p=cp(),n=N[p.pos];
     else if(winter&&n.y<MAP.snowY){mult=2;m="大雪で除雪費がかかった";key="snow"}
     else m=MINUS_MSG[rnd(0,MINUS_MSG.length-1)];
     const amt=r100(rnd(600,2000)*yf()*mult);p.money-=amt;ST(p).minus++;gain(p,-amt);log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(V(`おっと、赤マス……。${m}。${p.name}は${yen(amt)}の出費です。`,`赤マス。${m}。${p.name}は${yen(amt)}の出費です。`),key)}
-  else if(n.type==="card"){if(Math.random()<.3)await badCard(p);
+  else if(n.type==="card"){if(Math.random()<.25)await badCard(p);
     else if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);await say(V(`カードマスです。でも${p.name}はカードがいっぱいで、受け取れませんでした。`,`カードマス。${p.name}はカードが満杯のため、受け取れませんでした。`),"card")}
     else{const c=randomCard();p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");render();await say(V(`カードマスです！ ${p.name}が${CARDS[c].n}を手に入れましたよ。`,`カードマス。${p.name}が${CARDS[c].n}を手に入れました。`),"card")}}
   else if(n.type==="shop")await cardShop(p);
@@ -1981,7 +1984,7 @@ function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),min
     draw()};
 })}
 /* card shop: no money cards on sale */
-const CARD_PRICE={kyuko:1000,tokkyu:3000,buttobi:2500,oharai:3000,ashidome:2500,donko:3000,goudatsu:2000,buttobashi:4000,nasuri:3000,omamori:2000};
+const CARD_PRICE={chouhan:1500,kyuko:1000,tokkyu:3000,buttobi:2500,oharai:3000,ashidome:2500,donko:3000,goudatsu:2000,buttobashi:4000,nasuri:3000,omamori:2000};
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
 async function cardShop(p){Snd.sfx("card");
   const kinds=shuffle(Object.keys(CARD_PRICE).filter(k=>S.rules.yokai||!CARDS[k].yokai)).slice(0,4);
@@ -2046,6 +2049,11 @@ async function useCard(p,i){const c=p.cards[i];
   if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");log(`${p.name}に${yen(amt)}の臨時収入。`);render();await say(V(`臨時収入カード！ ${p.name}に${yen(amt)}の臨時収入ですよ。`,`臨時収入カード。${p.name}に${yen(amt)}の臨時収入です。`),"plus")}
   else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`);render();await say(V(`お祓い成功です！ ${nm}は${p.name}のもとから去っていきましたよ。`,`お祓い成功。${nm}は${p.name}のもとから去りました。`),"oharai")}else toast("取り憑いている妖怪がいませんでした")}
   else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");log(`${p.name}が${to}駅へワープ。`);await say(V(`ぶっとびカード！ ${p.name}は${to}駅までぶっとびました！`,`ぶっとびカード。${p.name}は${to}駅へ移動しました。`),"warp");return "warp"}
+  else if(c==="chouhan"){const d=distTo(S.dest)[p.pos];let pick;
+    if(p.cpu)pick=d>=1&&d<=6?(d%2?"odd":"even"):(Math.random()<.5?"odd":"even");
+    else{setScene("chouhan","丁か、半か！");pick=await modal(`${sceneHTML("chouhan")}<h2>丁か、半か！</h2><p>次のサイコロの目を、丁（偶数：2・4・6）か半（奇数：1・3・5）のどちらかに限定します。</p><p class="hint">目的地「${esc(S.dest)}」まであと${d}マス${d<=6?`（${d%2?"半":"丁"}なら当たりの目が入っています）`:""}。</p>`,[["半（奇数）","odd"],["丁（偶数）","even","primary"]])}
+    S.parity=pick==="odd"?"odd":"even";const nm=S.parity==="odd"?"半":"丁";log(`${p.name}が丁半カードで「${nm}」に張った。`);
+    const m=V(`「${nm}」に張りました！ 次の目は${nm==="丁"?"2・4・6":"1・3・5"}のどれかですよ。`,`${p.name}が丁半カードを使用。次の目は「${nm}」です。`);if(p.cpu)await say(m,"chouhan");else setScene("roll",m)}
   else if(c==="kyuko"||c==="tokkyu"){const m=V(`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みますよ！`,`${p.name}が${CARDS[c].n}を使用。サイコロ${S.dice}個で進みます。`);if(p.cpu)await say(m,"roll");else setScene("roll",m)}
   render();return null}
 async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];cpuRepay(p);
@@ -2054,8 +2062,8 @@ async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];cpuRepay(p);
   const ni=p.cards.indexOf("nasuri");if(ni>=0&&possessed())await useCard(p,ni);
   const ai=p.cards.findIndex(c=>CARDS[c]&&CARDS[c].t==="attack"&&c!=="nasuri");if(ai>=0&&Math.random()<.5)await useCard(p,ai);
   const bi=p.cards.indexOf("buttobi");if(bi>=0&&d>=24&&Math.random()<.6){await useCard(p,bi);S.phase="busy";await land();return endTurn()}
-  const ti=p.cards.indexOf("tokkyu"),ki=p.cards.indexOf("kyuko");
-  if(ti>=0&&d>=10)await useCard(p,ti);else if(ki>=0&&d>=6)await useCard(p,ki);
+  const ci=p.cards.indexOf("chouhan"),ti=p.cards.indexOf("tokkyu"),ki=p.cards.indexOf("kyuko");
+  if(ci>=0&&d>=1&&d<=6&&S.rules.exact&&!p.slow)await useCard(p,ci);else if(ti>=0&&d>=10)await useCard(p,ti);else if(ki>=0&&d>=6)await useCard(p,ki);
   renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);setScene("cpu",`${p.name}は${t}マス進みます。`);
   const r=reach(p.pos,t,S.dest,S.rules.exact),dd=distTo(S.dest),pref={plus:0,card:1,shop:1,st:2,minus:3},ps=possessed();
   const fk=S.rules.yokai&&S.yokai.good&&S.yokai.owner!=null&&S.yokai.owner!==S.cur?S.players[S.yokai.owner].pos:null;
