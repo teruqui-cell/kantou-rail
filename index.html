@@ -74,6 +74,9 @@ body[data-map="east"] #mapWrap,body[data-map="east"] .fm-wrap{background:var(--s
 .yakucard.on{border:2px solid var(--goal);background:color-mix(in srgb,var(--goal) 8%,var(--panel))}
 .yakucard b{font-size:14px}.yakucard small{font-size:11px;color:var(--muted);line-height:1.45}.yakucard .yk-st{color:var(--ink)}.yakucard .yk-now{color:var(--goal);font-weight:700}
 .yaku-name{font-size:30px!important;letter-spacing:.1em}
+.sheet-head{position:sticky;top:-20px;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--panel);margin:-20px -20px 8px;padding:14px 20px 10px;border-bottom:1px solid var(--line)}
+.sheet-head h2{margin:0!important}
+.sheet.wide .btns{position:sticky;bottom:-20px;background:var(--panel);margin:14px -20px -20px;padding:10px 20px;border-top:1px solid var(--line)}
 .plist{display:flex;flex-direction:column;gap:6px}
 .pitem{font:inherit;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;cursor:pointer}
 .pi-top{display:flex;justify-content:space-between;gap:8px}.pi-num{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
@@ -2116,7 +2119,7 @@ async function propList(){if(!S)return;const body=$("#modalBody");let cat="all",
   const draw=()=>{const tops=catTops(),all=[];[...STATIONS.map(x=>x[0]),HQ].forEach(st=>(P(st)||[]).forEach((pp,k)=>all.push({st,k,n:pp[0],price:pp[1],rate:pp[2],c:propCat(pp[0],st),o:S.owners[st][k],d:propDesc(pp[0],st)})));
     let L=all.filter(x=>(cat==="all"||x.c===cat)&&(owner==="all"||(owner==="free"?x.o==null:x.o===+owner)));
     L.sort(sort==="yield"?(a,b)=>b.rate-a.rate||a.price-b.price:sort==="price"?(a,b)=>b.price-a.price:sort==="cheap"?(a,b)=>a.price-b.price:()=>0);
-    body.innerHTML=`<h2>物件一覧</h2>
+    body.innerHTML=`<div class="sheet-head"><h2>物件一覧</h2><button class="btn sm" data-close>閉じる</button></div>
     <h3 style="margin-top:4px">業界トップの状況<small style="font-weight:400;color:var(--muted);margin-left:6px">決算のときに判定・収益1.6倍</small></h3>
     <div class="tops">${CAT_KEYS.map(c=>{const t=tops[c],mx=Math.max(...t.cnt),lead=t.owner>=0?S.players[t.owner]:null;
       return `<button class="topcard ${cat===c?"on":""}" data-cat="${c}"><span class="catchip c-${c}">${CAT_NAME[c]}</span><b>${lead?`<span class="dot" style="background:${pcol(t.owner)};display:inline-block;width:10px;height:10px;margin-right:4px"></span>${esc(lead.name)}`:"トップなし"}</b><small>${S.players.map((q,i)=>t.cnt[i]?`${esc(q.name.slice(0,4))}${t.cnt[i]}`:"").filter(Boolean).join("・")||"まだ誰も持っていません"}<br>必要${t.need}件以上・全${t.total}件</small></button>`}).join("")}</div>
@@ -2131,7 +2134,7 @@ async function propList(){if(!S)return;const body=$("#modalBody");let cat="all",
     <div class="plist">${L.map(x=>`<button class="pitem" data-st="${esc(x.st)}"><span class="pi-top"><b>${esc(x.n)}</b><span class="pi-num">${yen(x.price)}・${x.rate}%</span></span><span class="pi-sub"><span class="catchip c-${x.c}">${CAT_NAME[x.c]}</span>${x.st===HQ?"東京駅・HQ特区":esc(x.st)+"駅"}・${x.o==null?"空き":`<span class="dot" style="background:${pcol(x.o)};display:inline-block;width:9px;height:9px;margin:0 3px"></span>${esc(S.players[x.o].name)}`}</span>${x.d?`<span class="pi-desc">${esc(x.d)}</span>`:""}</button>`).join("")}</div>`};
   draw();
   body.onchange=e=>{if(e.target.id==="plCat")cat=e.target.value;else if(e.target.id==="plOwner")owner=e.target.value;else if(e.target.id==="plSort")sort=e.target.value;else return;draw()};
-  body.onclick=e=>{const t=e.target.closest("[data-cat]");if(t){cat=cat===t.dataset.cat?"all":t.dataset.cat;draw();return}
+  body.onclick=e=>{if(e.target.closest("[data-close]")){$("#modalBtns button").click();return}const t=e.target.closest("[data-cat]");if(t){cat=cat===t.dataset.cat?"all":t.dataset.cat;draw();return}
     const it=e.target.closest("[data-st]");if(it){body.onclick=body.onchange=null;$("#modal").hidden=true;const st=it.dataset.st===HQ?"東京":it.dataset.st;setTimeout(()=>fullMap(st),0)}};
   await pr;body.onclick=body.onchange=null}
 async function fullMap(start){if(!S)return;if(busy()){toast("手番が終わるまでお待ちください");return}
