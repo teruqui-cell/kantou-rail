@@ -251,6 +251,8 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
 .yok{fill:var(--yokai);stroke:var(--panel);stroke-width:2.5}
 .yokt{font-size:11px}
 .tag.yk{color:var(--yokai);border-color:var(--yokai)}
+.tag.fk{color:#8A6400;border-color:var(--card);background:color-mix(in srgb,var(--card) 25%,transparent)}
+.tok.fuku .yok{fill:var(--card);stroke:#7A5200}.tok.fuku .yokt{fill:#5A3A00}
 .tag.bad{color:var(--minus);border-color:var(--minus)}
 .cardbtn.atk{border-color:var(--minus);background:color-mix(in srgb,var(--minus) 10%,transparent)}
 #statusBar{display:flex;flex-direction:column;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px;min-height:34px}
@@ -1381,13 +1383,13 @@ function placeTokens(){if(!S)return;const heads=[],groups={};S.players.forEach((
     tokEls[i].classList.toggle("cur",i===S.cur)});
   S.players.forEach((p,i)=>{if(i===S.cur)gTok.appendChild(tokEls[i])});
   if(yokEl){const y=S.yokai,on=S.rules&&S.rules.yokai&&y&&y.owner!=null;yokEl.style.display=on?"":"none";
-    if(on){yokEl.lastChild.textContent=YOKAI[y.form].s;yokEl.style.transform=`translate(${heads[y.owner][0]+20}px,${heads[y.owner][1]-20}px)`;gTok.appendChild(yokEl)}}}
+    if(on){yokEl.lastChild.textContent=y.good?"福":YOKAI[y.form].s;yokEl.classList.toggle("fuku",!!y.good);yokEl.style.transform=`translate(${heads[y.owner][0]+20}px,${heads[y.owner][1]-20}px)`;gTok.appendChild(yokEl)}}}
 function baseW(){const w=$("#mapWrap");return Math.min(w.clientWidth,w.clientHeight*VW/VH)}
 function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.width=W+"px";svg.style.height=W*VH/VW+"px"}
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
 
 /* ---------- scene illustrations (placeholders; img/<key>.png or .webp on the site replaces them) ---------- */
-const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
+const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",fuku:"福だぬき",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
 const SCENE_IMG={};let CER_N=4;
 let SVGID=0;
 const BG={sky:["#8CCDF0","#E6F5FD","#7CC26B"],sea:["#9BD3F2","#E3F3FC","#2F7FB8"],night:["#1B2440","#3B3F70","#283055"],snow:["#C9DDEA","#F2F8FB","#FFFFFF"],
@@ -1464,6 +1466,7 @@ const SCENES={
   rank4:["night",()=>`<path d="M0 0 H70 Q60 90 80 180 H0Z" fill="#B3261E"/><path d="M320 0 H250 Q260 90 240 180 H320Z" fill="#B3261E"/><path d="M110 0 L80 180 H240 L210 0Z" fill="#F8E7A1" opacity=".25"/><rect x="0" y="0" width="320" height="16" fill="#8A1C15"/>`+IC.trophy(160,100,"4","plain")],
   lose:["night",()=>`<g fill="#9AA6B2"><ellipse cx="150" cy="44" rx="56" ry="24"/><ellipse cx="200" cy="50" rx="40" ry="20"/><ellipse cx="110" cy="54" rx="34" ry="16"/></g>${[110,140,170,200,125,185].map((x,i)=>`<path d="M${x} ${78+i%2*14} l-6 16" stroke="#8CCDF0" stroke-width="3" stroke-linecap="round"/>`).join("")}`+IC.tanuki(250,118,.55)+IC.arrow(80,118,false,"#B3261E")+`<g transform="translate(160,138) rotate(-6)"><rect x="-34" y="-20" width="68" height="34" rx="4" fill="#F7F1E3" stroke="#4A2E18" stroke-width="3"/><text x="0" y="8" text-anchor="middle" font-size="22" font-weight="700" fill="#B3261E">${CER_N}位</text></g>`],
   yaku:["gold",()=>`<g transform="translate(160,92)">${[-70,0,70].map((x,k)=>`<g transform="translate(${x} 0) rotate(${(k-1)*12})"><rect x="-26" y="-40" width="52" height="80" rx="6" fill="#F7F1E3" stroke="#7A1E14" stroke-width="4"/><rect x="-20" y="-34" width="40" height="68" rx="3" fill="${["#DE3F34","#2B4C9B","#0C8565"][k]}"/><circle cx="0" cy="-6" r="13" fill="#F2C443"/><rect x="-14" y="14" width="28" height="6" fill="#F7F1E3"/></g>`).join("")}</g>`],
+  fuku:["gold",()=>`<g transform="translate(160,96)"><circle r="44" fill="#F2C443" stroke="#7A5200" stroke-width="4"/><circle r="34" fill="none" stroke="#FFF3C4" stroke-width="3" stroke-dasharray="4 6"/></g>`+IC.tanuki(160,100,.75)+IC.coins(70,120,.8)+IC.coins(250,120,.8)+IC.sparkle(90,46,1.2)+IC.sparkle(236,40)],
   s_spring:["sky",()=>tree(160,150,"#F3A6C0","#E58AAE")+tree(70,160,"#F7C1D3","#E58AAE",.7)+tree(255,158,"#F7C1D3","#E58AAE",.75)],
   s_summer:["sea",()=>`<circle cx="250" cy="44" r="22" fill="#FFD84A"/>${Array.from({length:10},(_,i)=>{const a=i*Math.PI/5;return `<path d="M${250+30*Math.cos(a)} ${44+30*Math.sin(a)} L${250+40*Math.cos(a)} ${44+40*Math.sin(a)}" stroke="#FFD84A" stroke-width="4" stroke-linecap="round"/>`}).join("")}<g fill="#fff"><circle cx="70" cy="80" r="26"/><circle cx="100" cy="66" r="30"/><circle cx="132" cy="84" r="24"/><rect x="50" y="84" width="100" height="24" rx="12"/></g>`],
   s_autumn:["sunset",()=>tree(160,150,"#E07A2E","#B4531A")+tree(70,160,"#F2B33D","#C9851A",.7)+tree(255,158,"#D9472E","#A8321F",.75)],
@@ -1585,7 +1588,7 @@ const styleOf=p=>STYLE[p.style]||STYLE.normal;
 function cpuRepay(p){const st=styleOf(p),d=debtOf(p);if(d<=0||p.money<=st.repayAbove)return;const v=Math.min(d,Math.floor((p.money-st.repayAbove*.6)/1000)*1000);if(v>0){p.debt=d-v;p.money-=v;log(`${p.name}が銀行に${yen(v)}を返した。`)}}
 
 /* ---------- per-game stats ---------- */
-const newSt=()=>({steps:0,stations:[],arrivals:0,bought:0,boughtValue:0,boughtList:[],plus:0,minus:0,bad:0,cardsUsed:0,cardKinds:[],quizN:0,quizOk:0,yokaiTurns:0,maxGain:0,maxLoss:0,sea:0,attacks:0,maxDebt:0,wasLast:false,maxTops:0,yakus:[]});
+const newSt=()=>({steps:0,stations:[],arrivals:0,bought:0,boughtValue:0,boughtList:[],plus:0,minus:0,bad:0,cardsUsed:0,cardKinds:[],quizN:0,quizOk:0,yokaiTurns:0,fuku:0,maxGain:0,maxLoss:0,sea:0,attacks:0,maxDebt:0,wasLast:false,maxTops:0,yakus:[]});
 const ST=p=>p.st||(p.st=newSt());
 function gain(p,a){const s=ST(p);if(a>s.maxGain)s.maxGain=a;if(-a>s.maxLoss)s.maxLoss=-a}
 function useKind(p,c){const s=ST(p);s.cardsUsed++;if(!s.cardKinds.includes(c))s.cardKinds.push(c)}
@@ -1659,7 +1662,7 @@ async function statsModal(){
 /* ---------- music selection ---------- */
 function pickBgm(){if(!$("#title").hidden||!S){Snd.setTrack("title");return}
   const p=cp();let t=S.season||seasonKey(S.month);
-  if(S.phase!=="over"){if(S.year>=S.years&&S.years>1)t="final";if(N[p.pos]&&N[p.pos].sea)t="ferry";if(S.rules&&S.rules.yokai&&S.yokai&&S.yokai.owner===S.cur)t="yokai"}
+  if(S.phase!=="over"){if(S.year>=S.years&&S.years>1)t="final";if(N[p.pos]&&N[p.pos].sea)t="ferry";if(S.rules&&S.rules.yokai&&S.yokai&&S.yokai.owner===S.cur&&!S.yokai.good)t="yokai"}
   Snd.setTrack(t,p.cpu&&S.phase!=="over")}
 /* ---------- seasons ---------- */
 const SEASON_N={spring:"春",summer:"夏",autumn:"秋",winter:"冬"};
@@ -1706,6 +1709,7 @@ const ACH=[
  {id:"top3",n:"コングロマリット",d:"1回の決算で3つの業界のトップを同時に取る",t:(R,g)=>g.tops>=3},
  {id:"yaku1",n:"役者",d:"はじめて役を成立させる",t:(R,g)=>g.yakus>=1},
  {id:"sanbon",n:"三本の矢",d:"大役「三本の矢」を成立させる",t:(R,g)=>g.sanbon},
+ {id:"fuku",n:"福の神",d:"福だぬきに出会う",t:(R,g)=>g.fuku>=1},
  {id:"comeback",n:"大逆転",d:"一度は最下位になりながら優勝する",t:(R,g)=>g.won&&g.wasLast},
  {id:"nodebt",n:"無借金経営",d:"一度も借入をせずに優勝する",t:(R,g)=>g.won&&g.maxDebt===0},
  {id:"leverage",n:"借金も実力のうち",d:"借入10億円以上を経験して優勝する",t:(R,g)=>g.won&&g.maxDebt>=100000},
@@ -1738,7 +1742,7 @@ function updateRecords(order){const me=order.find(x=>!x.p.cpu);if(!me)return nul
   s.cardKinds.forEach(k=>{if(!REC.cardKinds.includes(k))REC.cardKinds.push(k)});
   const vis=REC.visited[S.map]||(REC.visited[S.map]=[]);s.stations.forEach(st=>{if(!vis.includes(st))vis.push(st)});
   s.boughtList.forEach(k=>REC.props[k]=1);
-  const g={won:me.rank===1,nw:me.nw,monos,arrivals:s.arrivals,quizN:s.quizN,quizOk:s.quizOk,yokai:s.yokaiTurns,maxDebt:s.maxDebt,years:S.years,bad:s.bad,title:p.title||0,tops:s.maxTops||0,yakus:(s.yakus||[]).length,sanbon:(s.yakus||[]).includes("sanbon"),wasLast:s.wasLast,hokMono:S.map==="east"?HOK.filter(st=>S.owners[st]&&isMono(st,i)).length:0};
+  const g={won:me.rank===1,nw:me.nw,monos,arrivals:s.arrivals,quizN:s.quizN,quizOk:s.quizOk,yokai:s.yokaiTurns,maxDebt:s.maxDebt,years:S.years,bad:s.bad,title:p.title||0,tops:s.maxTops||0,fuku:s.fuku||0,yakus:(s.yakus||[]).length,sanbon:(s.yakus||[]).includes("sanbon"),wasLast:s.wasLast,hokMono:S.map==="east"?HOK.filter(st=>S.owners[st]&&isMono(st,i)).length:0};
   const newAch=[];ACH.forEach(a=>{if(!REC.ach[a.id]&&a.t(REC,g)){REC.ach[a.id]=Date.now();newAch.push(a)}});
   REC.recent.unshift({t:Date.now(),map:S.map,years:S.years,rank:me.rank,n:order.length,nw:me.nw});REC.recent=REC.recent.slice(0,10);
   saveRec();return{newAch,bestUp}}
@@ -1777,7 +1781,7 @@ function setView(){const b=document.body;let v="title";
 function humanStatus(){const hs=S.players.filter(p=>!p.cpu),d=distTo(S.dest),one=hs.length===1;
   return hs.map(p=>{const i=p.idx;return `<div class="hs ${i===S.cur&&!one?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><b class="hs-nm">${esc(p.name)}</b>${ttlTag(p)}<span class="sb-money ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sb-dist">総資産${yen(netWorth(i))}・${esc(S.dest)}まで${d[p.pos]}マス・カード${p.cards.length}枚</span>${statusTags(p)}</div>`}).join("")}
 function statusTags(p){const t=[];if(p.slow>0)t.push(`<span class="tag bad">鈍行 残り${p.slow}回</span>`);if(p.rest>0)t.push(`<span class="tag bad">運休</span>`);
-  if(S.rules.yokai&&S.yokai.owner===p.idx)t.push(`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`);if(p.cards.includes("omamori"))t.push(`<span class="tag">お守り</span>`);if(debtOf(p)>0)t.push(`<span class="tag">借入${yen(debtOf(p))}</span>`);return t.join("")}
+  if(S.rules.yokai&&S.yokai.owner===p.idx)t.push(S.yokai.good?`<span class="tag fk">福だぬき 残り${S.yokai.good}回</span>`:`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`);if(p.cards.includes("omamori"))t.push(`<span class="tag">お守り</span>`);if(debtOf(p)>0)t.push(`<span class="tag">借入${yen(debtOf(p))}</span>`);return t.join("")}
 function render(){if(!S)return;applySeason();pickBgm();
   $("#when").textContent=`${S.year}年目 ${MONTHS[S.month]}　(全${S.years}年)`;
   $("#goalName").textContent=S.dest;
@@ -1821,7 +1825,26 @@ const modalOpen=()=>!$("#modal").hidden;
 
 /* ---------- game ---------- */
 function pickDest(from){const d=distTo(from);const c=STATIONS.map(s=>s[0]).filter(n=>n!==from&&d[n]>=MAP.minDest);return c[rnd(0,c.length-1)]}
-const possessed=()=>S.rules.yokai&&S.yokai.owner===S.cur;
+const possessed=()=>S.rules.yokai&&S.yokai.owner===S.cur&&!S.yokai.good;
+const blessed=()=>S.rules.yokai&&S.yokai.owner===S.cur&&!!S.yokai.good;
+const yfM=()=>1+.15*(S.year-1); // mischief / blessing amounts: grow slower than the economy
+// 福だぬき: very rarely the tanuki reforms and only does good things for a few turns (more likely for players who are behind)
+function fukuChance(i){const nw=S.players.map((_,k)=>netWorth(k)),me=nw[i],rank=nw.filter(v=>v>me).length;return me<0||rank===nw.length-1?.045:rank>=nw.length/2?.025:.01}
+const FUKU_CARDS=["tokkyu","kyuko","omamori","buttobi","rinji"];
+async function fukuStart(p){const y=S.yokai;y.good=rnd(3,5);y.form=0;y.turns=0;ST(p).fuku=(ST(p).fuku||0)+1;log(`${YOKAI[0].n}が改心して福だぬきになった！`);render();Snd.sfx("arrive");
+  if(p.cpu){await say(`${p.name}に取り憑いていた${YOKAI[0].n}が改心し、福だぬきになりました。同じマスに止まると奪えます。`,"fuku","board");return}
+  setScene("fuku","狸が改心した！");
+  const pr=modal(`${sceneHTML("fuku")}<div class="cer-rank r1 arr">狸が改心した！</div><h2 class="cer-name">福だぬき 降臨</h2><p>${esc(p.name)}に取り憑いていた${YOKAI[0].n}が改心しました。これから${y.good}回、${esc(p.name)}の番の終わりに良いことだけをしてくれます。</p><p class="hint">ほかのオーナーが同じマスにぴったり止まると、福だぬきを奪われます。</p>`,[["つづける",1,"primary"]]);
+  confetti(70);await pr}
+async function blessing(p){const y=S.yokai,r=Math.random();let m;
+  if(r<.35&&p.cards.length<6){const c=FUKU_CARDS[rnd(0,FUKU_CARDS.length-1)];p.cards.push(c);m=`${CARDS[c].n}を持ってきてくれた。`}
+  else if(r<.8||p.cards.length>=6){const a=r100(rnd(2000,4000)*yfM());p.money+=a;gain(p,a);m=`商売繁盛のご利益で${yen(a)}の臨時収入。`}
+  else{S.extraRoll=true;m="もう一度サイコロを振らせてくれる。"}
+  y.good--;log(`福だぬき：${p.name}に${m}`);Snd.sfx("plus");render();
+  await say(V(`福だぬきが${p.name}に${m}`,`福だぬき：${p.name}に${m}`),"fuku");
+  if(y.good<=0){S.yokai={owner:null,form:0,turns:0};log("福だぬきは満足して山へ帰っていった。");placeTokens();render();await say(V("福だぬきは満足して、山へ帰っていきました。","福だぬきは山へ帰りました。"),"fuku")}}
+async function stealFuku(){const y=S.yokai;if(!S.rules.yokai||!y.good||y.owner==null||y.owner===S.cur)return;const h=S.players[y.owner],p=cp();if(h.pos!==p.pos)return;
+  y.owner=S.cur;log(`${p.name}が${h.name}から福だぬきを奪った！`);Snd.sfx("pass");placeTokens();render();await say(V(`やりました！ ${p.name}が${h.name}から福だぬきを奪いましたよ！`,`${p.name}が${h.name}から福だぬきを奪いました。`),"fuku")}
 const passes=path=>path.slice(1).some(id=>S.players.some((q,j)=>j!==S.cur&&q.pos===id));
 function newGame(seats,years,assist,rules,mapId,mode){useMap(mapId);
   const props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(master(s[0]))]));
@@ -1860,16 +1883,16 @@ async function mischief(p){const y=S.yokai;y.turns++;ST(p).yokaiTurns++;let pre=
   const f=y.form,nm=YOKAI[f].n,r=Math.random(),mine=ownedList(p.idx);let msg;
   if(f===0){
     if(r<.25)msg=`${nm}は昼寝している。今回は何もしなかった。`;
-    else if(r<.5){const a=r100(rnd(800,2500)*yf());p.money-=a;msg=`${nm}が勝手に宴会を開いた。${yen(a)}の出費。`}
+    else if(r<.5){const a=r100(rnd(800,2500)*yfM());p.money-=a;msg=`${nm}が勝手に宴会を開いた。${yen(a)}の出費。`}
     else if(r<.65&&p.cards.length){const c=p.cards.splice(rnd(0,p.cards.length-1),1)[0];msg=`${nm}が${CARDS[c].n}を食べてしまった。`}
     else if(r<.8&&mine.length){mine.sort((a,b)=>a[2]-b[2]);msg=`${nm}が${sellHalf(p,mine[0][0],mine[0][1])}を半値で売り払った。`}
-    else{const a=r100(2000*yf());p.money-=a;msg=`${nm}が狸の置物を大量に買い込んだ。${yen(a)}の出費。`}
+    else{const a=r100(2000*yfM());p.money-=a;msg=`${nm}が狸の置物を大量に買い込んだ。${yen(a)}の出費。`}
   }else{
     if(r<.1)msg=`${nm}は腹鼓を打っている。今回は何もしなかった。`;
-    else if(r<.45){const a=r100(rnd(4000,10000)*yf());p.money-=a;msg=`${nm}が温泉街で豪遊した。${yen(a)}の出費。`}
+    else if(r<.45){const a=r100(rnd(4000,10000)*yfM());p.money-=a;msg=`${nm}が温泉街で豪遊した。${yen(a)}の出費。`}
     else if(r<.7&&mine.length){const sold=[];for(let i=0;i<2&&mine.length;i++){const[s,k]=mine.splice(rnd(0,mine.length-1),1)[0];sold.push(sellHalf(p,s,k))}msg=`${nm}が${sold.join("と")}を半値で売り払った。`}
     else if(r<.85&&p.cards.length){p.cards=[];msg=`${nm}がカードをすべて食べてしまった。`}
-    else{const a=r100(rnd(3000,6000)*yf());p.money-=a;msg=`${nm}が駅前で大騒ぎした。後始末に${yen(a)}かかった。`}
+    else{const a=r100(rnd(3000,6000)*yfM());p.money-=a;msg=`${nm}が駅前で大騒ぎした。後始末に${yen(a)}かかった。`}
   }
   msg=pre+msg;log(`${p.name}：${msg}`);Snd.sfx("yokai");render();const key=evolved||f===1?"bigyokai":"mischief";
   if(p.cpu)await say(`${p.name}のもとで、${msg}`,key);
@@ -1883,7 +1906,7 @@ async function badCard(p){const ks=Object.keys(BAD),k=ks[rnd(0,ks.length-1)];let
   else if(k==="fine"){const a=r100(rnd(1000,3000)*yf());p.money-=a;gain(p,-a);m=`罰金${yen(a)}を払いました。`}
   else{if(p.cards.length){const c=p.cards.splice(rnd(0,p.cards.length-1),1)[0];m=`${CARDS[c].n}をなくしてしまいました。`}else m="なくすカードを持っておらず、助かりました。"}
   log(`${p.name}：災難カード「${BAD[k].n}」。${m}`);Snd.sfx("minus");render();await say(V(`あいたた、${p.name}が${BAD[k].n}を引いてしまいました。${m}`,`${p.name}が${BAD[k].n}を引きました。${m}`),"bad")}
-async function land(){const p=cp(),n=N[p.pos];
+async function land(){await stealFuku();const p=cp(),n=N[p.pos];
   if(p.pos===S.dest)await arrive(p);
   if(n.type==="st"){await quiz(p);
     if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件購入しました。`,"buy")}
@@ -1904,7 +1927,7 @@ async function land(){const p=cp(),n=N[p.pos];
 async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r100((4000+dist*260)*yf());p.money+=amt;const sa=ST(p);sa.arrivals++;gain(p,amt);
   const old=S.dest,next=pickDest(old);S.destFrom=old;log(`${p.name}が${old}駅に一番乗り！援助金${yen(amt)}。`);
   let yk="";
-  if(S.rules.yokai){const dd=distTo(old);let far=-1,c=[];S.players.forEach((q,i)=>{if(i===S.cur)return;const d=dd[q.pos];if(d>far){far=d;c=[i]}else if(d===far)c.push(i)});
+  if(S.rules.yokai&&!S.yokai.good){const dd=distTo(old);let far=-1,c=[];S.players.forEach((q,i)=>{if(i===S.cur)return;const d=dd[q.pos];if(d>far){far=d;c=[i]}else if(d===far)c.push(i)});
     const t=c[rnd(0,c.length-1)],y=S.yokai;
     if(y.owner!==t){S.yokai={owner:t,form:0,turns:0};yk=V(`おや……${old}駅からいちばん遠い${S.players[t].name}に、${YOKAI[0].n}が取り憑いてしまいました！`,`${old}駅からいちばん遠い${S.players[t].name}に、${YOKAI[0].n}が取り憑きました。`)}
     else yk=V(`${S.players[t].name}には、まだ${YOKAI[y.form].n}が取り憑いたままですね……。`,`${S.players[t].name}には${YOKAI[y.form].n}が取り憑いたままです。`);
@@ -2034,7 +2057,8 @@ async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];cpuRepay(p);
   if(ti>=0&&d>=10)await useCard(p,ti);else if(ki>=0&&d>=6)await useCard(p,ki);
   renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);setScene("cpu",`${p.name}は${t}マス進みます。`);
   const r=reach(p.pos,t,S.dest,S.rules.exact),dd=distTo(S.dest),pref={plus:0,card:1,shop:1,st:2,minus:3},ps=possessed();
-  const key=id=>[id===S.dest?0:1,ps&&passes(r.get(id))?0:1,dd[id],pref[N[id].type]];
+  const fk=S.rules.yokai&&S.yokai.good&&S.yokai.owner!=null&&S.yokai.owner!==S.cur?S.players[S.yokai.owner].pos:null;
+  const key=id=>[id===S.dest?0:1,(ps&&passes(r.get(id)))||id===fk?0:1,dd[id],pref[N[id].type]];
   const best=[...r.keys()].sort((a,b)=>{const A=key(a),B=key(b);for(let i=0;i<4;i++)if(A[i]!==B[i])return A[i]-B[i];return 0})[0];
   await wait(400);await moveAlong(r.get(best));await land();return endTurn()}
 async function forceSell(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);
@@ -2042,7 +2066,9 @@ async function forceSell(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);
   if(sold){render();await say(V(`${p.name}は借金返済のため、物件を${sold}件手放しました……。`,`${p.name}は借金返済のため、物件を${sold}件売却しました。`),"minus")}}
 async function endTurn(){const p=cp();
   if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await checkTitles();await say(V(`${p.name}はもう一回サイコロを振れますよ！`,`${p.name}はもう一度サイコロを振ります。`),"roll");return startTurn()}
-  if(possessed())await mischief(p);if(p.money<0)await forceSell(p);
+  if(blessed()){await blessing(p);if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);render();return startTurn()}}
+  else if(possessed()){if(Math.random()<fukuChance(S.cur)){await fukuStart(p);await blessing(p);if(S.extraRoll){S.extraRoll=false;render();return startTurn()}}else await mischief(p)}
+  if(p.money<0)await forceSell(p);
   S.cur=(S.cur+1)%S.players.length;
   if(S.cur===0){S.month++;if(S.month===6)await settle(false);if(S.month>=12){await settle(true);S.month=0;S.year++;if(S.year>S.years){await checkTitles();return gameOver()}}await seasonTurn();await monthEvents();snapshot(`${S.year}年${MONTHS[S.month]}`)}
   await checkTitles();startTurn()}
@@ -2107,6 +2133,7 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場・夜の街・金融学術）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
   <h3>季節</h3><p>春（3〜5月）・夏（6〜8月）・秋（9〜11月）・冬（12〜2月）で、画面の色や絵、BGMが変わります。妖怪に取り憑かれているとき、フェリー航路の上、最終年にも専用の曲が流れます。CPUの番は控えめな演奏になります。季節の変わり目にはお知らせが出ます。</p>
   <h3>称号</h3><p>総資産が増えると称号が上がり、そのたびに昇格ボーナス（クイズ正解の賞金と同じくらい）がもらえます。CPUも同じです。駆け出し → 小金持ち（2億円）→ 資産家（4億円）→ 大地主（8億円）→ 大富豪（15億円）→ 億万長者（30億円）。一度上がった称号は、総資産が減っても下がりません。</p>
+  <h3>福だぬき</h3><p>ごくまれに、取り憑いている${YOKAI[0].n}が改心して「福だぬき」になります。総資産が下位のオーナーほど起きやすくなっています。福だぬきは3〜5回のあいだ、番の終わりに良いこと（良いカード・臨時収入・もう一度サイコロ）だけをしてくれて、満足すると山へ帰ります。このあいだ、ほかのオーナーは福だぬき付きのオーナーと同じマスにぴったり止まると、福だぬきを奪えます。</p>
   <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
   <p class="hint">物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>`,[["閉じる",0,"primary"]])}
 function openMenu(){modal(`<h2>メニュー</h2><div class="menu">
