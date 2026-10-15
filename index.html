@@ -838,8 +838,9 @@ const YAKU=[
  {id:"sanbon",n:"三本の矢",hq:["人材派遣会社","広告代理店","総合商社"],d:"人材派遣会社・広告代理店・総合商社の3社すべて",fx:"すべての物件の収益が1.2倍",big:1}];
 const YAKU_TOP_MULT=2.0;
 // the HQ district can be reached from 東京 and the stations next to it (首都圏)
-let HQ_GATES=null,HQ_GATES_MAP=null;
-function hqGate(st){if(HQ_GATES_MAP!==CUR_MAP){HQ_GATES_MAP=CUR_MAP;HQ_GATES=new Set(["東京"]);for(let d=0;d<2;d++)[...HQ_GATES].forEach(a=>MAP.edges.forEach(e=>{if(e[2]===1||e[2]===2)return;if(e[0]===a)HQ_GATES.add(e[1]);if(e[1]===a)HQ_GATES.add(e[0])}))}return HQ_GATES.has(st)}
+// the HQ district can be reached from stations in 東京・神奈川・千葉・埼玉 (一都三県)
+const HQ_AREA=new Set(["東京","新宿","上野","品川","八王子","横浜","鎌倉","小田原","箱根湯本","千葉","成田","銚子","木更津","館山","大宮","川越","秩父"]);
+const hqGate=st=>HQ_AREA.has(st);
 const LL=(lon,lat)=>[Math.round((lon-136)*185+60),Math.round((44-lat)*230+60)];
 const MAPS={
   kanto:{name:"関東甲信越編",title:"大人の鉄道すごろく 関東甲信越編",w:1060,h:1120,stations:KANTO_ST,edges:KANTO_EDGES,prefs:KANTO_PREFS,prefSize:58,
@@ -1851,8 +1852,8 @@ function newGame(seats,years,assist,rules,mapId,mode){useMap(mapId);
   S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"],slow:0,rest:0,debt:0,title:0,style:s.cpu?["aggressive","cautious","normal","normal"][(s.color+3)%4]:null})),rate:ECON.rateStart,season:"spring",cur:0,year:1,month:0,years,assist,rules,map:CUR_MAP,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"busy",dice:1,lastDice:null};
   STATIONS.forEach(([n])=>S.owners[n]=props[n].map(()=>null));S.props[HQ]=clone(HQ_PROPS);S.owners[HQ]=HQ_PROPS.map(()=>null);S.yaku={};
   S.mode=mode||"multi";S.players.forEach(p=>p.st=newSt());S.destFrom="東京";S.dest="東京";snapshot("開始");const first=pickDest("東京");
-  buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);setScene("title",`ご乗車ありがとうございます！ ${years}年間の旅、東京駅から出発進行です。`);render();
-  revealDest(first,"最初の目的地は……").then(()=>startTurn());
+  buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);render();
+  (async()=>{await say(`ご乗車ありがとうございます！ ${years}年間の旅、東京駅から出発進行です。`,"title");await revealDest(first,"最初の目的地は……");startTurn()})();
 }
 async function startTurn(){CAND=null;S.dice=1;const p=cp();
   if(p.rest>0){p.rest--;S.phase="busy";render();focus(p.pos);log(`${p.name}は運休で1回休み。`);await say(V(`${p.name}は運休中です。今回はお休みですね。`,`${p.name}は運休のため、1回休みです。`),"rest");return endTurn()}
@@ -2127,7 +2128,7 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>進み方</h3><p>自分の番にサイコロを振り、地図で光るマスから止まる場所を選びます。目的地にぴったり止まると援助金がもらえ、ルーレットで次の目的地が決まります。</p>
   <h3>マス</h3><p><b style="color:var(--plus)">青</b>はお金が入り、<b style="color:var(--minus)">赤</b>は出費です。冬の北国では大雪で出費が増えます。<b style="color:var(--card)">黄</b>はカードがもらえますが、ときどき災難カード（鈍行・運休・罰金・紛失）を引きます。<b style="color:var(--shop)">ピンクのひし形</b>はカード売り場です。駅では物件を買えます。駅の物件をすべて持つと独占になり、決算での収益が1.3倍になります。</p>
   <h3>業界トップ</h3><p>物件は9つのカテゴリ（飲食・名産甘味・宿泊レジャー・工場醸造・伝統工芸・農園漁業・観光商業・夜の街娯楽・金融学術）に分かれています。決算のときに、あるカテゴリの物件をいちばん多く持ち、カテゴリ全体の3割以上を持っているオーナーは「業界トップ」となり、そのカテゴリの収益が1.6倍になります（同数で並んだときは該当なし）。独占と重なると約2.1倍です。メニューの「物件一覧」で、各カテゴリの状況を確かめられます。</p>
-  <h3>汐留ヘッドクォーター特区と役</h3><p>東京駅と、東京から2駅以内の首都圏の駅に止まると、「汐留ヘッドクォーター特区」で大企業の本社（人材派遣会社・広告代理店・旅行代理店・総合商社・物流会社）も買えます。本社は単体の利回りが低めですが、組み合わせると「役」が成立します。決算のときに役が成立していると、その業界の収益が1.6倍から2.0倍に上がります。はじめて成立したときは祝い金（2.5億円から。年を追うごとに増えます）ももらえます。本社は10億円以上の大物件なので、役は5年以上のゲームの後半に狙う大勝負です。役は「人手不足解消（人材派遣会社＋工場・醸造トップ）」「話題沸騰（広告代理店＋観光・商業トップ）」「旅行パッケージ（旅行代理店＋宿泊・レジャートップ）」「全国流通（総合商社＋名産・甘味トップ）」「産地直送（物流会社＋農園・漁業トップ）」「接待で一杯（広告代理店＋銀座のナイトクラブ）」、大役「三本の矢（人材派遣会社・広告代理店・総合商社）」の7つです。</p>
+  <h3>汐留ヘッドクォーター特区と役</h3><p>一都三県（東京・神奈川・千葉・埼玉）の駅に止まると、「汐留ヘッドクォーター特区」で大企業の本社（人材派遣会社・広告代理店・旅行代理店・総合商社・物流会社）も買えます。本社は単体の利回りが低めですが、組み合わせると「役」が成立します。決算のときに役が成立していると、その業界の収益が1.6倍から2.0倍に上がります。はじめて成立したときは祝い金（2.5億円から。年を追うごとに増えます）ももらえます。本社は10億円以上の大物件なので、役は5年以上のゲームの後半に狙う大勝負です。役は「人手不足解消（人材派遣会社＋工場・醸造トップ）」「話題沸騰（広告代理店＋観光・商業トップ）」「旅行パッケージ（旅行代理店＋宿泊・レジャートップ）」「全国流通（総合商社＋名産・甘味トップ）」「産地直送（物流会社＋農園・漁業トップ）」「接待で一杯（広告代理店＋銀座のナイトクラブ）」、大役「三本の矢（人材派遣会社・広告代理店・総合商社）」の7つです。</p>
   <h3>カード</h3><p>急行・特急・ぶっとびなどの移動カードのほか、相手を1回休みにする足止め、サイコロを半分にする鈍行押し付け、カード強奪、ぶっとばし、妖怪なすりつけといった邪魔カードがあります。お守りカードを持っていると、邪魔カードを1回防げます。</p>
   <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠いオーナーに妖怪「${YOKAI[0].n}」が取り憑きます。ほかのオーナーのいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
   <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場・夜の街・金融学術）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
