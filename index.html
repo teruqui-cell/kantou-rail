@@ -13,7 +13,7 @@
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>大人の鉄道すごろく</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
 <style>
 /* Layout: one-screen game — route map (scrollable, zoomable) beside a control column; stacks map-over-controls on phones */
 :root{
@@ -242,12 +242,21 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
 #menuBtn{display:none}
 /* events box with scene art */
 #log{display:flex;flex-direction:column;gap:8px}
-#log.active{outline:3px solid var(--accent);outline-offset:-1px}
+#log.active{outline:none}
 .scene,.scene-pic{border-radius:10px;overflow:hidden;aspect-ratio:16/9;max-width:100%;background:var(--bg)}
 .scene svg,.scene img,.scene-pic svg,.scene-pic img{display:block;width:100%;height:100%;object-fit:cover}
 .scene-pic{margin:-4px 0 12px;max-height:200px;width:100%}
-.scene-text{margin:0;font-size:16px;font-weight:700;line-height:1.6;min-height:1.6em}
+.msgwin{display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px;align-items:start;background:linear-gradient(#22357A,#162457);color:#F4F6FB;border:3px solid #E9EDF5;outline:2px solid #162457;border-radius:10px;padding:10px 12px 8px}
+.conductor svg{display:block;border-radius:8px}
+.msgbody{min-width:0}
+.msg-name{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;background:#E8B730;color:#162457;border-radius:4px;padding:0 6px;margin:0 0 2px}
+.scene-text{margin:0;font-size:19px;font-weight:700;line-height:1.65;min-height:3.3em;overflow-wrap:anywhere}
+body.dotfont .msgwin .scene-text{font-family:"DotGothic16",var(--f-body);font-weight:400;font-size:20px;letter-spacing:.02em}
+.m-plus{color:#8FD8FF;font-weight:700}.m-minus{color:#FF9A8F;font-weight:700}.m-yen{color:#FFE27A;font-weight:700}
+.m-st{color:#FFE27A}.m-card{color:#B9F0C9}.m-pl{border-bottom:3px solid var(--pc);padding-bottom:1px}
+.msgwin .scene-hint{color:#AFC0E6}
 .scene-hint{margin:0;text-align:right;font-size:12px;color:var(--muted);min-height:1em}
+#log.active .msgwin{outline-color:var(--accent);outline-width:3px}
 .scene-hint.tap::after{content:" ▼";display:inline-block;animation:bob 1s ease-in-out infinite}
 .loglabel{margin:4px 0 0}
 .menu{display:grid;gap:8px}
@@ -266,6 +275,7 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
 .t-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .t-row .btn{padding:10px 4px}
 .t-note{font-size:12px;color:var(--muted);line-height:1.6;margin:0}
+@media (min-width:821px){#action{order:1}#log{order:2}#playersBox{order:3}}
 @media (max-width:820px){
   body{gap:6px;padding-block:6px}
   header{gap:6px}
@@ -296,7 +306,12 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
   body[data-view="cpu"] #action{display:none}
   body[data-view="map"] #log,body[data-view="cpu"] #log{display:grid;grid-template-columns:40% 1fr;grid-template-rows:auto auto;gap:4px 10px;align-items:start}
   body[data-view="map"] #log .scene,body[data-view="cpu"] #log .scene{grid-row:1/3}
-  body[data-view="map"] #log .scene-text,body[data-view="cpu"] #log .scene-text{font-size:14px;align-self:center}
+  body[data-view="map"] #log .msgwin,body[data-view="cpu"] #log .msgwin{grid-template-columns:32px minmax(0,1fr);gap:6px;padding:6px 8px}
+  body[data-view="map"] #log .conductor svg,body[data-view="cpu"] #log .conductor svg{width:32px;height:32px}
+  body[data-view="map"] #log .msg-name,body[data-view="cpu"] #log .msg-name{display:none}
+  body[data-view="map"] #log .scene-text,body[data-view="cpu"] #log .scene-text{font-size:15px;min-height:0}
+  body.dotfont[data-view="map"] #log .scene-text,body.dotfont[data-view="cpu"] #log .scene-text{font-size:16px}
+  body[data-view="roll"] .scene-text{font-size:18px}
   body[data-view="map"] #log .loglabel,body[data-view="map"] #log ol,body[data-view="cpu"] #log .loglabel,body[data-view="cpu"] #log ol{display:none}
 }
 @media (prefers-reduced-motion:reduce){.tok,.tok .tokin{transition:none}.tok.cur .tokring{animation:none;opacity:.9}.goalring{animation:none}.scene-hint.tap::after,.roulette.hit{animation:none}}
@@ -330,7 +345,7 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
   <aside>
     <section class="box" id="playersBox"><p class="label">オーナー一覧</p><div id="players"></div></section>
     <section class="box" id="action"><p class="hint">読み込み中…</p></section>
-    <section class="box" id="log" aria-live="polite"><div class="scene" id="scene"></div><p class="scene-text" id="sceneText"></p><p class="scene-hint" id="sceneHint"></p><p class="label loglabel">これまでの出来事</p><ol></ol></section>
+    <section class="box" id="log" aria-live="polite"><div class="scene" id="scene"></div><div class="msgwin" id="msgWin"><div class="conductor" aria-hidden="true"><svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="8" fill="#2B4C9B"/><circle cx="24" cy="29" r="12" fill="#F5D2B0"/><path d="M10 20 Q24 6 38 20 Z" fill="#1B2A5E"/><rect x="9" y="19" width="30" height="5" rx="2" fill="#1B2A5E"/><rect x="9" y="19" width="30" height="2" fill="#E8B730"/><circle cx="24" cy="14" r="2.6" fill="#E8B730"/><circle cx="19.5" cy="28" r="1.6" fill="#2B3540"/><circle cx="28.5" cy="28" r="1.6" fill="#2B3540"/><path d="M17 33 Q20.5 31 24 33 Q27.5 31 31 33 Q27.5 36 24 34.5 Q20.5 36 17 33Z" fill="#6B4A2E"/><path d="M14 41 Q24 47 34 41 L34 48 L14 48Z" fill="#1B2A5E"/><circle cx="24" cy="44" r="1.4" fill="#E8B730"/></svg></div><div class="msgbody"><p class="msg-name">車掌</p><p class="scene-text" id="sceneText"></p><p class="scene-hint" id="sceneHint"></p></div></div><p class="label loglabel">これまでの出来事</p><ol></ol></section>
   </aside>
 </div>
 <div id="title" hidden>
@@ -795,14 +810,34 @@ let toastT;function toast(t,ms=1800){const el=$("#toast");el.textContent=t;el.hi
 const GP={speed:"normal"};
 try{Object.assign(GP,JSON.parse(localStorage.getItem("kks-game"))||{})}catch(e){}
 const saveGP=()=>{try{localStorage.setItem("kks-game",JSON.stringify(GP))}catch(e){}};
+const applyDotFont=()=>document.body.classList.toggle("dotfont",GP.dotFont!==false);applyDotFont();
 const SPEEDS={tap:{n:"タップで進む",k:1},slow:{n:"ゆっくり",k:1.6,base:1500,per:110},normal:{n:"ふつう",k:1,base:1000,per:65},fast:{n:"はやい",k:.6,base:550,per:32}};
 const wait=ms=>sleep(ms*(SPEEDS[GP.speed]||SPEEDS.normal).k);
-function setScene(key,text){if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}if(text!=null)$("#sceneText").textContent=text}
-function say(text,key){return new Promise(res=>{setScene(key||curScene||"move",text);document.body.dataset.wait="1";const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
+// highlight money, stations, players and cards inside messages
+let FMT_RE=null,FMT_KEY="";
+function fmtMsg(text){const esc2=t=>t.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+  const names=S?S.players.map(p=>p.name).filter(Boolean):[],key=names.join("|")+"/"+STATIONS.length;
+  if(key!==FMT_KEY){FMT_KEY=key;const rx=a=>a.slice().sort((x,y)=>y.length-x.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|");
+    const cards=[...Object.values(CARDS).map(c=>c.n),...Object.values(BAD).map(c=>c.n)];
+    FMT_RE=new RegExp(`(−?(?=\\d)(?:[\\d,]+億)?(?:[\\d,]+万)?円)|(${rx(ALL_ST.map(s=>s[0]))})駅|(${rx(cards)})${names.length?`|(${rx(names)})`:""}`,"g")}
+  const neg=/出費|損失|罰金|払|かか|手放|売却|利息|税|豪遊|後始末|損/.test(text),pos=/収入|ボーナス|賞金|もら|援助|臨時|配当/.test(text);
+  return esc2(text).replace(FMT_RE,(m,yen1,st,card,pl)=>yen1?`<span class="${neg&&!pos?"m-minus":pos&&!neg?"m-plus":"m-yen"}">${m}</span>`:st?`<b class="m-st">${st}駅</b>`:card?`<b class="m-card">${card}</b>`:
+    `<b class="m-pl" style="--pc:${pcol(S.players.findIndex(p=>p.name===pl))}">${pl}</b>`)}
+const TYPE_MS={tap:28,slow:40,normal:28,fast:16};
+let typing=null;
+function typeText(text){const el=$("#sceneText");if(typing)typing.finish();el.innerHTML=fmtMsg(text);
+  const ms=window.__FAST||reduce?0:(TYPE_MS[GP.speed]||28);if(!ms){typing=null;return 0}
+  const nodes=[],w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);while(w.nextNode())nodes.push([w.currentNode,w.currentNode.nodeValue]);
+  nodes.forEach(([n])=>n.nodeValue="");let ni=0,ci=0,total=nodes.reduce((a,[,t])=>a+t.length,0);
+  const tick=()=>{let k=0;while(ni<nodes.length&&k<1){const[n,t]=nodes[ni];ci++;n.nodeValue=t.slice(0,ci);if(ci>=t.length){ni++;ci=0}k++}if(ni>=nodes.length)finish()};
+  const iv=setInterval(tick,ms);const finish=()=>{clearInterval(iv);nodes.forEach(([n,t])=>n.nodeValue=t);if(typing===me)typing=null};const me={finish};typing=me;return total*ms}
+function setScene(key,text){if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}if(text!=null)typeText(text)}
+function say(text,key){return new Promise(res=>{if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}const typeMs=typeText(text);document.body.dataset.wait="1";const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
   const done=()=>{clearTimeout(t);delete document.body.dataset.wait;box.classList.remove("active");h.textContent="";h.className="scene-hint";layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",kd);res()};
-  const kd=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();done()}};
-  if(GP.speed==="tap"){addEventListener("keydown",kd);box.onclick=done;h.textContent="タップで次へ";h.className="scene-hint tap";layer.hidden=false;layer.onclick=done}
-  else{const sp=SPEEDS[GP.speed]||SPEEDS.normal;t=setTimeout(done,sp.base+sp.per*text.length)}})}
+  const adv=()=>{if(typing){typing.finish();return}done()};
+  const kd=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();adv()}};
+  if(GP.speed==="tap"){addEventListener("keydown",kd);box.onclick=adv;h.textContent="タップで次へ";h.className="scene-hint tap";layer.hidden=false;layer.onclick=adv}
+  else{const sp=SPEEDS[GP.speed]||SPEEDS.normal;t=setTimeout(done,Math.max(sp.base+sp.per*text.length,typeMs+sp.base))}})}
 
 /* ---------- storage: browser + (signed-in) account ---------- */
 const Store={cloud:null,q:Promise.resolve(),
@@ -1174,7 +1209,7 @@ async function settle(yearEnd){render();
   for(const p of S.players)if(p.money<0)await forceSellOf(p)}
 async function forceSellOf(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);let sold=0;
   while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が資金繰りのため${s}の「${P(s)[k][0]}」を売却。`)}
-  if(sold){render();await say(`${p.name}は資金繰りのため物件を${sold}件売却しました。`,"minus")}}
+  if(sold){render();await say(`おっと、お金が足りません……。${p.name}は資金繰りのため、物件を${sold}件手放しました。`,"minus")}}
 /* bank */
 function bankModal(){return new Promise(res=>{const p=cp(),i=S.cur,body=$("#modalBody");
   const draw=()=>{const lim=loanLimit(i),d=debtOf(p),room=Math.max(0,lim-d);
@@ -1434,31 +1469,31 @@ function newGame(seats,years,assist,rules,mapId,mode){useMap(mapId);
   S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"],slow:0,rest:0,debt:0,title:0,style:s.cpu?["aggressive","cautious","normal","normal"][(s.color+3)%4]:null})),rate:ECON.rateStart,season:"spring",cur:0,year:1,month:0,years,assist,rules,map:CUR_MAP,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"busy",dice:1,lastDice:null};
   STATIONS.forEach(([n])=>S.owners[n]=props[n].map(()=>null));
   S.mode=mode||"multi";S.players.forEach(p=>p.st=newSt());S.destFrom="東京";S.dest="東京";snapshot("開始");const first=pickDest("東京");
-  buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);setScene("title",`${years}年間の旅が東京駅から始まります。`);render();
+  buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);setScene("title",`ご乗車ありがとうございます！ ${years}年間の旅、東京駅から出発進行です。`);render();
   revealDest(first,"最初の目的地は……").then(()=>startTurn());
 }
 async function startTurn(){CAND=null;S.dice=1;const p=cp();
-  if(p.rest>0){p.rest--;S.phase="busy";render();focus(p.pos);log(`${p.name}は運休で1回休み。`);await say(`${p.name}は運休のため、今回は1回休みです。`,"rest");return endTurn()}
-  if(p.cpu){S.phase="busy";setScene("cpu",`${p.name}の番です。`);render();autosave();focus(p.pos);await wait(500);await cpuTurn()}
-  else{S.phase="roll";setScene("roll",`${p.name}の番です。サイコロを振ってください。`);render();autosave();
+  if(p.rest>0){p.rest--;S.phase="busy";render();focus(p.pos);log(`${p.name}は運休で1回休み。`);await say(`${p.name}は運休中です。今回はお休みですね。`,"rest");return endTurn()}
+  if(p.cpu){S.phase="busy";setScene("cpu",`次は${p.name}の番ですよ。`);render();autosave();focus(p.pos);await wait(500);await cpuTurn()}
+  else{S.phase="roll";setScene("roll",`${p.name}の番です。さあ、サイコロをどうぞ！`);render();autosave();
     if(S.players.filter(q=>!q.cpu).length>1)Snd.sfx("turn")}
 }
 async function rollDice(){const p=cp(),n=S.dice,boost=S.cur===lastPlace();let v;
   for(let i=0;i<9;i++){v=Array.from({length:n},()=>rnd(1,6));showDice(v);Snd.sfx("dice");await sleep(55)}
   if(boost)v=v.map(x=>Math.random()<.5?Math.max(x,rnd(1,6)):x);
   showDice(v);let t=v.reduce((a,b)=>a+b,0);
-  if(p.slow>0){const t0=t;t=Math.max(1,Math.ceil(t/2));p.slow--;log(`${p.name}は鈍行中のため${t0}マスが${t}マスに。`);await say(`鈍行中のため、${t0}マスが半分の${t}マスになりました。${p.slow?`（残り${p.slow}回）`:"（鈍行はこれで終わり）"}`,"bad")}
+  if(p.slow>0){const t0=t;t=Math.max(1,Math.ceil(t/2));p.slow--;log(`${p.name}は鈍行中のため${t0}マスが${t}マスに。`);await say(`鈍行運転中のため、${t0}マスが半分の${t}マスになりますよ。${p.slow?`（鈍行はあと${p.slow}回）`:"（鈍行はこれでおしまいです）"}`,"bad")}
   return t}
 async function humanRoll(){S.phase="busy";renderAction();const t=await rollDice();const p=cp();log(`${p.name}は${t}マス進める。`);
   CAND=reach(p.pos,t,S.dest,S.rules.exact);
-  if(CAND.size===1){const id=[...CAND.keys()][0];setScene("move",`${t}マス進みます。`);return choose(id)}
-  S.phase="choose";setScene("move",`${t}マス進めます。地図で光っているマスか、下のボタンから止まるマスを選んでください。`);render();const ids=[...CAND.keys()];focus(ids[0])}
+  if(CAND.size===1){const id=[...CAND.keys()][0];setScene("move",`${t}マス進みますよ。`);return choose(id)}
+  S.phase="choose";setScene("move",`${t}マス進めます。止まるマスを、地図の光っているところか下のボタンから選んでくださいね。`);render();const ids=[...CAND.keys()];focus(ids[0])}
 async function choose(id){if(!CAND||!CAND.has(id))return;const path=CAND.get(id);CAND=null;S.phase="busy";render();await moveAlong(path);await land();await endTurn()}
 async function moveAlong(path){const p=cp(),st=ST(p);for(let i=1;i<path.length;i++){p.pos=path[i];st.steps++;const nd=N[p.pos];if(nd.type==="st"&&!st.stations.includes(p.pos))st.stations.push(p.pos);if(nd.sea)st.sea++;placeTokens();Snd.sfx("step");if(i%3===1)focus(p.pos);
     if(possessed()){const j=S.players.findIndex((q,k)=>k!==S.cur&&q.pos===path[i]);if(j>=0)await passYokai(j)}
     await sleep(reduce?40:150)}focus(p.pos);renderPlayers()}
 async function passYokai(j){const y=S.yokai,from=cp(),to=S.players[j];y.owner=j;y.turns=0;
-  const m=`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`;log(m);Snd.sfx("pass");placeTokens();renderPlayers();await say(m,"pass")}
+  const m=`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`;log(m);Snd.sfx("pass");placeTokens();renderPlayers();await say(`おやおや、${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けましたよ！`,"pass")}
 function ownedList(i){const a=[];for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)a.push([s,k,P(s)[k][1]])});return a}
 function sellHalf(p,s,k){const pr=P(s)[k],v=r100(pr[1]/2);S.owners[s][k]=null;p.money+=v;return `${s}の「${pr[0]}」`}
 async function mischief(p){const y=S.yokai;y.turns++;ST(p).yokaiTurns++;let pre="",evolved=false;
@@ -1478,7 +1513,7 @@ async function mischief(p){const y=S.yokai;y.turns++;ST(p).yokaiTurns++;let pre=
     else{const a=r100(rnd(3000,6000)*yf());p.money-=a;msg=`${nm}が駅前で大騒ぎした。後始末に${yen(a)}かかった。`}
   }
   msg=pre+msg;log(`${p.name}：${msg}`);Snd.sfx("yokai");render();const key=evolved||f===1?"bigyokai":"mischief";
-  if(p.cpu)await say(`${p.name}　${msg}`,key);
+  if(p.cpu)await say(`あらら、${p.name}のところで……${msg}`,key);
   else{setScene(key,msg);await modal(`${sceneHTML(key)}<h2>${nm}のしわざ</h2><p>${esc(msg)}</p><p class="hint">ほかのオーナーのいるマスを通るか同じマスに止まると、${nm}を押し付けられます。お祓いカードや妖怪なすりつけカードでも追い払えます。</p>`,[["つづける",1,"primary"]])}}
 /* cards */
 const GOOD_W={kyuko:20,tokkyu:12,buttobi:10,rinji:14,oharai:6,ashidome:8,donko:7,goudatsu:7,buttobashi:5,nasuri:4,omamori:7};
@@ -1488,20 +1523,20 @@ async function badCard(p){const ks=Object.keys(BAD),k=ks[rnd(0,ks.length-1)];let
   else if(k==="rest"){p.rest=(p.rest||0)+1;m="次の番は1回休みです。"}
   else if(k==="fine"){const a=r100(rnd(1000,3000)*yf());p.money-=a;gain(p,-a);m=`罰金${yen(a)}を払いました。`}
   else{if(p.cards.length){const c=p.cards.splice(rnd(0,p.cards.length-1),1)[0];m=`${CARDS[c].n}をなくしてしまいました。`}else m="なくすカードを持っておらず、助かりました。"}
-  log(`${p.name}：災難カード「${BAD[k].n}」。${m}`);Snd.sfx("minus");render();await say(`災難カード「${BAD[k].n}」　${p.name}：${m}`,"bad")}
+  log(`${p.name}：災難カード「${BAD[k].n}」。${m}`);Snd.sfx("minus");render();await say(`あいたた、${p.name}が${BAD[k].n}を引いてしまいました。${m}`,"bad")}
 async function land(){const p=cp(),n=N[p.pos];
   if(p.pos===S.dest)await arrive(p);
   if(n.type==="st"){await quiz(p);
-    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件買いました。`,"buy")}}else await shopModal(p,n.id)}
-  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;ST(p).plus++;gain(p,amt);const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(`青マス　${p.name}：${m}。${yen(amt)}の収入！`,n.sea?"sea":"plus")}
+    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件買いましたよ。`,"buy")}}else await shopModal(p,n.id)}
+  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;ST(p).plus++;gain(p,amt);const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(`青マスです！ ${m}。${p.name}に${yen(amt)}の収入ですよ！`,n.sea?"sea":"plus")}
   else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10;let mult=1,m,key="minus";
     if(n.sea){key="sea";if(n.sea==="js"&&winter){mult=2;m="冬の日本海が大しけで、船の修理費がかさんだ"}else m=SEA_MSG[rnd(0,SEA_MSG.length-1)]}
     else if(winter&&n.y<MAP.snowY){mult=2;m="大雪で除雪費がかかった";key="snow"}
     else m=MINUS_MSG[rnd(0,MINUS_MSG.length-1)];
-    const amt=r100(rnd(600,2000)*yf()*mult);p.money-=amt;ST(p).minus++;gain(p,-amt);log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(`赤マス　${p.name}：${m}。${yen(amt)}の出費。`,key)}
+    const amt=r100(rnd(600,2000)*yf()*mult);p.money-=amt;ST(p).minus++;gain(p,-amt);log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(`おっと、赤マス……。${m}。${p.name}は${yen(amt)}の出費です。`,key)}
   else if(n.type==="card"){if(Math.random()<.3)await badCard(p);
-    else if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);await say(`カードマス　${p.name}はカードがいっぱいで受け取れませんでした。`,"card")}
-    else{const c=randomCard();p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");render();await say(`カードマス　${p.name}が${CARDS[c].n}を手に入れた！`,"card")}}
+    else if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);await say(`カードマスです。でも${p.name}はカードがいっぱいで、受け取れませんでした。`,"card")}
+    else{const c=randomCard();p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");render();await say(`カードマスです！ ${p.name}が${CARDS[c].n}を手に入れましたよ。`,"card")}}
   else if(n.type==="shop")await cardShop(p);
   render();
 }
@@ -1510,10 +1545,10 @@ async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r10
   let yk="";
   if(S.rules.yokai){const dd=distTo(old);let far=-1,c=[];S.players.forEach((q,i)=>{if(i===S.cur)return;const d=dd[q.pos];if(d>far){far=d;c=[i]}else if(d===far)c.push(i)});
     const t=c[rnd(0,c.length-1)],y=S.yokai;
-    if(y.owner!==t){S.yokai={owner:t,form:0,turns:0};yk=`${old}駅からいちばん遠い${S.players[t].name}に${YOKAI[0].n}が取り憑いた！`}
-    else yk=`${S.players[t].name}には${YOKAI[y.form].n}が取り憑いたままです。`;
+    if(y.owner!==t){S.yokai={owner:t,form:0,turns:0};yk=`おや……${old}駅からいちばん遠い${S.players[t].name}に、${YOKAI[0].n}が取り憑いてしまいました！`}
+    else yk=`${S.players[t].name}には、まだ${YOKAI[y.form].n}が取り憑いたままですね……。`;
     log(yk)}
-  render();Snd.sfx("arrive");setScene("arrive",`${p.name}が${old}駅に一番乗り！`);
+  render();Snd.sfx("arrive");setScene("arrive",`到着〜！ ${p.name}が${old}駅に一番乗りです！`);
   const foods=(P(old)||[]).filter(pp=>propCat(pp[0])==="food"),toast2=foods.length?`駅前の「${foods[rnd(0,foods.length-1)][0]}」で祝杯をあげました！`:"駅前で祝杯をあげました！";
   const pr=modal(`${sceneHTML("arrive")}<div class="cer-rank r1 arr">一番乗り！</div><h2 class="cer-name">${esc(old)}駅に到着！</h2><p><span class="dot" style="background:${pcol(S.cur)};display:inline-block;vertical-align:middle;margin-right:6px"></span><b>${esc(p.name)}</b>、この旅で<b>${sa.arrivals}回目</b>の一番乗りです。</p><div class="big-money">＋${yen(amt)}</div><p>援助金を受け取りました。${toast2}</p>`,[["次の目的地を決める",1,"primary"]]);
   confetti(p.cpu?40:90);await pr;
@@ -1525,7 +1560,7 @@ async function revealDest(next,title){
   $("#modalBtns").hidden=true;const names=STATIONS.map(s=>s[0]).filter(n=>n!==next);let d=45;const steps=reduce?1:18;
   for(let i=0;i<steps;i++){$("#roul").textContent=names[rnd(0,names.length-1)];Snd.sfx("dice");await sleep(d);d*=1.15}
   S.dest=next;log(`次の目的地は${next}駅です。`);$("#roul").textContent=next+"駅";$("#roul").classList.add("hit");Snd.sfx("settle");
-  $("#roulHint").textContent=`${title?"最初":"次"}の目的地は「${next}駅」です！地図の赤い旗を目指しましょう。`;setScene("roulette",`目的地は${next}駅です。`);render();focus(next);
+  $("#roulHint").textContent=`${title?"最初":"次"}の目的地は「${next}駅」です！地図の赤い旗を目指しましょう。`;setScene("roulette",`次の目的地は${next}駅です！`);render();focus(next);
   $("#modalBtns").hidden=false;$("#modalBtns button").focus();await pr}
 function isMono(st,i){return S.owners[st].every(x=>x===i)}
 function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];{const s=ST(p);s.bought++;s.boughtValue+=pr[1];const k=st+"|"+pr[0];if(!s.boughtList.includes(k))s.boughtList.push(k)}log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
@@ -1537,7 +1572,7 @@ function cpuBuy(p,st){const own=S.owners[st],props=P(st),got=[],sty=styleOf(p);
     if(best<0)break;const price=props[best][1];
     if(p.money-price<sty.reserve){const need=r1000(price+sty.reserve-p.money);p.debt=debtOf(p)+need;p.money+=need;ST(p).maxDebt=Math.max(ST(p).maxDebt,p.debt);log(`${p.name}が銀行から${yen(need)}を借りた。`)}
     buy(p,st,best);got.push(best)}return got}
-function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),mine=new Set();setScene("buy",`${st}駅に着きました。物件を買えます。`);
+function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),mine=new Set();setScene("buy",`${st}駅に到着です。物件、見ていきますか？`);
   const draw=()=>{const own=S.owners[st];body.innerHTML=`${sceneHTML("buy")}<h2>${esc(st)}駅の物件</h2><p>所持金 <b>${yen(p.money)}</b></p>`+P(st).map((pr,i)=>{const o=own[i];
     const right=o==null?`<button class="btn primary" data-buy="${i}" ${p.money<pr[1]?"disabled":""}>買う</button>`:mine.has(i)?`<button class="btn danger" data-undo="${i}">取り消す</button>`:`<span class="own" style="background:${pcol(o)}">${esc(S.players[o].name)}</span>`;
     return `<div class="row"><span class="pn">${esc(pr[0])}</span><span class="pp">${yen(pr[1])}・${pr[2]}%</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">駅の物件をすべて持つと独占になり、決算での収益が2倍になります。この画面にいる間は、買った物件を取り消して代金を戻せます。</p>`;renderPlayers();renderDyn()};
@@ -1554,9 +1589,9 @@ async function cardShop(p){Snd.sfx("card");
   const kinds=shuffle(Object.keys(CARD_PRICE).filter(k=>S.rules.yokai||!CARDS[k].yokai)).slice(0,4);
   const offer=kinds.map(k=>({k,price:r100(CARD_PRICE[k]*yf()),got:false}));
   if(p.cpu){const got=[];for(const o of offer){if(p.cards.length>=5)break;const want=CARDS[o.k].yokai?possessed():true;if(want&&p.money-o.price>=6000){p.money-=o.price;p.cards.push(o.k);got.push(CARDS[o.k].n)}}
-    if(got.length){log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render();await say(`カード売り場　${p.name}が${got.join("・")}を買いました。`,"shop")}
-    else await say(`カード売り場　${p.name}は何も買いませんでした。`,"shop");return}
-  const body=$("#modalBody");setScene("shop","カード売り場に着きました。");
+    if(got.length){log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render();await say(`カード売り場で、${p.name}が${got.join("・")}を買いましたよ。`,"shop")}
+    else await say(`カード売り場に寄りましたが、${p.name}は何も買いませんでした。`,"shop");return}
+  const body=$("#modalBody");setScene("shop","カード売り場ですよ。何か買っていきますか？");
   const draw=()=>{body.innerHTML=`${sceneHTML("shop")}<h2>カード売り場</h2><p>所持金 <b>${yen(p.money)}</b>・カード ${p.cards.length}/6枚</p>`+offer.map((o,i)=>{
     const right=o.got?`<button class="btn danger" data-cundo="${i}">取り消す</button>`:`<button class="btn primary" data-cbuy="${i}" ${p.money<o.price||p.cards.length>=6?"disabled":""}>買う</button>`;
     return `<div class="row"><span class="pn">${CARDS[o.k].n}<br><small style="font-weight:400;color:var(--muted)">${CARDS[o.k].d}</small></span><span class="pp">${yen(o.price)}</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">今日の品ぞろえは4種類です。この画面にいる間は取り消せます。</p>`;renderPlayers()};
@@ -1571,7 +1606,7 @@ const REWARDS=[["again","もう一度サイコロを振れる"],["card","カー�
 function pickQuestion(){if(!S.quizUsed||S.quizUsed.length>=QUIZ.length)S.quizUsed=[];let i;do{i=rnd(0,QUIZ.length-1)}while(S.quizUsed.includes(i));S.quizUsed.push(i);return [QUIZ[i],QUIZ_EXPL[i]]}
 async function quiz(p){if(p.cpu||!S.rules.quiz||Math.random()>=1/3)return;
   const[q,ex]=pickQuestion(),[genre,text,ans]=q,opts=shuffle(q.slice(2,6)),rw=REWARDS[rnd(0,REWARDS.length-1)];
-  setScene("quiz","クイズに挑戦！");
+  setScene("quiz","ここでクイズです！");
   const ok=await new Promise(res=>{const body=$("#modalBody");Snd.sfx("turn");let result=false;
     modal(`${sceneHTML("quiz")}<span class="qgenre">${esc(genre)}</span><h2>クイズ</h2><p style="font-size:16px;font-weight:700">${esc(text)}</p><p class="qreward">正解すると：${rw[1]}</p><div class="qopts">${opts.map((o,i)=>`<button class="qopt" data-q="${i}">${esc(o)}</button>`).join("")}</div><p class="qres" id="qres"></p><p class="qex" id="qex" hidden></p>`,[["つづける",1,"primary"]]).then(()=>{body.onclick=null;res(result)});
     $("#modalBtns").hidden=true;
@@ -1587,17 +1622,17 @@ async function award(p,k){let m;
   else if(k==="card"){const c=randomCard();p.cards.push(c);m=`特典：${p.name}が${CARDS[c].n}をもらいました。`}
   else if(k==="yield"){const l=ownedList(p.idx);l.forEach(([s,i])=>P(s)[i][2]+=1);m=`特典：${p.name}の物件${l.length}件の収益率が1%上がりました。`}
   else{const a=r100(3000*yf());p.money+=a;m=`特典：${p.name}に賞金${yen(a)}！`}
-  log(m);Snd.sfx("card");render();await say(m,"correct")}
+  log(m);Snd.sfx("card");render();await say("正解のごほうびです！ "+m.replace("特典：",""),"correct")}
 /* using cards */
 async function attack(from,k,to){const p=S.players[from],t=S.players[to];log(`${p.name}が${t.name}に${CARDS[k].n}を使った。`);
-  if(t.cards.includes("omamori")){t.cards.splice(t.cards.indexOf("omamori"),1);Snd.sfx("settle");render();await say(`${p.name}が${t.name}に${CARDS[k].n}を使った！　しかし${t.name}のお守りカードが守ってくれました。`,"guard");return}
+  if(t.cards.includes("omamori")){t.cards.splice(t.cards.indexOf("omamori"),1);Snd.sfx("settle");render();await say(`${p.name}が${t.name}に${CARDS[k].n}を使いました！……が、${t.name}のお守りカードが守ってくれましたよ。`,"guard");return}
   let m;
   if(k==="ashidome"){t.rest=(t.rest||0)+1;m=`${t.name}は次の番、1回休みになりました。`}
   else if(k==="donko"){t.slow=Math.max(t.slow||0,2);m=`${t.name}のサイコロが2回分、半分になります。`}
   else if(k==="goudatsu"){if(t.cards.length&&p.cards.length<6){const c=t.cards.splice(rnd(0,t.cards.length-1),1)[0];p.cards.push(c);m=`${p.name}が${t.name}から${CARDS[c].n}を奪った！`}else m=`${t.name}から奪えるカードはありませんでした。`}
   else if(k==="buttobashi"){const st=STATIONS[rnd(0,STATIONS.length-1)][0];t.pos=st;placeTokens();focus(st);Snd.sfx("warp");m=`${t.name}は${st}駅へぶっとばされた！`}
   else if(k==="nasuri"){if(S.rules.yokai&&S.yokai.owner===from){S.yokai.owner=to;S.yokai.turns=0;placeTokens();m=`${YOKAI[S.yokai.form].n}を${t.name}になすりつけた！`}else m="取り憑いている妖怪がいませんでした。"}
-  log(m);Snd.sfx("minus");render();await say(`${p.name}が${CARDS[k].n}を使った！　${m}`,"attack")}
+  log(m);Snd.sfx("minus");render();await say(`なんと、${p.name}が${CARDS[k].n}を使いました！ ${m}`,"attack")}
 function pickTarget(from,k){const others=S.players.filter(q=>q.idx!==from);if(!others.length)return null;
   if(k==="buttobashi"){const d=distTo(S.dest);return others.sort((a,b)=>d[a.pos]-d[b.pos])[0].idx}
   if(k==="goudatsu"){const w=others.filter(q=>q.cards.length);if(w.length)return w.sort((a,b)=>b.cards.length-a.cards.length)[0].idx}
@@ -1610,10 +1645,10 @@ async function useCard(p,i){const c=p.cards[i];
     if(target==null)return null;useKind(p,c);ST(p).attacks++;p.cards.splice(p.cards.indexOf(c),1);await attack(p.idx,c,target);render();return null}
   p.cards.splice(i,1);useKind(p,c);log(`${p.name}が${CARDS[c].n}を使った。`);Snd.sfx("card");
   if(c==="kyuko")S.dice=2;else if(c==="tokkyu")S.dice=3;
-  if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");log(`${p.name}に${yen(amt)}の臨時収入。`);render();await say(`臨時収入カード　${p.name}に${yen(amt)}の臨時収入！`,"plus")}
-  else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`);render();await say(`お祓い成功！${nm}が${p.name}のもとから去っていきました。`,"oharai")}else toast("取り憑いている妖怪がいませんでした")}
-  else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");log(`${p.name}が${to}駅へワープ。`);await say(`ぶっとびカード　${p.name}は${to}駅へぶっとんだ！`,"warp");return "warp"}
-  else if(c==="kyuko"||c==="tokkyu"){const m=`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みます。`;if(p.cpu)await say(m,"roll");else setScene("roll",m)}
+  if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");log(`${p.name}に${yen(amt)}の臨時収入。`);render();await say(`臨時収入カード！ ${p.name}に${yen(amt)}の臨時収入ですよ。`,"plus")}
+  else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`);render();await say(`お祓い成功です！ ${nm}は${p.name}のもとから去っていきましたよ。`,"oharai")}else toast("取り憑いている妖怪がいませんでした")}
+  else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");log(`${p.name}が${to}駅へワープ。`);await say(`ぶっとびカード！ ${p.name}は${to}駅までぶっとびました！`,"warp");return "warp"}
+  else if(c==="kyuko"||c==="tokkyu"){const m=`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みますよ！`;if(p.cpu)await say(m,"roll");else setScene("roll",m)}
   render();return null}
 async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];cpuRepay(p);
   let ri=p.cards.indexOf("rinji");while(ri>=0){await useCard(p,ri);ri=p.cards.indexOf("rinji")}
@@ -1623,16 +1658,16 @@ async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];cpuRepay(p);
   const bi=p.cards.indexOf("buttobi");if(bi>=0&&d>=24&&Math.random()<.6){await useCard(p,bi);S.phase="busy";await land();return endTurn()}
   const ti=p.cards.indexOf("tokkyu"),ki=p.cards.indexOf("kyuko");
   if(ti>=0&&d>=10)await useCard(p,ti);else if(ki>=0&&d>=6)await useCard(p,ki);
-  renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);setScene("cpu",`${p.name}は${t}マス進みます。`);
+  renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);setScene("cpu",`${p.name}は${t}マス進みますよ。`);
   const r=reach(p.pos,t,S.dest,S.rules.exact),dd=distTo(S.dest),pref={plus:0,card:1,shop:1,st:2,minus:3},ps=possessed();
   const key=id=>[id===S.dest?0:1,ps&&passes(r.get(id))?0:1,dd[id],pref[N[id].type]];
   const best=[...r.keys()].sort((a,b)=>{const A=key(a),B=key(b);for(let i=0;i<4;i++)if(A[i]!==B[i])return A[i]-B[i];return 0})[0];
   await wait(400);await moveAlong(r.get(best));await land();return endTurn()}
 async function forceSell(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);
   let sold=0;while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が借金返済のため${s}の「${P(s)[k][0]}」を売却。`)}
-  if(sold){render();await say(`${p.name}は借金返済のため物件を${sold}件売却しました。`,"minus")}}
+  if(sold){render();await say(`${p.name}は借金返済のため、物件を${sold}件手放しました……。`,"minus")}}
 async function endTurn(){const p=cp();
-  if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await checkTitles();await say(`${p.name}がもう一度サイコロを振ります。`,"roll");return startTurn()}
+  if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await checkTitles();await say(`${p.name}はもう一回サイコロを振れますよ！`,"roll");return startTurn()}
   if(possessed())await mischief(p);if(p.money<0)await forceSell(p);
   S.cur=(S.cur+1)%S.players.length;
   if(S.cur===0){S.month++;if(S.month===6)await settle(false);if(S.month>=12){await settle(true);S.month=0;S.year++;if(S.year>S.years){await checkTitles();return gameOver()}}await seasonTurn();await monthEvents();snapshot(`${S.year}年${MONTHS[S.month]}`)}
@@ -1789,6 +1824,7 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
   <h3>メッセージの進み方</h3>
   <div class="field"><label for="sSpeed">表示の速さ</label><select id="sSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
   <p class="hint">「タップで進む」にすると、CPUの番も含めてメッセージはタップするまで止まります。ほかの速さでは、メッセージは時間がたつと自動で進みます（タップでの早送りはしません）。</p>
+  <label class="check"><input type="checkbox" id="sDot" ${GP.dotFont!==false?"checked":""}><span>メッセージ欄をドット風の文字にする<small>オフにすると、ふつうの文字に戻ります。</small></span></label>
   <h3>サウンド</h3>
   <label class="check"><input type="checkbox" id="sOn" ${Snd.prefs.on?"checked":""}><span>音を出す<small>オフにするとBGMも効果音も止まります。iPhoneでは消音モードでも鳴るようにしています。</small></span></label>
   <label class="check"><input type="checkbox" id="sBgm" ${Snd.prefs.bgm?"checked":""}><span>BGM<small>ゲームのために作ったオリジナル曲です。</small></span></label>
@@ -1803,6 +1839,7 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
     else if(t.id==="sAssist"&&e.type==="change"){S.assist=t.checked;log(`追い上げサポートを${S.assist?"オン":"オフ"}にしました。`);render();autosave()}
     else if(t.id==="sExact"&&e.type==="change"){S.rules.exact=t.checked;log(`ぴったり到着を${t.checked?"オン":"オフ"}にしました。`);render();autosave()}
     else if(t.id==="sSpeed"){GP.speed=t.value;saveGP()}
+    else if(t.id==="sDot"&&e.type==="change"){GP.dotFont=t.checked;saveGP();applyDotFont()}
     else if(t.id==="sQuiz"&&e.type==="change"){S.rules.quiz=t.checked;log(`クイズを${t.checked?"オン":"オフ"}にしました。`);autosave()}
     else if(t.id==="sYokai"&&e.type==="change"){S.rules.yokai=t.checked;if(!t.checked)S.yokai={owner:null,form:0,turns:0};log(`妖怪を${t.checked?"オン":"オフ"}にしました。`);render();autosave()}
     Snd.savePrefs();Snd.apply();updSndBtn()};
