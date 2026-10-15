@@ -1350,7 +1350,7 @@ async function checkTitles(){for(const p of S.players){const old=p.title||0,t=ti
     if(p.cpu)continue;
     Snd.sfx("arrive");setScene("promote",`${p.name}が「${T.n}」に昇格！`);
     const msg=`総資産が${yen(T.min)}を超えました。`+(nx?`次の「${nx.n}」は総資産${yen(nx.min)}からです。`:"これ以上の称号はありません。名実ともに頂点です！");
-    const pr=modal(`${sceneHTML("promote")}<div class="cer-rank r1 arr">称号が上がった！</div><h2 class="cer-name"><span class="dot" style="background:${pcol(p.idx)}"></span>${esc(p.name)}は「${T.n}」に</h2><div class="reward"><p class="rw-h">ごほうび</p><p class="rw-n">昇格ボーナス（賞金）${t-old>1?`×${t-old}段階分`:""}</p><div class="big-money">＋${yen(bonus)}</div><p class="rw-s">所持金　${yen(p.money-bonus)} → <b>${yen(p.money)}</b></p></div><p>${msg}</p>${ladderHTML(t)}<p class="hint" style="text-align:center;margin-top:6px">称号が1段階上がるごとに、クイズ正解と同じくらいの賞金がもらえます。</p>`,[["つづける",1,"primary"]]);
+    const pr=modal(`${sceneHTML("promote")}<div class="cer-rank r1 arr">称号が上がった！</div><h2 class="cer-name"><span class="dot" style="background:${pcol(p.idx)}"></span>${esc(p.name)}は「${T.n}」に</h2><div class="reward"><p class="rw-h">ごほうび</p><p class="rw-n">昇格ボーナス（賞金）${t-old>1?`×${t-old}段階分`:""}</p><div class="big-money">＋${yen(bonus)}</div><p class="rw-s">所持金　${yen(p.money-bonus)} → <b>${yen(p.money)}</b></p></div><p>${msg}</p>${ladderHTML(t)}`,[["つづける",1,"primary"]]);
     confetti(t>=4?140:80);await pr}}
 
 /* ---------- lifetime records (single-player mode only) ---------- */
