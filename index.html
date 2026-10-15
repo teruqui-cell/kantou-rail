@@ -246,10 +246,18 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
 .scene,.scene-pic{border-radius:10px;overflow:hidden;aspect-ratio:16/9;max-width:100%;background:var(--bg)}
 .scene svg,.scene img,.scene-pic svg,.scene-pic img{display:block;width:100%;height:100%;object-fit:cover}
 .scene-pic{margin:-4px 0 12px;max-height:200px;width:100%}
-.msgwin{display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px;align-items:start;background:linear-gradient(#22357A,#162457);color:#F4F6FB;border:3px solid #E9EDF5;outline:2px solid #162457;border-radius:10px;padding:10px 12px 8px}
+.msgwin{--w1:#22357A;--w2:#162457;display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px;align-items:start;background:linear-gradient(var(--w1),var(--w2));color:#F4F6FB;border:3px solid #E9EDF5;outline:2px solid var(--w2);border-radius:10px;padding:10px 12px 8px}
 .conductor svg{display:block;border-radius:8px}
+.conductor .led-ico{display:none}
+.msgwin.board{background:#141414;border-color:#3A3A3A;outline-color:#000;color:#FFB04A}
+.msgwin.board .conductor svg{display:none}.msgwin.board .conductor .led-ico{display:block}
+.msgwin.board .msg-name{background:#FFA53A;color:#141414}
+.msgwin.board .scene-text{font-weight:400;text-shadow:0 0 6px rgba(255,150,40,.45)}
+.msgwin.board .scene-hint{color:#9A7A55}
+.msgwin.board .m-plus{color:#7CFF9B}.msgwin.board .m-minus{color:#FF6A5C}.msgwin.board .m-yen,.msgwin.board .m-st{color:#FFE45C}.msgwin.board .m-card{color:#8FE3FF}
+.m-plus,.m-minus,.m-yen{background:rgba(0,0,0,.28);border-radius:4px;padding:0 3px}
 .msgbody{min-width:0}
-.msg-name{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;background:#E8B730;color:#162457;border-radius:4px;padding:0 6px;margin:0 0 2px}
+.msg-name{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;background:#E8B730;color:#1A1A1A;border-radius:4px;padding:0 6px;margin:0 0 2px}
 .scene-text{margin:0;font-size:19px;font-weight:700;line-height:1.65;min-height:3.3em;overflow-wrap:anywhere}
 body.dotfont .msgwin .scene-text{font-family:"DotGothic16",var(--f-body);font-weight:400;font-size:20px;letter-spacing:.02em}
 .m-plus{color:#8FD8FF;font-weight:700}.m-minus{color:#FF9A8F;font-weight:700}.m-yen{color:#FFE27A;font-weight:700}
@@ -345,7 +353,7 @@ body.dotfont .msgwin .scene-text{font-family:"DotGothic16",var(--f-body);font-we
   <aside>
     <section class="box" id="playersBox"><p class="label">オーナー一覧</p><div id="players"></div></section>
     <section class="box" id="action"><p class="hint">読み込み中…</p></section>
-    <section class="box" id="log" aria-live="polite"><div class="scene" id="scene"></div><div class="msgwin" id="msgWin"><div class="conductor" aria-hidden="true"><svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="8" fill="#2B4C9B"/><circle cx="24" cy="29" r="12" fill="#F5D2B0"/><path d="M10 20 Q24 6 38 20 Z" fill="#1B2A5E"/><rect x="9" y="19" width="30" height="5" rx="2" fill="#1B2A5E"/><rect x="9" y="19" width="30" height="2" fill="#E8B730"/><circle cx="24" cy="14" r="2.6" fill="#E8B730"/><circle cx="19.5" cy="28" r="1.6" fill="#2B3540"/><circle cx="28.5" cy="28" r="1.6" fill="#2B3540"/><path d="M17 33 Q20.5 31 24 33 Q27.5 31 31 33 Q27.5 36 24 34.5 Q20.5 36 17 33Z" fill="#6B4A2E"/><path d="M14 41 Q24 47 34 41 L34 48 L14 48Z" fill="#1B2A5E"/><circle cx="24" cy="44" r="1.4" fill="#E8B730"/></svg></div><div class="msgbody"><p class="msg-name">車掌</p><p class="scene-text" id="sceneText"></p><p class="scene-hint" id="sceneHint"></p></div></div><p class="label loglabel">これまでの出来事</p><ol></ol></section>
+    <section class="box" id="log" aria-live="polite"><div class="scene" id="scene"></div><div class="msgwin" id="msgWin"><div class="conductor" aria-hidden="true"><svg class="led-ico" viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="6" fill="#1A1A1A"/><g fill="#FFA53A"><rect x="10" y="12" width="28" height="20" rx="5"/><rect x="14" y="34" width="5" height="4"/><rect x="29" y="34" width="5" height="4"/></g><g fill="#1A1A1A"><rect x="14" y="16" width="9" height="7"/><rect x="25" y="16" width="9" height="7"/><circle cx="16" cy="28" r="1.8"/><circle cx="32" cy="28" r="1.8"/></g></svg><svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="8" fill="#2B4C9B"/><circle cx="24" cy="29" r="12" fill="#F5D2B0"/><path d="M10 20 Q24 6 38 20 Z" fill="#1B2A5E"/><rect x="9" y="19" width="30" height="5" rx="2" fill="#1B2A5E"/><rect x="9" y="19" width="30" height="2" fill="#E8B730"/><circle cx="24" cy="14" r="2.6" fill="#E8B730"/><circle cx="19.5" cy="28" r="1.6" fill="#2B3540"/><circle cx="28.5" cy="28" r="1.6" fill="#2B3540"/><path d="M17 33 Q20.5 31 24 33 Q27.5 31 31 33 Q27.5 36 24 34.5 Q20.5 36 17 33Z" fill="#6B4A2E"/><path d="M14 41 Q24 47 34 41 L34 48 L14 48Z" fill="#1B2A5E"/><circle cx="24" cy="44" r="1.4" fill="#E8B730"/></svg></div><div class="msgbody"><p class="msg-name" id="msgName">車掌</p><p class="scene-text" id="sceneText"></p><p class="scene-hint" id="sceneHint"></p></div></div><p class="label loglabel">これまでの出来事</p><ol></ol></section>
   </aside>
 </div>
 <div id="title" hidden>
@@ -824,6 +832,15 @@ function fmtMsg(text){const esc2=t=>t.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&l
   return esc2(text).replace(FMT_RE,(m,yen1,st,card,pl)=>yen1?`<span class="${neg&&!pos?"m-minus":pos&&!neg?"m-plus":"m-yen"}">${m}</span>`:st?`<b class="m-st">${st}駅</b>`:card?`<b class="m-card">${card}</b>`:
     `<b class="m-pl" style="--pc:${pcol(S.players.findIndex(p=>p.name===pl))}">${pl}</b>`)}
 const TYPE_MS={tap:28,slow:40,normal:28,fast:16};
+// who speaks: the human's own conductor (friendly, in that train's colour) or the station board (plain facts)
+const isCpuTurn=()=>!!(S&&S.players&&S.players[S.cur]&&S.players[S.cur].cpu);
+const V=(friendly,plain)=>isCpuTurn()?plain:friendly;
+function shade(hex,k){const n=parseInt(hex.slice(1),16);return "#"+[n>>16,(n>>8)&255,n&255].map(v=>Math.round(v*k).toString(16).padStart(2,"0")).join("")}
+function msgMode(mode){const w=$("#msgWin");if(!w)return;mode=mode||(isCpuTurn()?"board":"cond");w.classList.toggle("board",mode==="board");
+  if(mode==="board"){$("#msgName").textContent="運行情報";return}
+  const p=S&&S.players&&S.players[S.cur];if(p&&!p.cpu){const c=pcol(S.cur);w.style.setProperty("--w1",shade(c,.52));w.style.setProperty("--w2",shade(c,.34));
+    const one=S.players.filter(q=>!q.cpu).length===1;$("#msgName").textContent=one?"あなたの車掌":`${p.name}の車掌`}
+  else{w.style.removeProperty("--w1");w.style.removeProperty("--w2");$("#msgName").textContent="車掌"}}
 let typing=null;
 function typeText(text){const el=$("#sceneText");if(typing)typing.finish();el.innerHTML=fmtMsg(text);
   const ms=window.__FAST||reduce?0:(TYPE_MS[GP.speed]||28);if(!ms){typing=null;return 0}
@@ -831,8 +848,8 @@ function typeText(text){const el=$("#sceneText");if(typing)typing.finish();el.in
   nodes.forEach(([n])=>n.nodeValue="");let ni=0,ci=0,total=nodes.reduce((a,[,t])=>a+t.length,0);
   const tick=()=>{let k=0;while(ni<nodes.length&&k<1){const[n,t]=nodes[ni];ci++;n.nodeValue=t.slice(0,ci);if(ci>=t.length){ni++;ci=0}k++}if(ni>=nodes.length)finish()};
   const iv=setInterval(tick,ms);const finish=()=>{clearInterval(iv);nodes.forEach(([n,t])=>n.nodeValue=t);if(typing===me)typing=null};const me={finish};typing=me;return total*ms}
-function setScene(key,text){if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}if(text!=null)typeText(text)}
-function say(text,key){return new Promise(res=>{if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}const typeMs=typeText(text);document.body.dataset.wait="1";const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
+function setScene(key,text,mode){if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}if(text!=null){msgMode(mode);typeText(text)}}
+function say(text,key,mode){return new Promise(res=>{if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}msgMode(mode);const typeMs=typeText(text);document.body.dataset.wait="1";const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
   const done=()=>{clearTimeout(t);delete document.body.dataset.wait;box.classList.remove("active");h.textContent="";h.className="scene-hint";layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",kd);res()};
   const adv=()=>{if(typing){typing.finish();return}done()};
   const kd=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();adv()}};
@@ -1189,14 +1206,14 @@ const loanLimit=i=>Math.floor(assets(i)*ECON.loanRatio/1000)*1000;
 const r1000=v=>Math.ceil(v/1000)*1000;
 function payoutRows(fn){return S.players.map((p,i)=>{let a=0;ownedList(i).forEach(([s,k,price])=>{const nm=P(s)[k][0];a+=price*fn(nm,propCat(nm),s)});return{p,a:r100(a)}}).filter(r=>r.a!==0)}
 async function econModal(key,title,desc,rows,extra){rows.forEach(r=>{r.p.money+=r.a;gain(r.p,r.a)});
-  rows.forEach(r=>log(`${title}　${r.p.name}${r.a>0?"に":"は"}${yen(Math.abs(r.a))}の${r.a>0?"収入":"出費"}。`));render();Snd.sfx(rows.some(r=>r.a<0)&&!rows.some(r=>r.a>0)?"minus":"plus");setScene(key,title);
+  rows.forEach(r=>log(`${title}　${r.p.name}${r.a>0?"に":"は"}${yen(Math.abs(r.a))}の${r.a>0?"収入":"出費"}。`));render();Snd.sfx(rows.some(r=>r.a<0)&&!rows.some(r=>r.a>0)?"minus":"plus");setScene(key,title,"board");
   await modal(`${sceneHTML(key)}<h2>${esc(title)}</h2><p>${esc(desc)}</p>${rows.length?`<table><tr><th>オーナー</th><th>影響</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}</td><td style="color:${r.a<0?"var(--minus)":"var(--accent)"}">${r.a>0?"＋":"−"}${yen(Math.abs(r.a))}</td></tr>`).join("")}</table>`:`<p class="hint">${extra||"影響を受けるオーナーはいませんでした。"}</p>`}`,[["つづける",1,"primary"]])}
 async function monthEvents(){
   const se=SEASONS[S.month];if(se){const rows=payoutRows(se.fn);if(rows.length)await econModal("season",se.t,se.d,rows)}
   if(Math.random()<ECON.newsChance){
     for(let tries=0;tries<4;tries++){const n=NEWS[rnd(0,NEWS.length-1)];
       if(n.rate){const was=S.rate;S.rate=Math.max(ECON.rateMin,Math.min(ECON.rateMax,S.rate+n.rate));if(S.rate===was)continue;
-        log(`${n.t}。年利は${S.rate}%になりました。`);setScene("news",n.t);Snd.sfx(n.rate>0?"minus":"plus");render();
+        log(`${n.t}。年利は${S.rate}%になりました。`);setScene("news",n.t,"board");Snd.sfx(n.rate>0?"minus":"plus");render();
         await modal(`${sceneHTML("news")}<h2>経済ニュース：${esc(n.t)}</h2><p>${esc(n.d)}借入金の年利は <b>${was}% → ${S.rate}%</b> になりました。</p>`,[["つづける",1,"primary"]]);return}
       const rows=payoutRows((nm,cat)=>cat===n.cat?n.pct:0);if(!rows.length)continue;
       await econModal("news","経済ニュース："+n.t,n.d,rows);return}}}
@@ -1204,12 +1221,12 @@ async function settle(yearEnd){render();
   const rows=S.players.map((p,i)=>{let inc=0,mono=0;for(const s in S.owners){const m=isMono(s,i);if(m)mono++;S.owners[s].forEach((o,k)=>{if(o===i){const[,pr,rt]=P(s)[k];inc+=pr*rt/100*(m?2:1)*ECON.incomeHalf}})}
     inc=r100(inc);const interest=r100(debtOf(p)*S.rate/100/2),tax=yearEnd?r100(assets(i)*ECON.taxRate):0,net=inc-interest-tax;p.money+=net;gain(p,net);return{p,inc,mono,interest,tax,net}});
   const label=yearEnd?`${S.year}年目 本決算（3月）`:`${S.year}年目 中間決算（9月）`;
-  log(`${label}が終わりました。`);setScene("settle",label);render();Snd.sfx("settle");
+  log(`${label}が終わりました。`);setScene("settle",label,"board");render();Snd.sfx("settle");
   await modal(`${sceneHTML("settle")}<h2>${label}</h2><p>物件の収益が入り、借入の利息${yearEnd?"と固定資産税（物件評価額の1.4%）":""}を支払いました。独占した駅は収益2倍です。</p><div style="overflow-x:auto"><table class="settle"><tr><th>オーナー</th><th>収益</th><th>利息</th>${yearEnd?"<th>税金</th>":""}<th>差引</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}${r.mono?`<br><small style="color:var(--muted)">独占${r.mono}駅</small>`:""}</td><td>＋${yen(r.inc)}</td><td>${r.interest?"−"+yen(r.interest):"—"}</td>${yearEnd?`<td>${r.tax?"−"+yen(r.tax):"—"}</td>`:""}<td style="color:${r.net<0?"var(--minus)":"var(--accent)"}"><b>${r.net<0?"−":"＋"}${yen(Math.abs(r.net))}</b></td></tr>`).join("")}</table></div>`,[["つづける",1,"primary"]]);
   for(const p of S.players)if(p.money<0)await forceSellOf(p)}
 async function forceSellOf(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);let sold=0;
   while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が資金繰りのため${s}の「${P(s)[k][0]}」を売却。`)}
-  if(sold){render();await say(`おっと、お金が足りません……。${p.name}は資金繰りのため、物件を${sold}件手放しました。`,"minus")}}
+  if(sold){render();await say(V(`おっと、お金が足りません……。${p.name}は資金繰りのため、物件を${sold}件手放しました。`,`${p.name}は資金繰りのため、物件を${sold}件売却しました。`),"minus")}}
 /* bank */
 function bankModal(){return new Promise(res=>{const p=cp(),i=S.cur,body=$("#modalBody");
   const draw=()=>{const lim=loanLimit(i),d=debtOf(p),room=Math.max(0,lim-d);
@@ -1260,10 +1277,10 @@ function ceremonyLine(x,first,last,order){const p=x.p,s=ST(p);
 async function gameOver(){S.year=S.years;S.month=11;S.phase="over";snapshot("終了");render();autosave();
   const order=S.players.map((p,i)=>({p,i,nw:netWorth(i)})).sort((a,b)=>b.nw-a.nw);order.forEach((x,k)=>x.rank=k+1);
   const awards=computeAwards();const rec=S.mode==="single"?updateRecords(order):null;
-  Snd.sfx("drum");setScene("ceremony","結果発表！");
+  Snd.sfx("drum");setScene("ceremony","結果発表！","board");
   await modal(`${sceneHTML("ceremony")}<h2 class="cer-title">結果発表！</h2><p>${MAP.name}・${S.years}年間の旅が終わりました。総資産（現金＋物件の評価額−借入残高）の少ないオーナーから、順に発表します。</p>`,[["発表を聞く",1,"primary"]]);
   for(let k=order.length-1;k>=0;k--){const x=order[k],first=k===0,last=k===order.length-1&&order.length>1;
-    CER_N=x.rank;const key=first?"win":last?"lose":"rank"+Math.min(x.rank,4);if(key==="lose")curScene=null;Snd.sfx(first?"over":last?"sad":"settle");setScene(key,`${x.rank}位 ${x.p.name}`);
+    CER_N=x.rank;const key=first?"win":last?"lose":"rank"+Math.min(x.rank,4);if(key==="lose")curScene=null;Snd.sfx(first?"over":last?"sad":"settle");setScene(key,`${x.rank}位 ${x.p.name}`,"board");
     const pr=modal(`${sceneHTML(key)}<div class="cer-rank r${Math.min(x.rank,4)}">${first?"優勝":x.rank+"位"}</div><h2 class="cer-name"><span class="dot" style="background:${pcol(x.i)}"></span>${esc(x.p.name)}</h2><p style="text-align:center;margin:0">称号：<b>${TITLES[x.p.title||0].n}</b></p><div class="big-money ${x.nw<0?"neg":""}">${x.nw<0?"−":""}${yen(Math.abs(x.nw))}</div><p class="cer-line">${esc(ceremonyLine(x,first,last,order))}</p><div class="awards">${awards[x.i].map(a=>`<span class="award">${a}</span>`).join("")}</div>`,[[first?"表彰式を終える":"次の発表へ",1,"primary"]]);
     if(first)confetti(140);await pr}
   if(rec&&rec.newAch.length){Snd.sfx("card");confetti(50);await modal(`${sceneHTML("correct")}<h2>新しい実績を獲得！</h2>${rec.newAch.map(a=>`<div class="ach got"><b>${a.n}</b><small>${a.d}</small></div>`).join("")}`,[["つづける",1,"primary"]])}
@@ -1314,7 +1331,7 @@ const seasonKey=idx=>seasonOfMonth((idx+3)%12+1); // game month index (0 = April
 function applySeason(k){k=k||(S&&$("#title").hidden?seasonKey(S.month):seasonOfMonth(new Date().getMonth()+1));if(document.documentElement.dataset.season!==k){document.documentElement.dataset.season=k;drawSeasonGlyphs();if(curScene){const c=curScene;curScene=null;setScene(c)}}}
 const SEASON_MSG={spring:"桜前線が北上中。旅にも商売にもいい季節です。",summer:"海も山もにぎわう、書き入れどきの季節です。",autumn:"紅葉と実りの季節。食欲の秋がやってきました。",winter:"北国は雪、航路は荒れ模様。温泉とスキー場の出番です。"};
 async function seasonTurn(){const k=seasonKey(S.month);if(S.season===k)return;const first=S.season==null;S.season=k;applySeason(k);if(first)return;
-  log(`${SEASON_N[k]}になりました。`);Snd.sfx("settle");setScene("s_"+k,`${SEASON_N[k]}が来ました`);
+  log(`${SEASON_N[k]}になりました。`);Snd.sfx("settle");setScene("s_"+k,`${SEASON_N[k]}が来ました`,"board");
   await modal(`${sceneHTML("s_"+k)}<div class="sea-kanji">${SEASON_N[k]}</div><h2 style="text-align:center">${SEASON_N[k]}が来ました</h2><p style="text-align:center">${SEASON_MSG[k]}</p>`,[["つづける",1,"primary"]])}
 
 /* ---------- titles (promotion by net worth) ---------- */
@@ -1473,8 +1490,8 @@ function newGame(seats,years,assist,rules,mapId,mode){useMap(mapId);
   revealDest(first,"最初の目的地は……").then(()=>startTurn());
 }
 async function startTurn(){CAND=null;S.dice=1;const p=cp();
-  if(p.rest>0){p.rest--;S.phase="busy";render();focus(p.pos);log(`${p.name}は運休で1回休み。`);await say(`${p.name}は運休中です。今回はお休みですね。`,"rest");return endTurn()}
-  if(p.cpu){S.phase="busy";setScene("cpu",`次は${p.name}の番ですよ。`);render();autosave();focus(p.pos);await wait(500);await cpuTurn()}
+  if(p.rest>0){p.rest--;S.phase="busy";render();focus(p.pos);log(`${p.name}は運休で1回休み。`);await say(V(`${p.name}は運休中です。今回はお休みですね。`,`${p.name}は運休のため、1回休みです。`),"rest");return endTurn()}
+  if(p.cpu){S.phase="busy";setScene("cpu",`${p.name}の番です。`);render();autosave();focus(p.pos);await wait(500);await cpuTurn()}
   else{S.phase="roll";setScene("roll",`${p.name}の番です。さあ、サイコロをどうぞ！`);render();autosave();
     if(S.players.filter(q=>!q.cpu).length>1)Snd.sfx("turn")}
 }
@@ -1482,18 +1499,18 @@ async function rollDice(){const p=cp(),n=S.dice,boost=S.cur===lastPlace();let v;
   for(let i=0;i<9;i++){v=Array.from({length:n},()=>rnd(1,6));showDice(v);Snd.sfx("dice");await sleep(55)}
   if(boost)v=v.map(x=>Math.random()<.5?Math.max(x,rnd(1,6)):x);
   showDice(v);let t=v.reduce((a,b)=>a+b,0);
-  if(p.slow>0){const t0=t;t=Math.max(1,Math.ceil(t/2));p.slow--;log(`${p.name}は鈍行中のため${t0}マスが${t}マスに。`);await say(`鈍行運転中のため、${t0}マスが半分の${t}マスになりますよ。${p.slow?`（鈍行はあと${p.slow}回）`:"（鈍行はこれでおしまいです）"}`,"bad")}
+  if(p.slow>0){const t0=t;t=Math.max(1,Math.ceil(t/2));p.slow--;log(`${p.name}は鈍行中のため${t0}マスが${t}マスに。`);await say(V(`鈍行運転中のため、${t0}マスが半分の${t}マスになりますよ。${p.slow?`（鈍行はあと${p.slow}回）`:"（鈍行はこれでおしまいです）"}`,`${p.name}は鈍行運転中のため、${t0}マスが${t}マスになりました。${p.slow?`（残り${p.slow}回）`:"（鈍行は終了）"}`),"bad")}
   return t}
 async function humanRoll(){S.phase="busy";renderAction();const t=await rollDice();const p=cp();log(`${p.name}は${t}マス進める。`);
   CAND=reach(p.pos,t,S.dest,S.rules.exact);
-  if(CAND.size===1){const id=[...CAND.keys()][0];setScene("move",`${t}マス進みますよ。`);return choose(id)}
+  if(CAND.size===1){const id=[...CAND.keys()][0];setScene("move",V(`${t}マス進みますよ。`,`${t}マス進みます。`));return choose(id)}
   S.phase="choose";setScene("move",`${t}マス進めます。止まるマスを、地図の光っているところか下のボタンから選んでくださいね。`);render();const ids=[...CAND.keys()];focus(ids[0])}
 async function choose(id){if(!CAND||!CAND.has(id))return;const path=CAND.get(id);CAND=null;S.phase="busy";render();await moveAlong(path);await land();await endTurn()}
 async function moveAlong(path){const p=cp(),st=ST(p);for(let i=1;i<path.length;i++){p.pos=path[i];st.steps++;const nd=N[p.pos];if(nd.type==="st"&&!st.stations.includes(p.pos))st.stations.push(p.pos);if(nd.sea)st.sea++;placeTokens();Snd.sfx("step");if(i%3===1)focus(p.pos);
     if(possessed()){const j=S.players.findIndex((q,k)=>k!==S.cur&&q.pos===path[i]);if(j>=0)await passYokai(j)}
     await sleep(reduce?40:150)}focus(p.pos);renderPlayers()}
 async function passYokai(j){const y=S.yokai,from=cp(),to=S.players[j];y.owner=j;y.turns=0;
-  const m=`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`;log(m);Snd.sfx("pass");placeTokens();renderPlayers();await say(`おやおや、${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けましたよ！`,"pass")}
+  const m=`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`;log(m);Snd.sfx("pass");placeTokens();renderPlayers();await say(V(`おやおや、${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けましたよ！`,`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けました。`),"pass")}
 function ownedList(i){const a=[];for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)a.push([s,k,P(s)[k][1]])});return a}
 function sellHalf(p,s,k){const pr=P(s)[k],v=r100(pr[1]/2);S.owners[s][k]=null;p.money+=v;return `${s}の「${pr[0]}」`}
 async function mischief(p){const y=S.yokai;y.turns++;ST(p).yokaiTurns++;let pre="",evolved=false;
@@ -1513,7 +1530,7 @@ async function mischief(p){const y=S.yokai;y.turns++;ST(p).yokaiTurns++;let pre=
     else{const a=r100(rnd(3000,6000)*yf());p.money-=a;msg=`${nm}が駅前で大騒ぎした。後始末に${yen(a)}かかった。`}
   }
   msg=pre+msg;log(`${p.name}：${msg}`);Snd.sfx("yokai");render();const key=evolved||f===1?"bigyokai":"mischief";
-  if(p.cpu)await say(`あらら、${p.name}のところで……${msg}`,key);
+  if(p.cpu)await say(`${p.name}のもとで、${msg}`,key);
   else{setScene(key,msg);await modal(`${sceneHTML(key)}<h2>${nm}のしわざ</h2><p>${esc(msg)}</p><p class="hint">ほかのオーナーのいるマスを通るか同じマスに止まると、${nm}を押し付けられます。お祓いカードや妖怪なすりつけカードでも追い払えます。</p>`,[["つづける",1,"primary"]])}}
 /* cards */
 const GOOD_W={kyuko:20,tokkyu:12,buttobi:10,rinji:14,oharai:6,ashidome:8,donko:7,goudatsu:7,buttobashi:5,nasuri:4,omamori:7};
@@ -1523,20 +1540,20 @@ async function badCard(p){const ks=Object.keys(BAD),k=ks[rnd(0,ks.length-1)];let
   else if(k==="rest"){p.rest=(p.rest||0)+1;m="次の番は1回休みです。"}
   else if(k==="fine"){const a=r100(rnd(1000,3000)*yf());p.money-=a;gain(p,-a);m=`罰金${yen(a)}を払いました。`}
   else{if(p.cards.length){const c=p.cards.splice(rnd(0,p.cards.length-1),1)[0];m=`${CARDS[c].n}をなくしてしまいました。`}else m="なくすカードを持っておらず、助かりました。"}
-  log(`${p.name}：災難カード「${BAD[k].n}」。${m}`);Snd.sfx("minus");render();await say(`あいたた、${p.name}が${BAD[k].n}を引いてしまいました。${m}`,"bad")}
+  log(`${p.name}：災難カード「${BAD[k].n}」。${m}`);Snd.sfx("minus");render();await say(V(`あいたた、${p.name}が${BAD[k].n}を引いてしまいました。${m}`,`${p.name}が${BAD[k].n}を引きました。${m}`),"bad")}
 async function land(){const p=cp(),n=N[p.pos];
   if(p.pos===S.dest)await arrive(p);
   if(n.type==="st"){await quiz(p);
-    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件買いましたよ。`,"buy")}}else await shopModal(p,n.id)}
-  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;ST(p).plus++;gain(p,amt);const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(`青マスです！ ${m}。${p.name}に${yen(amt)}の収入ですよ！`,n.sea?"sea":"plus")}
+    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件購入しました。`,"buy")}}else await shopModal(p,n.id)}
+  else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;ST(p).plus++;gain(p,amt);const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(V(`青マスです！ ${m}。${p.name}に${yen(amt)}の収入ですよ！`,`青マス。${m}。${p.name}に${yen(amt)}の収入です。`),n.sea?"sea":"plus")}
   else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10;let mult=1,m,key="minus";
     if(n.sea){key="sea";if(n.sea==="js"&&winter){mult=2;m="冬の日本海が大しけで、船の修理費がかさんだ"}else m=SEA_MSG[rnd(0,SEA_MSG.length-1)]}
     else if(winter&&n.y<MAP.snowY){mult=2;m="大雪で除雪費がかかった";key="snow"}
     else m=MINUS_MSG[rnd(0,MINUS_MSG.length-1)];
-    const amt=r100(rnd(600,2000)*yf()*mult);p.money-=amt;ST(p).minus++;gain(p,-amt);log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(`おっと、赤マス……。${m}。${p.name}は${yen(amt)}の出費です。`,key)}
+    const amt=r100(rnd(600,2000)*yf()*mult);p.money-=amt;ST(p).minus++;gain(p,-amt);log(`${p.name}：${m}。${yen(amt)}の出費。`);Snd.sfx("minus");render();await say(V(`おっと、赤マス……。${m}。${p.name}は${yen(amt)}の出費です。`,`赤マス。${m}。${p.name}は${yen(amt)}の出費です。`),key)}
   else if(n.type==="card"){if(Math.random()<.3)await badCard(p);
-    else if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);await say(`カードマスです。でも${p.name}はカードがいっぱいで、受け取れませんでした。`,"card")}
-    else{const c=randomCard();p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");render();await say(`カードマスです！ ${p.name}が${CARDS[c].n}を手に入れましたよ。`,"card")}}
+    else if(p.cards.length>=6){log(`${p.name}：カードがいっぱいで受け取れませんでした。`);await say(V(`カードマスです。でも${p.name}はカードがいっぱいで、受け取れませんでした。`,`カードマス。${p.name}はカードが満杯のため、受け取れませんでした。`),"card")}
+    else{const c=randomCard();p.cards.push(c);log(`${p.name}が${CARDS[c].n}を手に入れた。`);Snd.sfx("card");render();await say(V(`カードマスです！ ${p.name}が${CARDS[c].n}を手に入れましたよ。`,`カードマス。${p.name}が${CARDS[c].n}を手に入れました。`),"card")}}
   else if(n.type==="shop")await cardShop(p);
   render();
 }
@@ -1545,10 +1562,10 @@ async function arrive(p){const dist=distTo(S.destFrom)[S.dest]||14;const amt=r10
   let yk="";
   if(S.rules.yokai){const dd=distTo(old);let far=-1,c=[];S.players.forEach((q,i)=>{if(i===S.cur)return;const d=dd[q.pos];if(d>far){far=d;c=[i]}else if(d===far)c.push(i)});
     const t=c[rnd(0,c.length-1)],y=S.yokai;
-    if(y.owner!==t){S.yokai={owner:t,form:0,turns:0};yk=`おや……${old}駅からいちばん遠い${S.players[t].name}に、${YOKAI[0].n}が取り憑いてしまいました！`}
-    else yk=`${S.players[t].name}には、まだ${YOKAI[y.form].n}が取り憑いたままですね……。`;
+    if(y.owner!==t){S.yokai={owner:t,form:0,turns:0};yk=V(`おや……${old}駅からいちばん遠い${S.players[t].name}に、${YOKAI[0].n}が取り憑いてしまいました！`,`${old}駅からいちばん遠い${S.players[t].name}に、${YOKAI[0].n}が取り憑きました。`)}
+    else yk=V(`${S.players[t].name}には、まだ${YOKAI[y.form].n}が取り憑いたままですね……。`,`${S.players[t].name}には${YOKAI[y.form].n}が取り憑いたままです。`);
     log(yk)}
-  render();Snd.sfx("arrive");setScene("arrive",`到着〜！ ${p.name}が${old}駅に一番乗りです！`);
+  render();Snd.sfx("arrive");setScene("arrive",V(`到着〜！ ${p.name}が${old}駅に一番乗りです！`,`${p.name}が${old}駅に一番乗りしました。`));
   const foods=(P(old)||[]).filter(pp=>propCat(pp[0])==="food"),toast2=foods.length?`駅前の「${foods[rnd(0,foods.length-1)][0]}」で祝杯をあげました！`:"駅前で祝杯をあげました！";
   const pr=modal(`${sceneHTML("arrive")}<div class="cer-rank r1 arr">一番乗り！</div><h2 class="cer-name">${esc(old)}駅に到着！</h2><p><span class="dot" style="background:${pcol(S.cur)};display:inline-block;vertical-align:middle;margin-right:6px"></span><b>${esc(p.name)}</b>、この旅で<b>${sa.arrivals}回目</b>の一番乗りです。</p><div class="big-money">＋${yen(amt)}</div><p>援助金を受け取りました。${toast2}</p>`,[["次の目的地を決める",1,"primary"]]);
   confetti(p.cpu?40:90);await pr;
@@ -1560,7 +1577,7 @@ async function revealDest(next,title){
   $("#modalBtns").hidden=true;const names=STATIONS.map(s=>s[0]).filter(n=>n!==next);let d=45;const steps=reduce?1:18;
   for(let i=0;i<steps;i++){$("#roul").textContent=names[rnd(0,names.length-1)];Snd.sfx("dice");await sleep(d);d*=1.15}
   S.dest=next;log(`次の目的地は${next}駅です。`);$("#roul").textContent=next+"駅";$("#roul").classList.add("hit");Snd.sfx("settle");
-  $("#roulHint").textContent=`${title?"最初":"次"}の目的地は「${next}駅」です！地図の赤い旗を目指しましょう。`;setScene("roulette",`次の目的地は${next}駅です！`);render();focus(next);
+  $("#roulHint").textContent=`${title?"最初":"次"}の目的地は「${next}駅」です！地図の赤い旗を目指しましょう。`;setScene("roulette",V(`次の目的地は${next}駅です！`,`次の目的地は${next}駅です。`));render();focus(next);
   $("#modalBtns").hidden=false;$("#modalBtns button").focus();await pr}
 function isMono(st,i){return S.owners[st].every(x=>x===i)}
 function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];{const s=ST(p);s.bought++;s.boughtValue+=pr[1];const k=st+"|"+pr[0];if(!s.boughtList.includes(k))s.boughtList.push(k)}log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
@@ -1589,9 +1606,9 @@ async function cardShop(p){Snd.sfx("card");
   const kinds=shuffle(Object.keys(CARD_PRICE).filter(k=>S.rules.yokai||!CARDS[k].yokai)).slice(0,4);
   const offer=kinds.map(k=>({k,price:r100(CARD_PRICE[k]*yf()),got:false}));
   if(p.cpu){const got=[];for(const o of offer){if(p.cards.length>=5)break;const want=CARDS[o.k].yokai?possessed():true;if(want&&p.money-o.price>=6000){p.money-=o.price;p.cards.push(o.k);got.push(CARDS[o.k].n)}}
-    if(got.length){log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render();await say(`カード売り場で、${p.name}が${got.join("・")}を買いましたよ。`,"shop")}
-    else await say(`カード売り場に寄りましたが、${p.name}は何も買いませんでした。`,"shop");return}
-  const body=$("#modalBody");setScene("shop","カード売り場ですよ。何か買っていきますか？");
+    if(got.length){log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render();await say(V(`カード売り場で、${p.name}が${got.join("・")}を買いましたよ。`,`カード売り場で、${p.name}が${got.join("・")}を購入しました。`),"shop")}
+    else await say(V(`カード売り場に寄りましたが、${p.name}は何も買いませんでした。`,`カード売り場。${p.name}は何も購入しませんでした。`),"shop");return}
+  const body=$("#modalBody");setScene("shop",V("カード売り場ですよ。何か買っていきますか？","カード売り場です。"));
   const draw=()=>{body.innerHTML=`${sceneHTML("shop")}<h2>カード売り場</h2><p>所持金 <b>${yen(p.money)}</b>・カード ${p.cards.length}/6枚</p>`+offer.map((o,i)=>{
     const right=o.got?`<button class="btn danger" data-cundo="${i}">取り消す</button>`:`<button class="btn primary" data-cbuy="${i}" ${p.money<o.price||p.cards.length>=6?"disabled":""}>買う</button>`;
     return `<div class="row"><span class="pn">${CARDS[o.k].n}<br><small style="font-weight:400;color:var(--muted)">${CARDS[o.k].d}</small></span><span class="pp">${yen(o.price)}</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">今日の品ぞろえは4種類です。この画面にいる間は取り消せます。</p>`;renderPlayers()};
@@ -1625,14 +1642,14 @@ async function award(p,k){let m;
   log(m);Snd.sfx("card");render();await say("正解のごほうびです！ "+m.replace("特典：",""),"correct")}
 /* using cards */
 async function attack(from,k,to){const p=S.players[from],t=S.players[to];log(`${p.name}が${t.name}に${CARDS[k].n}を使った。`);
-  if(t.cards.includes("omamori")){t.cards.splice(t.cards.indexOf("omamori"),1);Snd.sfx("settle");render();await say(`${p.name}が${t.name}に${CARDS[k].n}を使いました！……が、${t.name}のお守りカードが守ってくれましたよ。`,"guard");return}
+  if(t.cards.includes("omamori")){t.cards.splice(t.cards.indexOf("omamori"),1);Snd.sfx("settle");render();await say(V(`${p.name}が${t.name}に${CARDS[k].n}を使いました！……が、${t.name}のお守りカードが守ってくれましたよ。`,`${p.name}が${t.name}に${CARDS[k].n}を使用。${t.name}のお守りカードで防がれました。`),"guard");return}
   let m;
   if(k==="ashidome"){t.rest=(t.rest||0)+1;m=`${t.name}は次の番、1回休みになりました。`}
   else if(k==="donko"){t.slow=Math.max(t.slow||0,2);m=`${t.name}のサイコロが2回分、半分になります。`}
   else if(k==="goudatsu"){if(t.cards.length&&p.cards.length<6){const c=t.cards.splice(rnd(0,t.cards.length-1),1)[0];p.cards.push(c);m=`${p.name}が${t.name}から${CARDS[c].n}を奪った！`}else m=`${t.name}から奪えるカードはありませんでした。`}
   else if(k==="buttobashi"){const st=STATIONS[rnd(0,STATIONS.length-1)][0];t.pos=st;placeTokens();focus(st);Snd.sfx("warp");m=`${t.name}は${st}駅へぶっとばされた！`}
   else if(k==="nasuri"){if(S.rules.yokai&&S.yokai.owner===from){S.yokai.owner=to;S.yokai.turns=0;placeTokens();m=`${YOKAI[S.yokai.form].n}を${t.name}になすりつけた！`}else m="取り憑いている妖怪がいませんでした。"}
-  log(m);Snd.sfx("minus");render();await say(`なんと、${p.name}が${CARDS[k].n}を使いました！ ${m}`,"attack")}
+  log(m);Snd.sfx("minus");render();await say(V(`なんと、${p.name}が${CARDS[k].n}を使いました！ ${m}`,`${p.name}が${CARDS[k].n}を使用。${m}`),"attack")}
 function pickTarget(from,k){const others=S.players.filter(q=>q.idx!==from);if(!others.length)return null;
   if(k==="buttobashi"){const d=distTo(S.dest);return others.sort((a,b)=>d[a.pos]-d[b.pos])[0].idx}
   if(k==="goudatsu"){const w=others.filter(q=>q.cards.length);if(w.length)return w.sort((a,b)=>b.cards.length-a.cards.length)[0].idx}
@@ -1645,10 +1662,10 @@ async function useCard(p,i){const c=p.cards[i];
     if(target==null)return null;useKind(p,c);ST(p).attacks++;p.cards.splice(p.cards.indexOf(c),1);await attack(p.idx,c,target);render();return null}
   p.cards.splice(i,1);useKind(p,c);log(`${p.name}が${CARDS[c].n}を使った。`);Snd.sfx("card");
   if(c==="kyuko")S.dice=2;else if(c==="tokkyu")S.dice=3;
-  if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");log(`${p.name}に${yen(amt)}の臨時収入。`);render();await say(`臨時収入カード！ ${p.name}に${yen(amt)}の臨時収入ですよ。`,"plus")}
-  else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`);render();await say(`お祓い成功です！ ${nm}は${p.name}のもとから去っていきましたよ。`,"oharai")}else toast("取り憑いている妖怪がいませんでした")}
-  else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");log(`${p.name}が${to}駅へワープ。`);await say(`ぶっとびカード！ ${p.name}は${to}駅までぶっとびました！`,"warp");return "warp"}
-  else if(c==="kyuko"||c==="tokkyu"){const m=`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みますよ！`;if(p.cpu)await say(m,"roll");else setScene("roll",m)}
+  if(c==="rinji"){const amt=r100(rnd(2000,6000)*yf());p.money+=amt;Snd.sfx("plus");log(`${p.name}に${yen(amt)}の臨時収入。`);render();await say(V(`臨時収入カード！ ${p.name}に${yen(amt)}の臨時収入ですよ。`,`臨時収入カード。${p.name}に${yen(amt)}の臨時収入です。`),"plus")}
+  else if(c==="oharai"){if(possessed()){const nm=YOKAI[S.yokai.form].n;S.yokai={owner:null,form:0,turns:0};Snd.sfx("settle");log(`${p.name}がお祓いで${nm}を追い払った。次の目的地到着まで現れません。`);render();await say(V(`お祓い成功です！ ${nm}は${p.name}のもとから去っていきましたよ。`,`お祓い成功。${nm}は${p.name}のもとから去りました。`),"oharai")}else toast("取り憑いている妖怪がいませんでした")}
+  else if(c==="buttobi"){const to=STATIONS[rnd(0,STATIONS.length-1)][0];p.pos=to;placeTokens();focus(to);Snd.sfx("warp");log(`${p.name}が${to}駅へワープ。`);await say(V(`ぶっとびカード！ ${p.name}は${to}駅までぶっとびました！`,`ぶっとびカード。${p.name}は${to}駅へ移動しました。`),"warp");return "warp"}
+  else if(c==="kyuko"||c==="tokkyu"){const m=V(`${p.name}が${CARDS[c].n}を使いました。サイコロ${S.dice}個で進みますよ！`,`${p.name}が${CARDS[c].n}を使用。サイコロ${S.dice}個で進みます。`);if(p.cpu)await say(m,"roll");else setScene("roll",m)}
   render();return null}
 async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];cpuRepay(p);
   let ri=p.cards.indexOf("rinji");while(ri>=0){await useCard(p,ri);ri=p.cards.indexOf("rinji")}
@@ -1658,16 +1675,16 @@ async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];cpuRepay(p);
   const bi=p.cards.indexOf("buttobi");if(bi>=0&&d>=24&&Math.random()<.6){await useCard(p,bi);S.phase="busy";await land();return endTurn()}
   const ti=p.cards.indexOf("tokkyu"),ki=p.cards.indexOf("kyuko");
   if(ti>=0&&d>=10)await useCard(p,ti);else if(ki>=0&&d>=6)await useCard(p,ki);
-  renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);setScene("cpu",`${p.name}は${t}マス進みますよ。`);
+  renderAction();const t=await rollDice();log(`${p.name}は${t}マス進める。`);setScene("cpu",`${p.name}は${t}マス進みます。`);
   const r=reach(p.pos,t,S.dest,S.rules.exact),dd=distTo(S.dest),pref={plus:0,card:1,shop:1,st:2,minus:3},ps=possessed();
   const key=id=>[id===S.dest?0:1,ps&&passes(r.get(id))?0:1,dd[id],pref[N[id].type]];
   const best=[...r.keys()].sort((a,b)=>{const A=key(a),B=key(b);for(let i=0;i<4;i++)if(A[i]!==B[i])return A[i]-B[i];return 0})[0];
   await wait(400);await moveAlong(r.get(best));await land();return endTurn()}
 async function forceSell(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);
   let sold=0;while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が借金返済のため${s}の「${P(s)[k][0]}」を売却。`)}
-  if(sold){render();await say(`${p.name}は借金返済のため、物件を${sold}件手放しました……。`,"minus")}}
+  if(sold){render();await say(V(`${p.name}は借金返済のため、物件を${sold}件手放しました……。`,`${p.name}は借金返済のため、物件を${sold}件売却しました。`),"minus")}}
 async function endTurn(){const p=cp();
-  if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await checkTitles();await say(`${p.name}はもう一回サイコロを振れますよ！`,"roll");return startTurn()}
+  if(S.extraRoll){S.extraRoll=false;if(p.money<0)await forceSell(p);await checkTitles();await say(V(`${p.name}はもう一回サイコロを振れますよ！`,`${p.name}はもう一度サイコロを振ります。`),"roll");return startTurn()}
   if(possessed())await mischief(p);if(p.money<0)await forceSell(p);
   S.cur=(S.cur+1)%S.players.length;
   if(S.cur===0){S.month++;if(S.month===6)await settle(false);if(S.month>=12){await settle(true);S.month=0;S.year++;if(S.year>S.years){await checkTitles();return gameOver()}}await seasonTurn();await monthEvents();snapshot(`${S.year}年${MONTHS[S.month]}`)}
