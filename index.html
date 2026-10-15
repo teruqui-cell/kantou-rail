@@ -818,7 +818,7 @@ const PROP_INFO={
 };
 // 汐留ヘッドクォーター特区: big-company HQs bought at 東京駅. Low yield on their own, but they are the cards for 役 (combos)
 const HQ="汐留特区",HQ_NAME="汐留ヘッドクォーター特区";
-const HQ_PROPS=[["人材派遣会社",15000,3],["広告代理店",20000,3],["旅行代理店",10000,4],["総合商社",25000,3],["物流会社",12000,4]];
+const HQ_PROPS=[["人材派遣会社",100000,3],["広告代理店",120000,3],["旅行代理店",100000,3],["総合商社",150000,3],["物流会社",100000,3]];
 Object.assign(PROP_INFO,{
 "汐留特区|人材派遣会社":["hq","繁忙期の工場に人を送り込む。人手不足の時代の主役"],
 "汐留特区|広告代理店":["hq","テレビもネットも押さえる。接待の領収書が分厚い"],
@@ -1555,7 +1555,7 @@ async function settle(yearEnd){render();
   await modal(`${sceneHTML("settle")}<h2>${label}</h2><p>物件の収益が入り、借入の利息${yearEnd?"と固定資産税（物件評価額の1.4%）":""}を支払いました。駅の独占は収益1.3倍、業界トップのカテゴリは収益1.6倍です。</p><div style="overflow-x:auto"><table class="settle"><tr><th>オーナー</th><th>収益</th><th>利息</th>${yearEnd?"<th>税金</th>":""}<th>差引</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}${r.mono?`<br><small style="color:var(--muted)">独占${r.mono}駅</small>`:""}${r.myTops.length?`<br><small style="color:var(--card);font-weight:700">業界トップ：${r.myTops.map(c=>CAT_NAME[c]).join("・")}</small>`:""}${r.yk.length?`<br><small style="color:var(--goal);font-weight:700">役：${r.yk.map(y=>y.n).join("・")}</small>`:""}</td><td>＋${yen(r.inc)}</td><td>${r.interest?"−"+yen(r.interest):"—"}</td>${yearEnd?`<td>${r.tax?"−"+yen(r.tax):"—"}</td>`:""}<td style="color:${r.net<0?"var(--minus)":"var(--accent)"}"><b>${r.net<0?"−":"＋"}${yen(Math.abs(r.net))}</b></td></tr>`).join("")}</table></div>`,[["つづける",1,"primary"]]);
   for(const {p,y} of newYaku)await yakuFanfare(p,y);
   for(const p of S.players)if(p.money<0)await forceSellOf(p)}
-async function yakuFanfare(p,y){const amt=r100((y.big?10000:y.small?3000:5000)*yf());p.money+=amt;gain(p,amt);log(`${p.name}が役「${y.n}」を成立させた！祝い金${yen(amt)}。`);render();
+async function yakuFanfare(p,y){const amt=r100((y.big?50000:y.small?15000:25000)*yf());p.money+=amt;gain(p,amt);log(`${p.name}が役「${y.n}」を成立させた！祝い金${yen(amt)}。`);render();
   if(p.cpu){Snd.sfx("card");await say(`${p.name}が役「${y.n}」を成立させました。祝い金${yen(amt)}。${y.fx}になります。`,"yaku","board");return}
   Snd.sfx("over");setScene("yaku",`役 成立！「${y.n}」`);
   const pr=modal(`${sceneHTML("yaku")}<div class="cer-rank r1 arr">役 成立！</div><h2 class="cer-name yaku-name">${esc(y.n)}</h2><p style="text-align:center">${esc(y.d)}</p>
@@ -1729,6 +1729,7 @@ const ACH=[
  {id:"sailor",n:"海の男",d:"フェリー航路を通算100マス進む",t:R=>R.sea>=100},
  {id:"allcards",n:"カードの達人",d:"すべての種類のカードを使う（通算）",t:R=>Object.keys(CARDS).every(k=>R.cardKinds.includes(k))},
  {id:"years10",n:"10年オーナー",d:"10年のゲームを遊び終える",t:(R,g)=>g.years>=10},
+ {id:"years20",n:"20年の大河ドラマ",d:"20年のゲームを遊び終える",t:(R,g)=>g.years>=20},
  {id:"unlucky",n:"災難の主人公",d:"1回のゲームで災難カードを5回引く",t:(R,g)=>g.bad>=5},
  {id:"broke",n:"どん底からの出直し",d:"総資産マイナスでゲームを終える",t:(R,g)=>g.nw<0}];
 function updateRecords(order){const me=order.find(x=>!x.p.cpu);if(!me)return null;const p=me.p,s=ST(p),i=me.i;
@@ -1930,7 +1931,7 @@ function yakuOf(i,tops){return YAKU.filter(y=>y.hq.every(n=>ownsHQ(i,n))&&(!y.to
 function incomeMult(i,cat,tops,yk){let m=1;if(tops[cat]&&tops[cat].owner===i)m=yk.some(y=>y.top===cat)?YAKU_TOP_MULT:TOP_MULT;
   if(cat==="night"&&yk.some(y=>y.id==="settai"))m*=1.4;if(yk.some(y=>y.big))m*=1.2;return m}
 function catTotals(){const t={};STATIONS.forEach(([st])=>P(st).forEach(pp=>{const c=propCat(pp[0],st);t[c]=(t[c]||0)+1}));return t}
-const topNeed=n=>Math.max(3,Math.round(n*.15));
+const topNeed=n=>Math.max(3,Math.ceil(n*.3));
 // industry tops: most properties in a category (no tie) and at least topNeed(total)
 function catTops(){const tot=catTotals(),cnt={};for(const st in S.owners)S.owners[st].forEach((o,k)=>{if(o==null)return;const c=propCat(P(st)[k][0],st);(cnt[c]=cnt[c]||Array(S.players.length).fill(0))[o]++});
   const res={};CAT_KEYS.forEach(c=>{const a=cnt[c]||Array(S.players.length).fill(0),mx=Math.max(...a),need=topNeed(tot[c]||0);res[c]={owner:mx>=need&&a.filter(x=>x===mx).length===1?a.indexOf(mx):-1,cnt:a,need,total:tot[c]||0}});return res}
@@ -2065,7 +2066,7 @@ async function setup(mode){mode=mode==="single"?"single":"multi";hideTitle();
   const pr=modal(`<h2>${single?"ひとりで遊ぶ":"みんなで遊ぶ"}</h2><p>駅をサイコロで巡り、目的地への一番乗りと物件の独占で総資産トップを目指します。</p>
   <div class="field"><label for="fMap">遊ぶ地図</label><select id="fMap">${order.map(k=>`<option value="${k}" ${cur===k?"selected":""}>${MAPS[k].name}</option>`).join("")}</select><small class="hint" id="fMapDesc" style="margin:0">${MAPS[cur].desc}</small></div>
   ${seatsHTML}
-  <div class="field" style="margin-top:12px"><label for="fYears">プレイ年数</label><select id="fYears"><option value="1">1年</option><option value="3" selected>3年</option><option value="5">5年</option><option value="10">10年</option></select></div>
+  <div class="field" style="margin-top:12px"><label for="fYears">プレイ年数</label><select id="fYears"><option value="1">1年</option><option value="3">3年（短期戦）</option><option value="5" selected>5年（標準）</option><option value="10">10年</option><option value="20">20年（大河戦）</option></select><small class="hint" style="margin:0">業界トップや役（やく）は、5年以上のゲームでじっくり狙う要素です。</small></div>
   <div class="field"><label for="fSpeed">メッセージの速さ</label><select id="fSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
   <label class="check"><input type="checkbox" id="fSound" ${Snd.prefs.on?"checked":""}><span>音を出す（BGM・効果音）<small>オフにすると無音で遊べます。ゲーム中も画面上部の「音」ボタンで切り替えられます。</small></span></label>
   <h3>ルール</h3>
@@ -2099,8 +2100,8 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>目的</h3><p>決められた年数のあいだ駅をめぐり、最後に総資産（お金＋物件の価値）がいちばん多いオーナーの勝ちです。</p>
   <h3>進み方</h3><p>自分の番にサイコロを振り、地図で光るマスから止まる場所を選びます。目的地にぴったり止まると援助金がもらえ、ルーレットで次の目的地が決まります。</p>
   <h3>マス</h3><p><b style="color:var(--plus)">青</b>はお金が入り、<b style="color:var(--minus)">赤</b>は出費です。冬の北国では大雪で出費が増えます。<b style="color:var(--card)">黄</b>はカードがもらえますが、ときどき災難カード（鈍行・運休・罰金・紛失）を引きます。<b style="color:var(--shop)">ピンクのひし形</b>はカード売り場です。駅では物件を買えます。駅の物件をすべて持つと独占になり、決算での収益が1.3倍になります。</p>
-  <h3>業界トップ</h3><p>物件は9つのカテゴリ（飲食・名産甘味・宿泊レジャー・工場醸造・伝統工芸・農園漁業・観光商業・夜の街娯楽・金融学術）に分かれています。決算のときに、あるカテゴリの物件をいちばん多く持ち、決められた件数以上を持っているオーナーは「業界トップ」となり、そのカテゴリの収益が1.6倍になります（同数で並んだときは該当なし）。独占と重なると約2.1倍です。メニューの「物件一覧」で、各カテゴリの状況を確かめられます。</p>
-  <h3>汐留ヘッドクォーター特区と役</h3><p>東京駅と、東京から2駅以内の首都圏の駅に止まると、「汐留ヘッドクォーター特区」で大企業の本社（人材派遣会社・広告代理店・旅行代理店・総合商社・物流会社）も買えます。本社は単体の利回りが低めですが、組み合わせると「役」が成立します。決算のときに役が成立していると、その業界の収益が1.6倍から2.0倍に上がります。はじめて成立したときは祝い金ももらえます。役は「人手不足解消（人材派遣会社＋工場・醸造トップ）」「話題沸騰（広告代理店＋観光・商業トップ）」「旅行パッケージ（旅行代理店＋宿泊・レジャートップ）」「全国流通（総合商社＋名産・甘味トップ）」「産地直送（物流会社＋農園・漁業トップ）」「接待で一杯（広告代理店＋銀座のナイトクラブ）」、大役「三本の矢（人材派遣会社・広告代理店・総合商社）」の7つです。</p>
+  <h3>業界トップ</h3><p>物件は9つのカテゴリ（飲食・名産甘味・宿泊レジャー・工場醸造・伝統工芸・農園漁業・観光商業・夜の街娯楽・金融学術）に分かれています。決算のときに、あるカテゴリの物件をいちばん多く持ち、カテゴリ全体の3割以上を持っているオーナーは「業界トップ」となり、そのカテゴリの収益が1.6倍になります（同数で並んだときは該当なし）。独占と重なると約2.1倍です。メニューの「物件一覧」で、各カテゴリの状況を確かめられます。</p>
+  <h3>汐留ヘッドクォーター特区と役</h3><p>東京駅と、東京から2駅以内の首都圏の駅に止まると、「汐留ヘッドクォーター特区」で大企業の本社（人材派遣会社・広告代理店・旅行代理店・総合商社・物流会社）も買えます。本社は単体の利回りが低めですが、組み合わせると「役」が成立します。決算のときに役が成立していると、その業界の収益が1.6倍から2.0倍に上がります。はじめて成立したときは祝い金（2.5億円から。年を追うごとに増えます）ももらえます。本社は10億円以上の大物件なので、役は5年以上のゲームの後半に狙う大勝負です。役は「人手不足解消（人材派遣会社＋工場・醸造トップ）」「話題沸騰（広告代理店＋観光・商業トップ）」「旅行パッケージ（旅行代理店＋宿泊・レジャートップ）」「全国流通（総合商社＋名産・甘味トップ）」「産地直送（物流会社＋農園・漁業トップ）」「接待で一杯（広告代理店＋銀座のナイトクラブ）」、大役「三本の矢（人材派遣会社・広告代理店・総合商社）」の7つです。</p>
   <h3>カード</h3><p>急行・特急・ぶっとびなどの移動カードのほか、相手を1回休みにする足止め、サイコロを半分にする鈍行押し付け、カード強奪、ぶっとばし、妖怪なすりつけといった邪魔カードがあります。お守りカードを持っていると、邪魔カードを1回防げます。</p>
   <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠いオーナーに妖怪「${YOKAI[0].n}」が取り憑きます。ほかのオーナーのいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
   <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場・夜の街・金融学術）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
@@ -2120,7 +2121,7 @@ async function propList(){if(!S)return;const body=$("#modalBody");let cat="all",
     let L=all.filter(x=>(cat==="all"||x.c===cat)&&(owner==="all"||(owner==="free"?x.o==null:x.o===+owner)));
     L.sort(sort==="yield"?(a,b)=>b.rate-a.rate||a.price-b.price:sort==="price"?(a,b)=>b.price-a.price:sort==="cheap"?(a,b)=>a.price-b.price:()=>0);
     body.innerHTML=`<div class="sheet-head"><h2>物件一覧</h2><button class="btn sm" data-close>閉じる</button></div>
-    <h3 style="margin-top:4px">業界トップの状況<small style="font-weight:400;color:var(--muted);margin-left:6px">決算のときに判定・収益1.6倍</small></h3>
+    <h3 style="margin-top:4px">業界トップの状況<small style="font-weight:400;color:var(--muted);margin-left:6px">決算のときに判定・3割以上で収益1.6倍</small></h3>
     <div class="tops">${CAT_KEYS.map(c=>{const t=tops[c],mx=Math.max(...t.cnt),lead=t.owner>=0?S.players[t.owner]:null;
       return `<button class="topcard ${cat===c?"on":""}" data-cat="${c}"><span class="catchip c-${c}">${CAT_NAME[c]}</span><b>${lead?`<span class="dot" style="background:${pcol(t.owner)};display:inline-block;width:10px;height:10px;margin-right:4px"></span>${esc(lead.name)}`:"トップなし"}</b><small>${S.players.map((q,i)=>t.cnt[i]?`${esc(q.name.slice(0,4))}${t.cnt[i]}`:"").filter(Boolean).join("・")||"まだ誰も持っていません"}<br>必要${t.need}件以上・全${t.total}件</small></button>`}).join("")}</div>
     <h3>役（やく）<small style="font-weight:400;color:var(--muted);margin-left:6px">決算のときに判定・成立すると祝い金</small></h3>
