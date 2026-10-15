@@ -68,6 +68,12 @@ body[data-map="east"] #mapWrap,body[data-map="east"] .fm-wrap{background:var(--s
 .topcard{font:inherit;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:7px 8px;display:flex;flex-direction:column;gap:3px;cursor:pointer}
 .topcard.on{outline:2px solid var(--accent)}.topcard b{font-size:13px}.topcard small{font-size:11px;color:var(--muted);line-height:1.45}
 #plCat,#plOwner,#plSort{flex:1 1 140px}
+.c-hq{background:#A07A12}
+.yakus{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px}
+.yakucard{border:1px solid var(--line);border-radius:10px;padding:7px 9px;display:flex;flex-direction:column;gap:3px;background:var(--panel)}
+.yakucard.on{border:2px solid var(--goal);background:color-mix(in srgb,var(--goal) 8%,var(--panel))}
+.yakucard b{font-size:14px}.yakucard small{font-size:11px;color:var(--muted);line-height:1.45}.yakucard .yk-st{color:var(--ink)}.yakucard .yk-now{color:var(--goal);font-weight:700}
+.yaku-name{font-size:30px!important;letter-spacing:.1em}
 .plist{display:flex;flex-direction:column;gap:6px}
 .pitem{font:inherit;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;cursor:pointer}
 .pi-top{display:flex;justify-content:space-between;gap:8px}.pi-num{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
@@ -807,6 +813,28 @@ const PROP_INFO={
 "福井|越前がにの店":["gourmet","黄色いタグ付きのブランドガニ。冬だけの大勝負"],
 "福井|眼鏡工場":["industry","国産眼鏡枠の大半を作る。海外ブランドも顧客"],
 };
+// 汐留ヘッドクォーター特区: big-company HQs bought at 東京駅. Low yield on their own, but they are the cards for 役 (combos)
+const HQ="汐留特区",HQ_NAME="汐留ヘッドクォーター特区";
+const HQ_PROPS=[["人材派遣会社",15000,3],["広告代理店",20000,3],["旅行代理店",10000,4],["総合商社",25000,3],["物流会社",12000,4]];
+Object.assign(PROP_INFO,{
+"汐留特区|人材派遣会社":["hq","繁忙期の工場に人を送り込む。人手不足の時代の主役"],
+"汐留特区|広告代理店":["hq","テレビもネットも押さえる。接待の領収書が分厚い"],
+"汐留特区|旅行代理店":["hq","宿と切符をセットで売るパッケージツアーの元締め"],
+"汐留特区|総合商社":["hq","ラーメンからミサイルまで。名産品を全国の店頭へ"],
+"汐留特区|物流会社":["hq","冷蔵トラックで産地から翌朝届ける"]});
+// 役 (yaku): like 花見で一杯 / 月見で一杯 in koi-koi
+const YAKU=[
+ {id:"haken",n:"人手不足解消",hq:["人材派遣会社"],top:"industry",d:"人材派遣会社＋工場・醸造の業界トップ",fx:"工場・醸造の収益が2.0倍"},
+ {id:"koukoku",n:"話題沸騰",hq:["広告代理店"],top:"tourism",d:"広告代理店＋観光・商業の業界トップ",fx:"観光・商業の収益が2.0倍"},
+ {id:"ryokou",n:"旅行パッケージ",hq:["旅行代理店"],top:"lodging",d:"旅行代理店＋宿泊・レジャーの業界トップ",fx:"宿泊・レジャーの収益が2.0倍"},
+ {id:"shousha",n:"全国流通",hq:["総合商社"],top:"sweets",d:"総合商社＋名産・甘味の業界トップ",fx:"名産・甘味の収益が2.0倍"},
+ {id:"butsuryu",n:"産地直送",hq:["物流会社"],top:"farm",d:"物流会社＋農園・漁業の業界トップ",fx:"農園・漁業の収益が2.0倍"},
+ {id:"settai",n:"接待で一杯",hq:["広告代理店"],prop:["東京","銀座のナイトクラブ"],d:"広告代理店＋銀座のナイトクラブ",fx:"夜の街・娯楽の収益が1.4倍",small:1},
+ {id:"sanbon",n:"三本の矢",hq:["人材派遣会社","広告代理店","総合商社"],d:"人材派遣会社・広告代理店・総合商社の3社すべて",fx:"すべての物件の収益が1.2倍",big:1}];
+const YAKU_TOP_MULT=2.0;
+// the HQ district can be reached from 東京 and the stations next to it (首都圏)
+let HQ_GATES=null,HQ_GATES_MAP=null;
+function hqGate(st){if(HQ_GATES_MAP!==CUR_MAP){HQ_GATES_MAP=CUR_MAP;HQ_GATES=new Set(["東京"]);for(let d=0;d<2;d++)[...HQ_GATES].forEach(a=>MAP.edges.forEach(e=>{if(e[2]===1||e[2]===2)return;if(e[0]===a)HQ_GATES.add(e[1]);if(e[1]===a)HQ_GATES.add(e[0])}))}return HQ_GATES.has(st)}
 const LL=(lon,lat)=>[Math.round((lon-136)*185+60),Math.round((44-lat)*230+60)];
 const MAPS={
   kanto:{name:"関東甲信越編",title:"大人の鉄道すごろく 関東甲信越編",w:1060,h:1120,stations:KANTO_ST,edges:KANTO_EDGES,prefs:KANTO_PREFS,prefSize:58,
@@ -1326,6 +1354,11 @@ function renderDyn(){
     own.forEach((o,i)=>el("circle",{cx:x0+i*sp,cy:y+7,r:3.4,class:"odot",fill:o==null?"var(--line)":COLORS[o]},gOwn));
     if(own.every(o=>o!=null&&o===own[0]))el("rect",{x:x-11,y:y-11,width:22,height:10,rx:2,fill:COLORS[own[0]]},gOwn);
   });
+  {const t=N["東京"];if(t&&S.owners[HQ]){const[hx,hy]=CUR_MAP==="east"?[t.x+52,t.y+58]:[t.x+58,t.y+52];
+    el("line",{x1:t.x,y1:t.y,x2:hx,y2:hy,stroke:"var(--card)","stroke-width":3,"stroke-dasharray":"5 4"},gOwn);
+    el("rect",{x:hx-34,y:hy-14,width:68,height:28,rx:6,fill:"#1B2A5E",stroke:"var(--card)","stroke-width":3},gOwn);
+    el("text",{x:hx,y:hy+5,"text-anchor":"middle","font-size":14,"font-weight":700,fill:"#F2C443"},gOwn,"HQ特区");
+    S.owners[HQ].forEach((o,k)=>el("circle",{cx:hx-20+k*10,cy:hy+20,r:3.6,class:"odot",fill:o==null?"var(--line)":COLORS[o]},gOwn))}}
   const g=N[S.dest];el("circle",{cx:g.x,cy:g.y,r:30,class:"goalring"},gDyn);
   el("path",{d:`M${g.x+20} ${g.y-24} v-30 l20 8 l-20 8`,class:"goalflag"},gDyn);
   if(CAND)for(const id of CAND.keys()){const n=N[id];const c=el("circle",{cx:n.x,cy:n.y,r:21,class:"cand",tabindex:0,role:"button","aria-label":sqName(id)},gDyn);
@@ -1351,7 +1384,7 @@ function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
 
 /* ---------- scene illustrations (placeholders; img/<key>.png or .webp on the site replaces them) ---------- */
-const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
+const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
 const SCENE_IMG={};let CER_N=4;
 let SVGID=0;
 const BG={sky:["#8CCDF0","#E6F5FD","#7CC26B"],sea:["#9BD3F2","#E3F3FC","#2F7FB8"],night:["#1B2440","#3B3F70","#283055"],snow:["#C9DDEA","#F2F8FB","#FFFFFF"],
@@ -1427,6 +1460,7 @@ const SCENES={
   rank3:["night",()=>`<path d="M0 0 H70 Q60 90 80 180 H0Z" fill="#B3261E"/><path d="M320 0 H250 Q260 90 240 180 H320Z" fill="#B3261E"/><path d="M110 0 L80 180 H240 L210 0Z" fill="#F8E7A1" opacity=".25"/><rect x="0" y="0" width="320" height="16" fill="#8A1C15"/>`+IC.trophy(160,100,"3","bronze")],
   rank4:["night",()=>`<path d="M0 0 H70 Q60 90 80 180 H0Z" fill="#B3261E"/><path d="M320 0 H250 Q260 90 240 180 H320Z" fill="#B3261E"/><path d="M110 0 L80 180 H240 L210 0Z" fill="#F8E7A1" opacity=".25"/><rect x="0" y="0" width="320" height="16" fill="#8A1C15"/>`+IC.trophy(160,100,"4","plain")],
   lose:["night",()=>`<g fill="#9AA6B2"><ellipse cx="150" cy="44" rx="56" ry="24"/><ellipse cx="200" cy="50" rx="40" ry="20"/><ellipse cx="110" cy="54" rx="34" ry="16"/></g>${[110,140,170,200,125,185].map((x,i)=>`<path d="M${x} ${78+i%2*14} l-6 16" stroke="#8CCDF0" stroke-width="3" stroke-linecap="round"/>`).join("")}`+IC.tanuki(250,118,.55)+IC.arrow(80,118,false,"#B3261E")+`<g transform="translate(160,138) rotate(-6)"><rect x="-34" y="-20" width="68" height="34" rx="4" fill="#F7F1E3" stroke="#4A2E18" stroke-width="3"/><text x="0" y="8" text-anchor="middle" font-size="22" font-weight="700" fill="#B3261E">${CER_N}位</text></g>`],
+  yaku:["gold",()=>`<g transform="translate(160,92)">${[-70,0,70].map((x,k)=>`<g transform="translate(${x} 0) rotate(${(k-1)*12})"><rect x="-26" y="-40" width="52" height="80" rx="6" fill="#F7F1E3" stroke="#7A1E14" stroke-width="4"/><rect x="-20" y="-34" width="40" height="68" rx="3" fill="${["#DE3F34","#2B4C9B","#0C8565"][k]}"/><circle cx="0" cy="-6" r="13" fill="#F2C443"/><rect x="-14" y="14" width="28" height="6" fill="#F7F1E3"/></g>`).join("")}</g>`],
   s_spring:["sky",()=>tree(160,150,"#F3A6C0","#E58AAE")+tree(70,160,"#F7C1D3","#E58AAE",.7)+tree(255,158,"#F7C1D3","#E58AAE",.75)],
   s_summer:["sea",()=>`<circle cx="250" cy="44" r="22" fill="#FFD84A"/>${Array.from({length:10},(_,i)=>{const a=i*Math.PI/5;return `<path d="M${250+30*Math.cos(a)} ${44+30*Math.sin(a)} L${250+40*Math.cos(a)} ${44+40*Math.sin(a)}" stroke="#FFD84A" stroke-width="4" stroke-linecap="round"/>`}).join("")}<g fill="#fff"><circle cx="70" cy="80" r="26"/><circle cx="100" cy="66" r="30"/><circle cx="132" cy="84" r="24"/><rect x="50" y="84" width="100" height="24" rx="12"/></g>`],
   s_autumn:["sunset",()=>tree(160,150,"#E07A2E","#B4531A")+tree(70,160,"#F2B33D","#C9851A",.7)+tree(255,158,"#D9472E","#A8321F",.75)],
@@ -1449,7 +1483,7 @@ function probeImages(){if(!/github\.io$/.test(location.hostname))return;
 /* ---------- economy: categories, news, seasons, settlements, bank, tax ---------- */
 const ECON={incomeHalf:1.15,taxRate:.014,loanRatio:.5,rateStart:5,rateMin:2,rateMax:9,newsChance:.35};
 const CAT_NAME={gourmet:"飲食",sweets:"名産・甘味",lodging:"宿泊・レジャー",industry:"工場・醸造",craft:"伝統工芸",farm:"農園・漁業",tourism:"観光・商業",night:"夜の街・娯楽",pro:"金融・学術"};
-const CAT_KEYS=Object.keys(CAT_NAME);
+const CAT_KEYS=Object.keys(CAT_NAME);CAT_NAME.hq="本社";
 const CAT_KW=[
   ["night",["ホストクラブ","スナック","メイドカフェ","ナイトクラブ","キャバレー","パチンコ","競輪","競馬","ボートレース","秘宝館","置屋","占い"]],
   ["pro",["ファンド","特許","税理士","セミナー","質屋","消費者金融","古書","古文書","骨董","予備校","加速器","望遠鏡","量子","AI","大学","スタートアップ"]],
@@ -1507,14 +1541,23 @@ async function monthEvents(){
       await econModal("news","経済ニュース："+n.t,n.d,rows);return}}}
 async function settle(yearEnd){render();
   const tops=catTops();S.tops=Object.fromEntries(CAT_KEYS.map(c=>[c,tops[c].owner]));
-  const rows=S.players.map((p,i)=>{let inc=0,mono=0;const myTops=CAT_KEYS.filter(c=>tops[c].owner===i);{const st=ST(p);st.maxTops=Math.max(st.maxTops||0,myTops.length)}
-    for(const s in S.owners){const m=isMono(s,i);if(m)mono++;S.owners[s].forEach((o,k)=>{if(o===i){const[nm,pr,rt]=P(s)[k];inc+=pr*rt/100*(m?MONO_MULT:1)*(tops[propCat(nm,s)].owner===i?TOP_MULT:1)*ECON.incomeHalf}})}
-    inc=r100(inc);const interest=r100(debtOf(p)*S.rate/100/2),tax=yearEnd?r100(assets(i)*ECON.taxRate):0,net=inc-interest-tax;p.money+=net;gain(p,net);return{p,inc,mono,myTops,interest,tax,net}});
+  const newYaku=[];
+  const rows=S.players.map((p,i)=>{let inc=0,mono=0;const myTops=CAT_KEYS.filter(c=>tops[c].owner===i),yk=yakuOf(i,tops);{const st=ST(p);st.maxTops=Math.max(st.maxTops||0,myTops.length);st.yakus=st.yakus||[];yk.forEach(y=>{if(!st.yakus.includes(y.id))st.yakus.push(y.id)})}
+    const done=S.yaku[i]=S.yaku[i]||[];yk.forEach(y=>{if(!done.includes(y.id)){done.push(y.id);newYaku.push({p,y})}});
+    for(const s in S.owners){const m=s!==HQ&&isMono(s,i);if(m)mono++;S.owners[s].forEach((o,k)=>{if(o===i){const[nm,pr,rt]=P(s)[k];inc+=pr*rt/100*(m?MONO_MULT:1)*incomeMult(i,propCat(nm,s),tops,yk)*ECON.incomeHalf}})}
+    inc=r100(inc);const interest=r100(debtOf(p)*S.rate/100/2),tax=yearEnd?r100(assets(i)*ECON.taxRate):0,net=inc-interest-tax;p.money+=net;gain(p,net);return{p,inc,mono,myTops,yk,interest,tax,net}});
   rows.forEach(r=>r.myTops.forEach(c=>log(`${r.p.name}が${CAT_NAME[c]}の業界トップ（${tops[c].cnt[r.p.idx]}件）。収益1.6倍。`)));
   const label=yearEnd?`${S.year}年目 本決算（3月）`:`${S.year}年目 中間決算（9月）`;
   log(`${label}が終わりました。`);setScene("settle",label,"board");render();Snd.sfx("settle");
-  await modal(`${sceneHTML("settle")}<h2>${label}</h2><p>物件の収益が入り、借入の利息${yearEnd?"と固定資産税（物件評価額の1.4%）":""}を支払いました。駅の独占は収益1.3倍、業界トップのカテゴリは収益1.6倍です。</p><div style="overflow-x:auto"><table class="settle"><tr><th>オーナー</th><th>収益</th><th>利息</th>${yearEnd?"<th>税金</th>":""}<th>差引</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}${r.mono?`<br><small style="color:var(--muted)">独占${r.mono}駅</small>`:""}${r.myTops.length?`<br><small style="color:var(--card);font-weight:700">業界トップ：${r.myTops.map(c=>CAT_NAME[c]).join("・")}</small>`:""}</td><td>＋${yen(r.inc)}</td><td>${r.interest?"−"+yen(r.interest):"—"}</td>${yearEnd?`<td>${r.tax?"−"+yen(r.tax):"—"}</td>`:""}<td style="color:${r.net<0?"var(--minus)":"var(--accent)"}"><b>${r.net<0?"−":"＋"}${yen(Math.abs(r.net))}</b></td></tr>`).join("")}</table></div>`,[["つづける",1,"primary"]]);
+  await modal(`${sceneHTML("settle")}<h2>${label}</h2><p>物件の収益が入り、借入の利息${yearEnd?"と固定資産税（物件評価額の1.4%）":""}を支払いました。駅の独占は収益1.3倍、業界トップのカテゴリは収益1.6倍です。</p><div style="overflow-x:auto"><table class="settle"><tr><th>オーナー</th><th>収益</th><th>利息</th>${yearEnd?"<th>税金</th>":""}<th>差引</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}${r.mono?`<br><small style="color:var(--muted)">独占${r.mono}駅</small>`:""}${r.myTops.length?`<br><small style="color:var(--card);font-weight:700">業界トップ：${r.myTops.map(c=>CAT_NAME[c]).join("・")}</small>`:""}${r.yk.length?`<br><small style="color:var(--goal);font-weight:700">役：${r.yk.map(y=>y.n).join("・")}</small>`:""}</td><td>＋${yen(r.inc)}</td><td>${r.interest?"−"+yen(r.interest):"—"}</td>${yearEnd?`<td>${r.tax?"−"+yen(r.tax):"—"}</td>`:""}<td style="color:${r.net<0?"var(--minus)":"var(--accent)"}"><b>${r.net<0?"−":"＋"}${yen(Math.abs(r.net))}</b></td></tr>`).join("")}</table></div>`,[["つづける",1,"primary"]]);
+  for(const {p,y} of newYaku)await yakuFanfare(p,y);
   for(const p of S.players)if(p.money<0)await forceSellOf(p)}
+async function yakuFanfare(p,y){const amt=r100((y.big?10000:y.small?3000:5000)*yf());p.money+=amt;gain(p,amt);log(`${p.name}が役「${y.n}」を成立させた！祝い金${yen(amt)}。`);render();
+  if(p.cpu){Snd.sfx("card");await say(`${p.name}が役「${y.n}」を成立させました。祝い金${yen(amt)}。${y.fx}になります。`,"yaku","board");return}
+  Snd.sfx("over");setScene("yaku",`役 成立！「${y.n}」`);
+  const pr=modal(`${sceneHTML("yaku")}<div class="cer-rank r1 arr">役 成立！</div><h2 class="cer-name yaku-name">${esc(y.n)}</h2><p style="text-align:center">${esc(y.d)}</p>
+    <div class="reward"><p class="rw-h">ごほうび</p><p class="rw-n">祝い金</p><div class="big-money">＋${yen(amt)}</div><p class="rw-s">さらに決算のたびに、${esc(y.fx)}（役が続いている間）</p></div>`,[["つづける",1,"primary"]]);
+  confetti(y.big?160:110);await pr}
 async function forceSellOf(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);let sold=0;
   while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が資金繰りのため${s}の「${P(s)[k][0]}」を売却。`)}
   if(sold){render();await say(V(`おっと、お金が足りません……。${p.name}は資金繰りのため、物件を${sold}件手放しました。`,`${p.name}は資金繰りのため、物件を${sold}件売却しました。`),"minus")}}
@@ -1539,7 +1582,7 @@ const styleOf=p=>STYLE[p.style]||STYLE.normal;
 function cpuRepay(p){const st=styleOf(p),d=debtOf(p);if(d<=0||p.money<=st.repayAbove)return;const v=Math.min(d,Math.floor((p.money-st.repayAbove*.6)/1000)*1000);if(v>0){p.debt=d-v;p.money-=v;log(`${p.name}が銀行に${yen(v)}を返した。`)}}
 
 /* ---------- per-game stats ---------- */
-const newSt=()=>({steps:0,stations:[],arrivals:0,bought:0,boughtValue:0,boughtList:[],plus:0,minus:0,bad:0,cardsUsed:0,cardKinds:[],quizN:0,quizOk:0,yokaiTurns:0,maxGain:0,maxLoss:0,sea:0,attacks:0,maxDebt:0,wasLast:false,maxTops:0});
+const newSt=()=>({steps:0,stations:[],arrivals:0,bought:0,boughtValue:0,boughtList:[],plus:0,minus:0,bad:0,cardsUsed:0,cardKinds:[],quizN:0,quizOk:0,yokaiTurns:0,maxGain:0,maxLoss:0,sea:0,attacks:0,maxDebt:0,wasLast:false,maxTops:0,yakus:[]});
 const ST=p=>p.st||(p.st=newSt());
 function gain(p,a){const s=ST(p);if(a>s.maxGain)s.maxGain=a;if(-a>s.maxLoss)s.maxLoss=-a}
 function useKind(p,c){const s=ST(p);s.cardsUsed++;if(!s.cardKinds.includes(c))s.cardKinds.push(c)}
@@ -1603,7 +1646,7 @@ function bindChart(){const svg=$("#chart svg"),hit=$("#chHit");if(!svg||!hit)ret
     const px=cx/W*r.width;tip.style.left=Math.min(r.width-tip.offsetWidth-4,Math.max(4,px+10))+"px"};
   hit.addEventListener("pointermove",move);hit.addEventListener("pointerdown",move);hit.addEventListener("pointerleave",()=>{$("#chTip").hidden=true;$("#chX").setAttribute("visibility","hidden")})}
 async function statsModal(){
-  const rows=[["称号",i=>TITLES[S.players[i].title||0].n],["業界トップ（直近の決算）",i=>{const c=CAT_KEYS.filter(c=>S.tops&&S.tops[c]===i);return c.length?c.map(x=>CAT_NAME[x]).join("・"):"—"}],["総資産",i=>yen(netWorth(i))],["現金",i=>yen(S.players[i].money)],["物件の評価額",i=>yen(assets(i))],["借入残高",i=>yen(debtOf(S.players[i]))],["物件の数",i=>ownedList(i).length+"件"],["独占した駅",i=>monoCount(i)+"駅"],
+  const rows=[["称号",i=>TITLES[S.players[i].title||0].n],["役（成立したもの）",i=>{const y=(ST(S.players[i]).yakus||[]).map(id=>YAKU.find(z=>z.id===id).n);return y.length?y.join("・"):"—"}],["業界トップ（直近の決算）",i=>{const c=CAT_KEYS.filter(c=>S.tops&&S.tops[c]===i);return c.length?c.map(x=>CAT_NAME[x]).join("・"):"—"}],["総資産",i=>yen(netWorth(i))],["現金",i=>yen(S.players[i].money)],["物件の評価額",i=>yen(assets(i))],["借入残高",i=>yen(debtOf(S.players[i]))],["物件の数",i=>ownedList(i).length+"件"],["独占した駅",i=>monoCount(i)+"駅"],
     ["目的地への一番乗り",i=>ST(S.players[i]).arrivals+"回"],["進んだマス",i=>ST(S.players[i]).steps+"マス"],["立ち寄った駅",i=>ST(S.players[i]).stations.length+"駅"],["航路を進んだマス",i=>ST(S.players[i]).sea+"マス"],
     ["青マス",i=>ST(S.players[i]).plus+"回"],["赤マス",i=>ST(S.players[i]).minus+"回"],["災難カード",i=>ST(S.players[i]).bad+"回"],["使ったカード",i=>ST(S.players[i]).cardsUsed+"枚"],["邪魔カードを使った",i=>ST(S.players[i]).attacks+"回"],
     ["クイズ",i=>S.players[i].cpu?"—":`${ST(S.players[i]).quizOk}/${ST(S.players[i]).quizN}問正解`],["妖怪に取り憑かれた",i=>ST(S.players[i]).yokaiTurns+"回"],["1回の最大収入",i=>yen(ST(S.players[i]).maxGain)],["1回の最大損失",i=>yen(ST(S.players[i]).maxLoss)],["最大借入額",i=>yen(ST(S.players[i]).maxDebt)]];
@@ -1658,6 +1701,8 @@ const ACH=[
  {id:"ttl5",n:"億万長者",d:"称号の頂点「億万長者」に昇格する",t:(R,g)=>g.title>=5},
  {id:"top1",n:"業界の顔",d:"決算で業界トップになる",t:(R,g)=>g.tops>=1},
  {id:"top3",n:"コングロマリット",d:"1回の決算で3つの業界のトップを同時に取る",t:(R,g)=>g.tops>=3},
+ {id:"yaku1",n:"役者",d:"はじめて役を成立させる",t:(R,g)=>g.yakus>=1},
+ {id:"sanbon",n:"三本の矢",d:"大役「三本の矢」を成立させる",t:(R,g)=>g.sanbon},
  {id:"comeback",n:"大逆転",d:"一度は最下位になりながら優勝する",t:(R,g)=>g.won&&g.wasLast},
  {id:"nodebt",n:"無借金経営",d:"一度も借入をせずに優勝する",t:(R,g)=>g.won&&g.maxDebt===0},
  {id:"leverage",n:"借金も実力のうち",d:"借入10億円以上を経験して優勝する",t:(R,g)=>g.won&&g.maxDebt>=100000},
@@ -1689,7 +1734,7 @@ function updateRecords(order){const me=order.find(x=>!x.p.cpu);if(!me)return nul
   s.cardKinds.forEach(k=>{if(!REC.cardKinds.includes(k))REC.cardKinds.push(k)});
   const vis=REC.visited[S.map]||(REC.visited[S.map]=[]);s.stations.forEach(st=>{if(!vis.includes(st))vis.push(st)});
   s.boughtList.forEach(k=>REC.props[k]=1);
-  const g={won:me.rank===1,nw:me.nw,monos,arrivals:s.arrivals,quizN:s.quizN,quizOk:s.quizOk,yokai:s.yokaiTurns,maxDebt:s.maxDebt,years:S.years,bad:s.bad,title:p.title||0,tops:s.maxTops||0,wasLast:s.wasLast,hokMono:S.map==="east"?HOK.filter(st=>S.owners[st]&&isMono(st,i)).length:0};
+  const g={won:me.rank===1,nw:me.nw,monos,arrivals:s.arrivals,quizN:s.quizN,quizOk:s.quizOk,yokai:s.yokaiTurns,maxDebt:s.maxDebt,years:S.years,bad:s.bad,title:p.title||0,tops:s.maxTops||0,yakus:(s.yakus||[]).length,sanbon:(s.yakus||[]).includes("sanbon"),wasLast:s.wasLast,hokMono:S.map==="east"?HOK.filter(st=>S.owners[st]&&isMono(st,i)).length:0};
   const newAch=[];ACH.forEach(a=>{if(!REC.ach[a.id]&&a.t(REC,g)){REC.ach[a.id]=Date.now();newAch.push(a)}});
   REC.recent.unshift({t:Date.now(),map:S.map,years:S.years,rank:me.rank,n:order.length,nw:me.nw});REC.recent=REC.recent.slice(0,10);
   saveRec();return{newAch,bestUp}}
@@ -1777,7 +1822,7 @@ const passes=path=>path.slice(1).some(id=>S.players.some((q,j)=>j!==S.cur&&q.pos
 function newGame(seats,years,assist,rules,mapId,mode){useMap(mapId);
   const props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(master(s[0]))]));
   S={players:seats.map((s,i)=>({name:s.name,cpu:s.cpu,color:s.color,idx:i,money:10000,pos:"東京",cards:["kyuko"],slow:0,rest:0,debt:0,title:0,style:s.cpu?["aggressive","cautious","normal","normal"][(s.color+3)%4]:null})),rate:ECON.rateStart,season:"spring",cur:0,year:1,month:0,years,assist,rules,map:CUR_MAP,yokai:{owner:null,form:0,turns:0},props,owners:{},log:[],phase:"busy",dice:1,lastDice:null};
-  STATIONS.forEach(([n])=>S.owners[n]=props[n].map(()=>null));
+  STATIONS.forEach(([n])=>S.owners[n]=props[n].map(()=>null));S.props[HQ]=clone(HQ_PROPS);S.owners[HQ]=HQ_PROPS.map(()=>null);S.yaku={};
   S.mode=mode||"multi";S.players.forEach(p=>p.st=newSt());S.destFrom="東京";S.dest="東京";snapshot("開始");const first=pickDest("東京");
   buildTokens();log(`${years}年間の旅が東京駅から始まりました。`);setScene("title",`ご乗車ありがとうございます！ ${years}年間の旅、東京駅から出発進行です。`);render();
   revealDest(first,"最初の目的地は……").then(()=>startTurn());
@@ -1837,7 +1882,9 @@ async function badCard(p){const ks=Object.keys(BAD),k=ks[rnd(0,ks.length-1)];let
 async function land(){const p=cp(),n=N[p.pos];
   if(p.pos===S.dest)await arrive(p);
   if(n.type==="st"){await quiz(p);
-    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件購入しました。`,"buy")}}else await shopModal(p,n.id)}
+    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件購入しました。`,"buy")}
+      if(hqGate(n.id)){const h=cpuBuy(p,HQ);if(h.length){Snd.sfx("buy");render();await say(`${p.name}が${HQ_NAME}で${h.map(k=>HQ_PROPS[k][0]).join("・")}を買収しました。`,"buy")}}}
+    else{await shopModal(p,n.id);if(hqGate(n.id))await shopModal(p,HQ)}}
   else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;ST(p).plus++;gain(p,amt);const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(V(`青マスです！ ${m}。${p.name}に${yen(amt)}の収入ですよ！`,`青マス。${m}。${p.name}に${yen(amt)}の収入です。`),n.sea?"sea":"plus")}
   else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10;let mult=1,m,key="minus";
     if(n.sea){key="sea";if(n.sea==="js"&&winter){mult=2;m="冬の日本海が大しけで、船の修理費がかさんだ"}else m=SEA_MSG[rnd(0,SEA_MSG.length-1)]}
@@ -1874,25 +1921,31 @@ async function revealDest(next,title){
   $("#modalBtns").hidden=false;$("#modalBtns button").focus();await pr}
 function isMono(st,i){return S.owners[st].every(x=>x===i)}
 const MONO_MULT=1.3,TOP_MULT=1.6;
+const ownsHQ=(i,n)=>{const k=HQ_PROPS.findIndex(x=>x[0]===n);return k>=0&&S.owners[HQ]&&S.owners[HQ][k]===i};
+const ownsProp=(i,st,n)=>{const k=(P(st)||[]).findIndex(x=>x[0]===n);return k>=0&&S.owners[st][k]===i};
+function yakuOf(i,tops){return YAKU.filter(y=>y.hq.every(n=>ownsHQ(i,n))&&(!y.top||tops[y.top].owner===i)&&(!y.prop||ownsProp(i,y.prop[0],y.prop[1])))}
+function incomeMult(i,cat,tops,yk){let m=1;if(tops[cat]&&tops[cat].owner===i)m=yk.some(y=>y.top===cat)?YAKU_TOP_MULT:TOP_MULT;
+  if(cat==="night"&&yk.some(y=>y.id==="settai"))m*=1.4;if(yk.some(y=>y.big))m*=1.2;return m}
 function catTotals(){const t={};STATIONS.forEach(([st])=>P(st).forEach(pp=>{const c=propCat(pp[0],st);t[c]=(t[c]||0)+1}));return t}
 const topNeed=n=>Math.max(3,Math.round(n*.15));
 // industry tops: most properties in a category (no tie) and at least topNeed(total)
 function catTops(){const tot=catTotals(),cnt={};for(const st in S.owners)S.owners[st].forEach((o,k)=>{if(o==null)return;const c=propCat(P(st)[k][0],st);(cnt[c]=cnt[c]||Array(S.players.length).fill(0))[o]++});
   const res={};CAT_KEYS.forEach(c=>{const a=cnt[c]||Array(S.players.length).fill(0),mx=Math.max(...a),need=topNeed(tot[c]||0);res[c]={owner:mx>=need&&a.filter(x=>x===mx).length===1?a.indexOf(mx):-1,cnt:a,need,total:tot[c]||0}});return res}
-function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];{const s=ST(p);s.bought++;s.boughtValue+=pr[1];const k=st+"|"+pr[0];if(!s.boughtList.includes(k))s.boughtList.push(k)}log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
+function buy(p,st,i){const pr=P(st)[i];if(S.owners[st][i]!=null||p.money<pr[1])return false;S.owners[st][i]=p.idx;p.money-=pr[1];{const s=ST(p);s.bought++;s.boughtValue+=pr[1];const k=st+"|"+pr[0];if(!s.boughtList.includes(k))s.boughtList.push(k)}log(`${p.name}が${st}の「${pr[0]}」を${yen(pr[1])}で購入。${st!==HQ&&isMono(st,p.idx)?st+"駅を独占！":""}`);return true}
 function cpuBuy(p,st){const own=S.owners[st],props=P(st),got=[],sty=styleOf(p),catCnt={};ownedList(p.idx).forEach(([s2,k2])=>{const c=propCat(P(s2)[k2][0],s2);catCnt[c]=(catCnt[c]||0)+1});
   for(;;){let best=-1,sc=-1;props.forEach((pr,i)=>{if(own[i]!=null)return;const canCash=p.money-pr[1]>=sty.reserve;
       const room=Math.floor((assets(p.idx)+pr[1])*Math.min(ECON.loanRatio,sty.maxDebt)/1000)*1000-debtOf(p);
-      const canLoan=!canCash&&pr[2]>=S.rate+sty.margin&&p.money+room-pr[1]>=sty.reserve;if(!canCash&&!canLoan)return;
-      const s=pr[2]+(own.some(o=>o===p.idx)?3:0)+(own.every((o,k)=>k===i||o===p.idx)?4:0)+(catCnt[propCat(pr[0],st)]||0)*.8-(canLoan?2:0);if(s>sc){sc=s;best=i}});
+      const hqWant=st===HQ&&(YAKU.some(y=>y.top&&y.hq.includes(pr[0])&&(catCnt[y.top]||0)>=3)||YAKU[6].hq.includes(pr[0])&&YAKU[6].hq.some(n=>ownsHQ(p.idx,n)));
+      const canLoan=!canCash&&(pr[2]>=S.rate+sty.margin||hqWant)&&p.money+room-pr[1]>=sty.reserve;if(!canCash&&!canLoan)return;
+      const s=st===HQ?3+YAKU.filter(y=>y.hq.includes(pr[0])&&y.top).reduce((a,y)=>a+(catCnt[y.top]||0)*1.2,0)+(YAKU[6].hq.filter(n=>ownsHQ(p.idx,n)).length&&YAKU[6].hq.includes(pr[0])?3:0)-(canLoan?2:0):pr[2]+(own.some(o=>o===p.idx)?3:0)+(own.every((o,k)=>k===i||o===p.idx)?4:0)+(catCnt[propCat(pr[0],st)]||0)*.8-(canLoan?2:0);if(s>sc){sc=s;best=i}});
     if(best<0)break;const price=props[best][1];
     if(p.money-price<sty.reserve){const need=r1000(price+sty.reserve-p.money);p.debt=debtOf(p)+need;p.money+=need;ST(p).maxDebt=Math.max(ST(p).maxDebt,p.debt);log(`${p.name}が銀行から${yen(need)}を借りた。`)}
     buy(p,st,best);got.push(best)}return got}
-function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),mine=new Set();setScene("buy",`${st}駅に到着です。物件、見ていきますか？`);
-  const draw=()=>{const own=S.owners[st];body.innerHTML=`${sceneHTML("buy")}<h2>${esc(st)}駅の物件</h2><p>所持金 <b>${yen(p.money)}</b></p>`+P(st).map((pr,i)=>{const o=own[i];
+function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),mine=new Set(),hq=st===HQ;setScene("buy",hq?`ここから${HQ_NAME}にも足を延ばせますよ。大企業の本社が売りに出ています。`:`${st}駅に到着です。物件、見ていきますか？`);
+  const draw=()=>{const own=S.owners[st];body.innerHTML=`${sceneHTML("buy")}<h2>${hq?HQ_NAME:esc(st)+"駅の物件"}</h2>${hq?`<p class="hint" style="margin-bottom:6px">大企業の本社です。単体の利回りは低めですが、業界トップなどと組み合わせると「役」が成立し、祝い金と高い倍率がつきます。</p>`:""}<p>所持金 <b>${yen(p.money)}</b></p>`+P(st).map((pr,i)=>{const o=own[i];
     const right=o==null?`<button class="btn primary" data-buy="${i}" ${p.money<pr[1]?"disabled":""}>買う</button>`:mine.has(i)?`<button class="btn danger" data-undo="${i}">取り消す</button>`:`<span class="own" style="background:${pcol(o)}">${esc(S.players[o].name)}</span>`;
-    const c=propCat(pr[0],st),mineC=ownedList(p.idx).filter(([s2,k2])=>propCat(P(s2)[k2][0],s2)===c).length;
-    return `<div class="row"><span class="pn">${esc(pr[0])}<small class="pdesc"><span class="catchip c-${c}">${CAT_NAME[c]}</span>${esc(propDesc(pr[0],st))}${mineC?`（${CAT_NAME[c]}を${mineC}件所有）`:""}</small></span><span class="pp">${yen(pr[1])}・${pr[2]}%</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">駅の物件をすべて持つと独占（収益1.3倍）。同じカテゴリの物件を一番多く持つと業界トップ（収益1.6倍）。この画面にいる間は、買った物件を取り消して代金を戻せます。</p>`;renderPlayers();renderDyn()};
+    const c=propCat(pr[0],st),mineC=hq?0:ownedList(p.idx).filter(([s2,k2])=>propCat(P(s2)[k2][0],s2)===c).length,yk=YAKU.filter(y=>y.hq.includes(pr[0])||(y.prop&&y.prop[0]===st&&y.prop[1]===pr[0])).map(y=>y.n);
+    return `<div class="row"><span class="pn">${esc(pr[0])}<small class="pdesc"><span class="catchip c-${c}">${CAT_NAME[c]}</span>${esc(propDesc(pr[0],st))}${mineC?`（${CAT_NAME[c]}を${mineC}件所有）`:""}${yk.length?`<br><b style="color:var(--goal)">役の札：${yk.join("・")}</b>`:""}</small></span><span class="pp">${yen(pr[1])}・${pr[2]}%</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">駅の物件をすべて持つと独占（収益1.3倍）。同じカテゴリの物件を一番多く持つと業界トップ（収益1.6倍）。この画面にいる間は、買った物件を取り消して代金を戻せます。</p>`;renderPlayers();renderDyn()};
   modal("",[["購入を終える",1,"primary"]]).then(()=>{body.onclick=null;res()});
   draw();body.onclick=e=>{const b=e.target.closest("[data-buy]"),u=e.target.closest("[data-undo]");
     if(b){const i=+b.dataset.buy;if(buy(p,st,i)){mine.add(i);Snd.sfx("buy")}}
@@ -2036,6 +2089,7 @@ async function setup(mode){mode=mode==="single"?"single":"multi";hideTitle();
 function resume(state){hideTitle();useMap(state.map||"kanto");S=state;if(!S.mode)S.mode=S.players.filter(q=>!q.cpu).length===1?"single":"multi";S.map=CUR_MAP;CAND=null;S.players.forEach(p=>{if(!N[p.pos])p.pos="東京"});if(!N[S.dest])S.dest="東京";
   if(!S.rules)S.rules={exact:false,yokai:false};if(S.rules.quiz==null)S.rules.quiz=true;if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
   if(!S.props){S.props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(DEFAULT_PROPS[s[0]])]))}
+  if(!S.owners[HQ]){S.props[HQ]=clone(HQ_PROPS);S.owners[HQ]=HQ_PROPS.map(()=>null)}if(!S.yaku)S.yaku={};
   S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i;p.slow=p.slow||0;p.rest=p.rest||0;p.debt=p.debt||0;p.title=p.title||0;if(p.cpu&&!p.style)p.style=["aggressive","cautious","normal","normal"][(i+3)%4]});if(S.rate==null)S.rate=ECON.rateStart;if(S.season==null)S.season=seasonKey(S.month);
   buildTokens();render();startTurn()}
 async function howTo(){await modal(`<h2>遊び方</h2>
@@ -2043,6 +2097,7 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>進み方</h3><p>自分の番にサイコロを振り、地図で光るマスから止まる場所を選びます。目的地にぴったり止まると援助金がもらえ、ルーレットで次の目的地が決まります。</p>
   <h3>マス</h3><p><b style="color:var(--plus)">青</b>はお金が入り、<b style="color:var(--minus)">赤</b>は出費です。冬の北国では大雪で出費が増えます。<b style="color:var(--card)">黄</b>はカードがもらえますが、ときどき災難カード（鈍行・運休・罰金・紛失）を引きます。<b style="color:var(--shop)">ピンクのひし形</b>はカード売り場です。駅では物件を買えます。駅の物件をすべて持つと独占になり、決算での収益が1.3倍になります。</p>
   <h3>業界トップ</h3><p>物件は9つのカテゴリ（飲食・名産甘味・宿泊レジャー・工場醸造・伝統工芸・農園漁業・観光商業・夜の街娯楽・金融学術）に分かれています。決算のときに、あるカテゴリの物件をいちばん多く持ち、決められた件数以上を持っているオーナーは「業界トップ」となり、そのカテゴリの収益が1.6倍になります（同数で並んだときは該当なし）。独占と重なると約2.1倍です。メニューの「物件一覧」で、各カテゴリの状況を確かめられます。</p>
+  <h3>汐留ヘッドクォーター特区と役</h3><p>東京駅と、東京から2駅以内の首都圏の駅に止まると、「汐留ヘッドクォーター特区」で大企業の本社（人材派遣会社・広告代理店・旅行代理店・総合商社・物流会社）も買えます。本社は単体の利回りが低めですが、組み合わせると「役」が成立します。決算のときに役が成立していると、その業界の収益が1.6倍から2.0倍に上がります。はじめて成立したときは祝い金ももらえます。役は「人手不足解消（人材派遣会社＋工場・醸造トップ）」「話題沸騰（広告代理店＋観光・商業トップ）」「旅行パッケージ（旅行代理店＋宿泊・レジャートップ）」「全国流通（総合商社＋名産・甘味トップ）」「産地直送（物流会社＋農園・漁業トップ）」「接待で一杯（広告代理店＋銀座のナイトクラブ）」、大役「三本の矢（人材派遣会社・広告代理店・総合商社）」の7つです。</p>
   <h3>カード</h3><p>急行・特急・ぶっとびなどの移動カードのほか、相手を1回休みにする足止め、サイコロを半分にする鈍行押し付け、カード強奪、ぶっとばし、妖怪なすりつけといった邪魔カードがあります。お守りカードを持っていると、邪魔カードを1回防げます。</p>
   <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠いオーナーに妖怪「${YOKAI[0].n}」が取り憑きます。ほかのオーナーのいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
   <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場・夜の街・金融学術）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
@@ -2058,22 +2113,26 @@ function openMenu(){modal(`<h2>メニュー</h2><div class="menu">
     ({stats:statsModal,map:fullMap,players:showPlayers,save:openSaves,edit:propList,set:openSettings,rec:recordsModal,how:howTo,title:showTitle})[m]()}}
 async function propList(){if(!S)return;const body=$("#modalBody");let cat="all",owner="all",sort="yield";
   const pr=modal("",[["閉じる",0,"primary"]],true);
-  const draw=()=>{const tops=catTops(),all=[];STATIONS.forEach(([st])=>P(st).forEach((pp,k)=>all.push({st,k,n:pp[0],price:pp[1],rate:pp[2],c:propCat(pp[0],st),o:S.owners[st][k],d:propDesc(pp[0],st)})));
+  const draw=()=>{const tops=catTops(),all=[];[...STATIONS.map(x=>x[0]),HQ].forEach(st=>(P(st)||[]).forEach((pp,k)=>all.push({st,k,n:pp[0],price:pp[1],rate:pp[2],c:propCat(pp[0],st),o:S.owners[st][k],d:propDesc(pp[0],st)})));
     let L=all.filter(x=>(cat==="all"||x.c===cat)&&(owner==="all"||(owner==="free"?x.o==null:x.o===+owner)));
     L.sort(sort==="yield"?(a,b)=>b.rate-a.rate||a.price-b.price:sort==="price"?(a,b)=>b.price-a.price:sort==="cheap"?(a,b)=>a.price-b.price:()=>0);
     body.innerHTML=`<h2>物件一覧</h2>
     <h3 style="margin-top:4px">業界トップの状況<small style="font-weight:400;color:var(--muted);margin-left:6px">決算のときに判定・収益1.6倍</small></h3>
     <div class="tops">${CAT_KEYS.map(c=>{const t=tops[c],mx=Math.max(...t.cnt),lead=t.owner>=0?S.players[t.owner]:null;
       return `<button class="topcard ${cat===c?"on":""}" data-cat="${c}"><span class="catchip c-${c}">${CAT_NAME[c]}</span><b>${lead?`<span class="dot" style="background:${pcol(t.owner)};display:inline-block;width:10px;height:10px;margin-right:4px"></span>${esc(lead.name)}`:"トップなし"}</b><small>${S.players.map((q,i)=>t.cnt[i]?`${esc(q.name.slice(0,4))}${t.cnt[i]}`:"").filter(Boolean).join("・")||"まだ誰も持っていません"}<br>必要${t.need}件以上・全${t.total}件</small></button>`}).join("")}</div>
-    <div class="fm-tools" style="margin-top:12px;flex-wrap:wrap"><select id="plCat" aria-label="カテゴリ"><option value="all">すべてのカテゴリ</option>${CAT_KEYS.map(c=>`<option value="${c}" ${cat===c?"selected":""}>${CAT_NAME[c]}</option>`).join("")}</select>
+    <h3>役（やく）<small style="font-weight:400;color:var(--muted);margin-left:6px">決算のときに判定・成立すると祝い金</small></h3>
+    <div class="yakus">${YAKU.map(y=>{const holders=y.hq.map(n=>{const k=HQ_PROPS.findIndex(x=>x[0]===n),o=S.owners[HQ][k];return `${n}：${o==null?"空き":esc(S.players[o].name)}`}).concat(y.top?[`${CAT_NAME[y.top]}トップ：${tops[y.top].owner>=0?esc(S.players[tops[y.top].owner].name):"なし"}`]:[]).concat(y.prop?[`${y.prop[1]}：${(()=>{const k=P(y.prop[0]).findIndex(x=>x[0]===y.prop[1]),o=k>=0?S.owners[y.prop[0]][k]:null;return o==null?"空き":esc(S.players[o].name)})()}`]:[]);
+      const now=S.players.map((q,i)=>yakuOf(i,tops).some(z=>z.id===y.id)?q.name:null).filter(Boolean);
+      return `<div class="yakucard ${now.length?"on":""}"><b>${y.n}${y.big?"（大役）":""}</b><small>${esc(y.d)}<br>効果：${esc(y.fx)}</small><small class="yk-st">${holders.join("<br>")}</small>${now.length?`<small class="yk-now">いま成立：${now.map(esc).join("・")}</small>`:""}</div>`}).join("")}</div>
+    <div class="fm-tools" style="margin-top:12px;flex-wrap:wrap"><select id="plCat" aria-label="カテゴリ"><option value="all">すべてのカテゴリ</option>${[...CAT_KEYS,"hq"].map(c=>`<option value="${c}" ${cat===c?"selected":""}>${CAT_NAME[c]}</option>`).join("")}</select>
       <select id="plOwner" aria-label="持ち主"><option value="all">すべての物件</option><option value="free" ${owner==="free"?"selected":""}>空き物件</option>${S.players.map((q,i)=>`<option value="${i}" ${owner===String(i)?"selected":""}>${esc(q.name)}の物件</option>`).join("")}</select>
       <select id="plSort" aria-label="並べ替え"><option value="yield" ${sort==="yield"?"selected":""}>利回りが高い順</option><option value="price" ${sort==="price"?"selected":""}>価格が高い順</option><option value="cheap" ${sort==="cheap"?"selected":""}>価格が安い順</option><option value="station" ${sort==="station"?"selected":""}>駅の順</option></select></div>
     <p class="hint" style="margin:0 0 6px">${L.length}件。物件をタップすると、地図でその駅を表示します。</p>
-    <div class="plist">${L.map(x=>`<button class="pitem" data-st="${esc(x.st)}"><span class="pi-top"><b>${esc(x.n)}</b><span class="pi-num">${yen(x.price)}・${x.rate}%</span></span><span class="pi-sub"><span class="catchip c-${x.c}">${CAT_NAME[x.c]}</span>${esc(x.st)}駅・${x.o==null?"空き":`<span class="dot" style="background:${pcol(x.o)};display:inline-block;width:9px;height:9px;margin:0 3px"></span>${esc(S.players[x.o].name)}`}</span>${x.d?`<span class="pi-desc">${esc(x.d)}</span>`:""}</button>`).join("")}</div>`};
+    <div class="plist">${L.map(x=>`<button class="pitem" data-st="${esc(x.st)}"><span class="pi-top"><b>${esc(x.n)}</b><span class="pi-num">${yen(x.price)}・${x.rate}%</span></span><span class="pi-sub"><span class="catchip c-${x.c}">${CAT_NAME[x.c]}</span>${x.st===HQ?"東京駅・HQ特区":esc(x.st)+"駅"}・${x.o==null?"空き":`<span class="dot" style="background:${pcol(x.o)};display:inline-block;width:9px;height:9px;margin:0 3px"></span>${esc(S.players[x.o].name)}`}</span>${x.d?`<span class="pi-desc">${esc(x.d)}</span>`:""}</button>`).join("")}</div>`};
   draw();
   body.onchange=e=>{if(e.target.id==="plCat")cat=e.target.value;else if(e.target.id==="plOwner")owner=e.target.value;else if(e.target.id==="plSort")sort=e.target.value;else return;draw()};
   body.onclick=e=>{const t=e.target.closest("[data-cat]");if(t){cat=cat===t.dataset.cat?"all":t.dataset.cat;draw();return}
-    const it=e.target.closest("[data-st]");if(it){body.onclick=body.onchange=null;$("#modal").hidden=true;const st=it.dataset.st;setTimeout(()=>fullMap(st),0)}};
+    const it=e.target.closest("[data-st]");if(it){body.onclick=body.onchange=null;$("#modal").hidden=true;const st=it.dataset.st===HQ?"東京":it.dataset.st;setTimeout(()=>fullMap(st),0)}};
   await pr;body.onclick=body.onchange=null}
 async function fullMap(start){if(!S)return;if(busy()){toast("手番が終わるまでお待ちください");return}
   let sel=start||cp().pos,z=1;if(!STATIONS.some(s=>s[0]===sel))sel=S.dest;
