@@ -1390,7 +1390,7 @@ function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
 
 /* ---------- scene illustrations (placeholders; img/<key>.png or .webp on the site replaces them) ---------- */
-const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",chouhan:"丁半カード",fuku:"福だぬき",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
+const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",mono:"駅の独占",chouhan:"丁半カード",fuku:"福だぬき",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
 const SCENE_IMG={};let CER_N=4;
 let SVGID=0;
 const BG={sky:["#8CCDF0","#E6F5FD","#7CC26B"],sea:["#9BD3F2","#E3F3FC","#2F7FB8"],night:["#1B2440","#3B3F70","#283055"],snow:["#C9DDEA","#F2F8FB","#FFFFFF"],
@@ -1469,6 +1469,7 @@ const SCENES={
   yaku:["gold",()=>`<g transform="translate(160,92)">${[-70,0,70].map((x,k)=>`<g transform="translate(${x} 0) rotate(${(k-1)*12})"><rect x="-26" y="-40" width="52" height="80" rx="6" fill="#F7F1E3" stroke="#7A1E14" stroke-width="4"/><rect x="-20" y="-34" width="40" height="68" rx="3" fill="${["#DE3F34","#2B4C9B","#0C8565"][k]}"/><circle cx="0" cy="-6" r="13" fill="#F2C443"/><rect x="-14" y="14" width="28" height="6" fill="#F7F1E3"/></g>`).join("")}</g>`],
   fuku:["gold",()=>`<g transform="translate(160,96)"><circle r="44" fill="#F2C443" stroke="#7A5200" stroke-width="4"/><circle r="34" fill="none" stroke="#FFF3C4" stroke-width="3" stroke-dasharray="4 6"/></g>`+IC.tanuki(160,100,.75)+IC.coins(70,120,.8)+IC.coins(250,120,.8)+IC.sparkle(90,46,1.2)+IC.sparkle(236,40)],
   chouhan:["night",()=>`<rect x="40" y="120" width="240" height="60" fill="#7A1E14"/><rect x="40" y="120" width="240" height="8" fill="#E9E2D3"/><g transform="translate(160,92)"><path d="M-36 30 Q-40 -30 0 -36 Q40 -30 36 30Z" fill="#8A5A33" stroke="#4A2E18" stroke-width="4"/><path d="M-30 -8 H30" stroke="#4A2E18" stroke-width="3"/></g><g transform="translate(92,140) rotate(-12)"><rect x="-14" y="-14" width="28" height="28" rx="5" fill="#fff" stroke="#2B3540" stroke-width="3"/><circle r="4" fill="#DE3F34"/></g><g transform="translate(232,142) rotate(10)"><rect x="-14" y="-14" width="28" height="28" rx="5" fill="#fff" stroke="#2B3540" stroke-width="3"/><circle cx="-6" cy="-6" r="3" fill="#2B3540"/><circle cx="6" cy="6" r="3" fill="#2B3540"/></g><text x="70" y="62" font-size="34" font-weight="700" fill="#F2C443">丁</text><text x="226" y="62" font-size="34" font-weight="700" fill="#F2C443">半</text>`],
+  mono:["sky",()=>`${[[60,70,52,"#E9E2D3"],[128,46,64,"#F7F1E3"],[208,60,56,"#E9E2D3"]].map(([x,y,w,c])=>`<rect x="${x}" y="${y}" width="${w}" height="${150-y}" fill="${c}" stroke="#2B3540" stroke-width="3"/>${[0,1,2,3].map(r=>`<rect x="${x+8}" y="${y+10+r*20}" width="${w-16}" height="8" fill="#8CCDF0"/>`).join("")}`).join("")}<rect x="0" y="150" width="320" height="30" fill="#7CC26B"/><path d="M160 46 V10" stroke="#2B3540" stroke-width="3"/><path d="M160 10 L196 20 L160 30Z" fill="#DE3F34" stroke="#2B3540" stroke-width="2"/>`+IC.sparkle(40,40,1.1)+IC.sparkle(286,34)],
   s_spring:["sky",()=>tree(160,150,"#F3A6C0","#E58AAE")+tree(70,160,"#F7C1D3","#E58AAE",.7)+tree(255,158,"#F7C1D3","#E58AAE",.75)],
   s_summer:["sea",()=>`<circle cx="250" cy="44" r="22" fill="#FFD84A"/>${Array.from({length:10},(_,i)=>{const a=i*Math.PI/5;return `<path d="M${250+30*Math.cos(a)} ${44+30*Math.sin(a)} L${250+40*Math.cos(a)} ${44+40*Math.sin(a)}" stroke="#FFD84A" stroke-width="4" stroke-linecap="round"/>`}).join("")}<g fill="#fff"><circle cx="70" cy="80" r="26"/><circle cx="100" cy="66" r="30"/><circle cx="132" cy="84" r="24"/><rect x="50" y="84" width="100" height="24" rx="12"/></g>`],
   s_autumn:["sunset",()=>tree(160,150,"#E07A2E","#B4531A")+tree(70,160,"#F2B33D","#C9851A",.7)+tree(255,158,"#D9472E","#A8321F",.75)],
@@ -1566,7 +1567,8 @@ async function yakuFanfare(p,y){const amt=r100((y.big?50000:y.small?15000:25000)
   const pr=modal(`${sceneHTML("yaku")}<div class="cer-rank r1 arr">役 成立！</div><h2 class="cer-name yaku-name">${esc(y.n)}</h2><p style="text-align:center">${esc(y.d)}</p>
     <div class="reward"><p class="rw-h">ごほうび</p><p class="rw-n">祝い金</p><div class="big-money">＋${yen(amt)}</div><p class="rw-s">さらに決算のたびに、${esc(y.fx)}（役が続いている間）</p></div>`,[["つづける",1,"primary"]]);
   confetti(y.big?160:110);await pr}
-async function forceSellOf(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);let sold=0;
+async function forceSellOf(p){const mb=monoSet(p.idx);await forceSellOf0(p);await monoLostCheck(p,mb)}
+async function forceSellOf0(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);let sold=0;
   while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が資金繰りのため${s}の「${P(s)[k][0]}」を売却。`)}
   if(sold){render();await say(V(`おっと、お金が足りません……。${p.name}は資金繰りのため、物件を${sold}件手放しました。`,`${p.name}は資金繰りのため、物件を${sold}件売却しました。`),"minus")}}
 /* bank */
@@ -1882,7 +1884,8 @@ async function passYokai(j){const y=S.yokai,from=cp(),to=S.players[j];y.owner=j;
   const m=`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けた！`;log(m);Snd.sfx("pass");placeTokens();renderPlayers();await say(V(`おやおや、${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けましたよ！`,`${from.name}が${to.name}に${YOKAI[y.form].n}を押し付けました。`),"pass")}
 function ownedList(i){const a=[];for(const s in S.owners)S.owners[s].forEach((o,k)=>{if(o===i)a.push([s,k,P(s)[k][1]])});return a}
 function sellHalf(p,s,k){const pr=P(s)[k],v=r100(pr[1]/2);S.owners[s][k]=null;p.money+=v;return `${s}の「${pr[0]}」`}
-async function mischief(p){const y=S.yokai;y.turns++;ST(p).yokaiTurns++;let pre="",evolved=false;
+async function mischief(p){const mb=monoSet(p.idx);await mischief0(p);await monoLostCheck(p,mb)}
+async function mischief0(p){const y=S.yokai;y.turns++;ST(p).yokaiTurns++;let pre="",evolved=false;
   if(y.form===0&&y.turns>=6){y.form=1;y.turns=0;evolved=true;pre=`${YOKAI[0].n}が${YOKAI[1].n}に化けた！ `}
   const f=y.form,nm=YOKAI[f].n,r=Math.random(),mine=ownedList(p.idx);let msg;
   if(f===0){
@@ -1913,9 +1916,9 @@ async function badCard(p){const ks=Object.keys(BAD),k=ks[rnd(0,ks.length-1)];let
 async function land(){await stealFuku();const p=cp(),n=N[p.pos];
   if(p.pos===S.dest)await arrive(p);
   if(n.type==="st"){await quiz(p);
-    if(p.cpu){const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件購入しました。`,"buy")}
+    if(p.cpu){const was=isMono(n.id,p.idx);const b=cpuBuy(p,n.id);if(b.length){Snd.sfx("buy");render();await say(`${p.name}が${n.id}駅で物件を${b.length}件購入しました。`,"buy");if(!was&&isMono(n.id,p.idx))await monoCelebrate(p,n.id)}
       if(hqGate(n.id)){const h=cpuBuy(p,HQ);if(h.length){Snd.sfx("buy");render();await say(`${p.name}が${HQ_NAME}で${h.map(k=>HQ_PROPS[k][0]).join("・")}を買収しました。`,"buy")}}}
-    else{await shopModal(p,n.id);if(hqGate(n.id))await shopModal(p,HQ)}}
+    else{const was=isMono(n.id,p.idx)&&S.owners[n.id].length>0;await shopModal(p,n.id);if(!was&&S.owners[n.id].length&&isMono(n.id,p.idx))await monoCelebrate(p,n.id);if(hqGate(n.id))await shopModal(p,HQ)}}
   else if(n.type==="plus"){const amt=r100(rnd(800,2500)*yf());p.money+=amt;ST(p).plus++;gain(p,amt);const m=PLUS_MSG[rnd(0,PLUS_MSG.length-1)];log(`${p.name}：${m}。${yen(amt)}の収入。`);Snd.sfx("plus");render();await say(V(`青マスです！ ${m}。${p.name}に${yen(amt)}の収入ですよ！`,`青マス。${m}。${p.name}に${yen(amt)}の収入です。`),n.sea?"sea":"plus")}
   else if(n.type==="minus"){const winter=S.month>=8&&S.month<=10;let mult=1,m,key="minus";
     if(n.sea){key="sea";if(n.sea==="js"&&winter){mult=2;m="冬の日本海が大しけで、船の修理費がかさんだ"}else m=SEA_MSG[rnd(0,SEA_MSG.length-1)]}
@@ -1952,6 +1955,19 @@ async function revealDest(next,title){
   $("#modalBtns").hidden=false;$("#modalBtns button").focus();await pr}
 function isMono(st,i){return S.owners[st].every(x=>x===i)}
 const MONO_MULT=1.3,TOP_MULT=1.6;
+// monopoly announcements: praise when a station is completed, one line when it is lost
+const monoSet=i=>STATIONS.map(x=>x[0]).filter(st=>S.owners[st]&&S.owners[st].length&&isMono(st,i));
+const stationYear=st=>P(st).reduce((a,pp)=>a+pp[1]*pp[2]/100,0)*ECON.incomeHalf*2;
+const MONO_PRAISE=["お見事です！","やりましたね！","さすがの手腕です！","駅前はもう、あなたの庭ですね！"];
+async function monoCelebrate(p,st){const base=r100(stationYear(st)),up=r100(base*MONO_MULT);
+  if(p.cpu){Snd.sfx("buy");await say(`${p.name}が${st}駅を独占しました。広告と人員の効率化で、この駅の収益は1.3倍になります。`,"mono","board");return}
+  Snd.sfx("arrive");setScene("mono",`${st}駅を独占！`);
+  const pr=modal(`${sceneHTML("mono")}<div class="cer-rank r1 arr">駅を独占！</div><h2 class="cer-name">${esc(st)}駅</h2>
+    <p>${MONO_PRAISE[rnd(0,MONO_PRAISE.length-1)]} ${esc(st)}駅の物件をすべて手に入れました。広告宣伝の相乗効果と人員の適正配置で、この駅の収益は決算のたびに<b>1.3倍</b>になります。</p>
+    <div class="reward"><p class="rw-h">独占の効果</p><p class="rw-n">この駅の収益（年間）</p><div class="big-money" style="font-size:24px">${yen(base)} → ${yen(up)}</div><p class="rw-s">業界トップの倍率とも重なります</p></div>`,[["つづける",1,"primary"]]);
+  confetti(60);await pr}
+async function monoLostCheck(p,before){const now=new Set(monoSet(p.idx)),lost=before.filter(st=>!now.has(st));
+  for(const st of lost){log(`${p.name}の${st}駅の独占が崩れた。`);Snd.sfx("minus");await say(V(`残念……${st}駅の独占が崩れてしまいました。収益の1.3倍はなくなります。`,`${p.name}の${st}駅の独占が崩れました。`),"minus")}}
 const ownsHQ=(i,n)=>{const k=HQ_PROPS.findIndex(x=>x[0]===n);return k>=0&&S.owners[HQ]&&S.owners[HQ][k]===i};
 const ownsProp=(i,st,n)=>{const k=(P(st)||[]).findIndex(x=>x[0]===n);return k>=0&&S.owners[st][k]===i};
 function yakuOf(i,tops){return YAKU.filter(y=>y.hq.every(n=>ownsHQ(i,n))&&(!y.top||tops[y.top].owner===i)&&(!y.prop||ownsProp(i,y.prop[0],y.prop[1])))}
@@ -2070,7 +2086,8 @@ async function cpuTurn(){const p=cp();const d=distTo(S.dest)[p.pos];cpuRepay(p);
   const key=id=>[id===S.dest?0:1,(ps&&passes(r.get(id)))||id===fk?0:1,dd[id],pref[N[id].type]];
   const best=[...r.keys()].sort((a,b)=>{const A=key(a),B=key(b);for(let i=0;i<4;i++)if(A[i]!==B[i])return A[i]-B[i];return 0})[0];
   await wait(400);await moveAlong(r.get(best));await land();return endTurn()}
-async function forceSell(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);
+async function forceSell(p){const mb=monoSet(p.idx);await forceSell0(p);await monoLostCheck(p,mb)}
+async function forceSell0(p){const mine=ownedList(p.idx).sort((a,b)=>a[2]-b[2]);
   let sold=0;while(p.money<0&&mine.length){const[s,k,v]=mine.shift();S.owners[s][k]=null;p.money+=v;sold++;log(`${p.name}が借金返済のため${s}の「${P(s)[k][0]}」を売却。`)}
   if(sold){render();await say(V(`${p.name}は借金返済のため、物件を${sold}件手放しました……。`,`${p.name}は借金返済のため、物件を${sold}件売却しました。`),"minus")}}
 async function endTurn(){const p=cp();
