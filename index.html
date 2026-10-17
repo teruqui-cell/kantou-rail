@@ -346,6 +346,12 @@ body.dotfont .msgwin .scene-text{font-family:"DotGothic16",var(--f-body);font-we
   body.dotfont[data-view="map"] #log .scene-text,body.dotfont[data-view="cpu"] #log .scene-text{font-size:15px}
   body[data-view="map"] #log .scene-hint,body[data-view="cpu"] #log .scene-hint{min-height:0;font-size:11px}
   body[data-view="map"] #action .chip{padding:5px 10px;font-size:13px}
+  body[data-view="roll"] #action .cards{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  body[data-view="roll"] #action .cards .label{grid-column:1/-1}
+  body[data-view="roll"] #action .cardbtn{margin-top:0;padding:6px 8px;flex-direction:column;gap:0;min-width:0}
+  body[data-view="roll"] #action .cardbtn small{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body[data-view="roll"] #action .dice{min-height:44px;margin-bottom:6px}
+  body[data-view="roll"] #action .die{width:42px;height:42px;font-size:22px}
   body[data-view="roll"] .scene-text{font-size:18px}
   body[data-view="map"] #log .loglabel,body[data-view="map"] #log ol,body[data-view="cpu"] #log .loglabel,body[data-view="cpu"] #log ol{display:none}
 }
@@ -1123,7 +1129,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const clone=o=>JSON.parse(JSON.stringify(o));
 function yen(m){const neg=m<0;m=Math.abs(Math.round(m));const oku=Math.floor(m/10000),man=m%10000;let s="";if(oku)s+=oku.toLocaleString()+"億";if(man||!oku)s+=man.toLocaleString()+"万";return(neg?"−":"")+s+"円"}
 const sqName=id=>{const n=N[id];return n.type==="st"?n.id+"駅":{plus:"青マス",minus:"赤マス",card:"カードマス",shop:"カード売り場"}[n.type]};
-const yf=()=>1+.35*(S.year-1);
+const yf=()=>Math.pow(1.08,S.year-1); // prices rise 8% a year
 let S=null,CAND=null,scale=.72,tokEls=[],CUSTOM={},curScene=null;
 const cp=()=>S.players[S.cur];
 const P=st=>S.props[st];
@@ -1390,7 +1396,7 @@ function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
 
 /* ---------- scene illustrations (placeholders; img/<key>.png or .webp on the site replaces them) ---------- */
-const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",mono:"駅の独占",chouhan:"丁半カード",fuku:"福だぬき",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
+const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",era:"時代の大波",mono:"駅の独占",chouhan:"丁半カード",fuku:"福だぬき",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
 const SCENE_IMG={};let CER_N=4;
 let SVGID=0;
 const BG={sky:["#8CCDF0","#E6F5FD","#7CC26B"],sea:["#9BD3F2","#E3F3FC","#2F7FB8"],night:["#1B2440","#3B3F70","#283055"],snow:["#C9DDEA","#F2F8FB","#FFFFFF"],
@@ -1470,6 +1476,7 @@ const SCENES={
   fuku:["gold",()=>`<g transform="translate(160,96)"><circle r="44" fill="#F2C443" stroke="#7A5200" stroke-width="4"/><circle r="34" fill="none" stroke="#FFF3C4" stroke-width="3" stroke-dasharray="4 6"/></g>`+IC.tanuki(160,100,.75)+IC.coins(70,120,.8)+IC.coins(250,120,.8)+IC.sparkle(90,46,1.2)+IC.sparkle(236,40)],
   chouhan:["night",()=>`<rect x="40" y="120" width="240" height="60" fill="#7A1E14"/><rect x="40" y="120" width="240" height="8" fill="#E9E2D3"/><g transform="translate(160,92)"><path d="M-36 30 Q-40 -30 0 -36 Q40 -30 36 30Z" fill="#8A5A33" stroke="#4A2E18" stroke-width="4"/><path d="M-30 -8 H30" stroke="#4A2E18" stroke-width="3"/></g><g transform="translate(92,140) rotate(-12)"><rect x="-14" y="-14" width="28" height="28" rx="5" fill="#fff" stroke="#2B3540" stroke-width="3"/><circle r="4" fill="#DE3F34"/></g><g transform="translate(232,142) rotate(10)"><rect x="-14" y="-14" width="28" height="28" rx="5" fill="#fff" stroke="#2B3540" stroke-width="3"/><circle cx="-6" cy="-6" r="3" fill="#2B3540"/><circle cx="6" cy="6" r="3" fill="#2B3540"/></g><text x="70" y="62" font-size="34" font-weight="700" fill="#F2C443">丁</text><text x="226" y="62" font-size="34" font-weight="700" fill="#F2C443">半</text>`],
   mono:["sky",()=>`${[[60,70,52,"#E9E2D3"],[128,46,64,"#F7F1E3"],[208,60,56,"#E9E2D3"]].map(([x,y,w,c])=>`<rect x="${x}" y="${y}" width="${w}" height="${150-y}" fill="${c}" stroke="#2B3540" stroke-width="3"/>${[0,1,2,3].map(r=>`<rect x="${x+8}" y="${y+10+r*20}" width="${w-16}" height="8" fill="#8CCDF0"/>`).join("")}`).join("")}<rect x="0" y="150" width="320" height="30" fill="#7CC26B"/><path d="M160 46 V10" stroke="#2B3540" stroke-width="3"/><path d="M160 10 L196 20 L160 30Z" fill="#DE3F34" stroke="#2B3540" stroke-width="2"/>`+IC.sparkle(40,40,1.1)+IC.sparkle(286,34)],
+  era:["night",()=>`<g fill="none" stroke="#8CCDF0" stroke-width="5" stroke-linecap="round">${[0,1,2].map(k=>`<path d="M0 ${110+k*22} q40 -30 80 0 t80 0 t80 0 t80 0" opacity="${1-k*.25}"/>`).join("")}</g><g transform="translate(160,70)"><circle r="30" fill="#F2C443" stroke="#7A5200" stroke-width="4"/><text y="11" text-anchor="middle" font-size="30" font-weight="700" fill="#7A1E14">時</text></g>`],
   s_spring:["sky",()=>tree(160,150,"#F3A6C0","#E58AAE")+tree(70,160,"#F7C1D3","#E58AAE",.7)+tree(255,158,"#F7C1D3","#E58AAE",.75)],
   s_summer:["sea",()=>`<circle cx="250" cy="44" r="22" fill="#FFD84A"/>${Array.from({length:10},(_,i)=>{const a=i*Math.PI/5;return `<path d="M${250+30*Math.cos(a)} ${44+30*Math.sin(a)} L${250+40*Math.cos(a)} ${44+40*Math.sin(a)}" stroke="#FFD84A" stroke-width="4" stroke-linecap="round"/>`}).join("")}<g fill="#fff"><circle cx="70" cy="80" r="26"/><circle cx="100" cy="66" r="30"/><circle cx="132" cy="84" r="24"/><rect x="50" y="84" width="100" height="24" rx="12"/></g>`],
   s_autumn:["sunset",()=>tree(160,150,"#E07A2E","#B4531A")+tree(70,160,"#F2B33D","#C9851A",.7)+tree(255,158,"#D9472E","#A8321F",.75)],
@@ -1553,7 +1560,7 @@ async function settle(yearEnd){render();
   const newYaku=[];
   const rows=S.players.map((p,i)=>{let inc=0,mono=0;const myTops=CAT_KEYS.filter(c=>tops[c].owner===i),yk=yakuOf(i,tops);{const st=ST(p);st.maxTops=Math.max(st.maxTops||0,myTops.length);st.yakus=st.yakus||[];yk.forEach(y=>{if(!st.yakus.includes(y.id))st.yakus.push(y.id)})}
     const done=S.yaku[i]=S.yaku[i]||[];yk.forEach(y=>{if(!done.includes(y.id)){done.push(y.id);newYaku.push({p,y})}});
-    for(const s in S.owners){const m=s!==HQ&&isMono(s,i);if(m)mono++;S.owners[s].forEach((o,k)=>{if(o===i){const[nm,pr,rt]=P(s)[k];inc+=pr*rt/100*(m?MONO_MULT:1)*incomeMult(i,propCat(nm,s),tops,yk)*ECON.incomeHalf}})}
+    for(const s in S.owners){const m=s!==HQ&&isMono(s,i);if(m)mono++;S.owners[s].forEach((o,k)=>{if(o===i){const[nm,pr,rt]=P(s)[k];inc+=pr*rt/100*(m?MONO_MULT:1)*incomeMult(i,propCat(nm,s),tops,yk)*eraMult(s,propCat(nm,s))*ECON.incomeHalf}})}
     inc=r100(inc);const interest=r100(debtOf(p)*S.rate/100/2),tax=yearEnd?r100(assets(i)*ECON.taxRate):0,net=inc-interest-tax;p.money+=net;gain(p,net);return{p,inc,mono,myTops,yk,interest,tax,net}});
   rows.forEach(r=>r.myTops.forEach(c=>log(`${r.p.name}が${CAT_NAME[c]}の業界トップ（${tops[c].cnt[r.p.idx]}件）。収益1.6倍。`)));
   const label=yearEnd?`${S.year}年目 本決算（3月）`:`${S.year}年目 中間決算（9月）`;
@@ -1668,6 +1675,36 @@ function pickBgm(){if(!$("#title").hidden||!S){Snd.setTrack("title");return}
   const p=cp();let t=S.season||seasonKey(S.month);
   if(S.phase!=="over"){if(S.year>=S.years&&S.years>1)t="final";if(N[p.pos]&&N[p.pos].sea)t="ferry";if(S.rules&&S.rules.yokai&&S.yokai&&S.yokai.owner===S.cur&&!S.yokai.good)t="yokai"}
   Snd.setTrack(t,p.cpu&&S.phase!=="over")}
+/* ---------- 時代の大波 (era events, fictional; from year 5, roughly every 3-4 years) ---------- */
+function regionAround(){const c=STATIONS[rnd(0,STATIONS.length-1)],R=CUR_MAP==="east"?260:200;return{center:c[0],sts:STATIONS.filter(x=>Math.hypot(x[1]-c[1],x[2]-c[2])<=R).map(x=>x[0])}}
+function scalePrices(sts,f){sts.forEach(st=>(P(st)||[]).forEach(pp=>pp[1]=Math.max(100,r100(pp[1]*f))))}
+const allSts=()=>[...STATIONS.map(x=>x[0]),HQ];
+const ERA_EVENTS=[
+ {id:"bubble",w:3,t:"空前の好景気（バブル）到来！",d:"土地も株も右肩上がり。すべての物件の評価額が3割上がりました。ただし、宴はいつか終わるもの……。",fx:()=>{scalePrices(allSts(),1.3);S.bubble=S.year+rnd(2,3)}},
+ {id:"crisis",w:2,t:"金融危機が発生！",d:"大手金融機関の破たんで市場が大混乱。物件の評価額が2割下がり、金利が3%上がりました。",fx:()=>{scalePrices(allSts(),.8);S.rate=Math.min(12,S.rate+3)}},
+ {id:"typhoon",w:2,t:"大型台風が直撃",d:"周辺の駅の物件は、次の1年間収益が出ず、評価額の1割の修繕費がかかります。翌年は復興特需で収益1.5倍。",region:1,kind:"台風"},
+ {id:"volcano",w:1,t:"火山が噴火",d:"周辺の駅の物件は、次の1年間収益が出ず、評価額の1割の修繕費がかかります。翌年は復興特需で収益1.5倍。",region:1,kind:"噴火"},
+ {id:"snow",w:1,t:"記録的な豪雪",d:"周辺の駅の物件は、次の1年間収益が出ず、評価額の1割の修繕費がかかります。翌年は復興特需で収益1.5倍。",region:1,kind:"豪雪"},
+ {id:"epidemic",w:2,t:"感染症が大流行",d:"観光・商業、宿泊・レジャー、夜の街・娯楽の物件は、1年間収益が出ません。明けた翌年は反動の特需で収益1.5倍。",fx:()=>{S.eraCat={cats:["tourism","lodging","night"],stop:S.year,boom:S.year+1}}},
+ {id:"expo",w:2,t:"万博の開催が決定！",d:"国内外から人が押し寄せます。観光・商業と宿泊・レジャーの物件は、1年間収益1.5倍。",fx:()=>{S.eraCat={cats:["tourism","lodging"],stop:-1,boom:S.year}}},
+ {id:"it",w:2,t:"IT革命が起きた！",d:"知識と金融が富を生む時代へ。金融・学術の物件の評価額が5割上がりました。",fx:()=>{STATIONS.forEach(([st])=>P(st).forEach(pp=>{if(propCat(pp[0],st)==="pro")pp[1]=r100(pp[1]*1.5)}))}},
+ {id:"shinkansen",w:2,t:"新幹線が延伸開業！",d:"新しい駅ができる地方に人と投資が集まり、周辺の駅の物件の評価額が4割上がりました。",region:1,boomPrice:1}];
+function eraMult(st,cat){let m=1;const d=S.eraDmg;if(d&&d.sts.includes(st)){if(S.year===d.stop)m=0;else if(S.year===d.boom)m*=1.5}
+  const c=S.eraCat;if(c&&c.cats.includes(cat)){if(S.year===c.stop)m=0;else if(S.year===c.boom)m*=1.5}return m}
+async function eraTurn(){if(S.year<5||S.years<5)return;
+  if(S.bubble&&S.year>=S.bubble){S.bubble=0;S.eraN=(S.eraN||0)+1;scalePrices(allSts(),.6);log("バブル崩壊！物件の評価額が4割下がった。");
+    Snd.sfx("sad");setScene("era","バブル崩壊",'board');await modal(`${sceneHTML("era")}<div class="cer-rank r4 arr">時代の大波</div><h2 class="cer-name">バブル崩壊</h2><p>宴は終わりました。すべての物件の評価額が4割下がりました。物件を多く持つオーナーほど痛手です。</p>`,[["つづける",1,"primary"]]);S.lastEra=S.year;return}
+  if(S.lastEra&&S.year-S.lastEra<3)return;if(Math.random()>.32)return;
+  const pool=ERA_EVENTS.filter(e=>!(e.id==="bubble"&&S.bubble));let r=Math.random()*pool.reduce((a,e)=>a+e.w,0),ev=pool[0];for(const e of pool){r-=e.w;if(r<0){ev=e;break}}
+  let extra="";
+  if(ev.region){const g=regionAround();
+    if(ev.boomPrice){scalePrices(g.sts,1.4);extra=`対象：${g.center}駅の周辺（${g.sts.join("・")}）`}
+    else{S.eraDmg={sts:g.sts,stop:S.year,boom:S.year+1};extra=`対象：${g.center}駅の周辺（${g.sts.join("・")}）`;
+      for(const pl of S.players){let cost=0;g.sts.forEach(st=>S.owners[st].forEach((o,k)=>{if(o===pl.idx)cost+=P(st)[k][1]*.1}));cost=r100(cost);if(cost>0){pl.money-=cost;gain(pl,-cost);extra+=`<br>${esc(pl.name)}：修繕費 −${yen(cost)}`}}}}
+  else ev.fx();
+  S.lastEra=S.year;S.eraN=(S.eraN||0)+1;log(`時代の大波：${ev.t}`);render();Snd.sfx(["typhoon","volcano","snow","crisis","epidemic"].includes(ev.id)?"minus":"over");setScene("era",ev.t,"board");
+  await modal(`${sceneHTML("era")}<div class="cer-rank r1 arr">時代の大波</div><h2 class="cer-name">${esc(ev.t)}</h2><p>${esc(ev.d)}</p>${extra?`<p class="hint">${extra}</p>`:""}`,[["つづける",1,"primary"]]);
+  for(const pl of S.players)if(pl.money<0)await forceSellOf(pl)}
 /* ---------- seasons ---------- */
 const SEASON_N={spring:"春",summer:"夏",autumn:"秋",winter:"冬"};
 const seasonOfMonth=m=>m>=3&&m<=5?"spring":m>=6&&m<=8?"summer":m>=9&&m<=11?"autumn":"winter"; // m = calendar month 1-12
@@ -1831,7 +1868,7 @@ const modalOpen=()=>!$("#modal").hidden;
 function pickDest(from){const d=distTo(from);const c=STATIONS.map(s=>s[0]).filter(n=>n!==from&&d[n]>=MAP.minDest);return c[rnd(0,c.length-1)]}
 const possessed=()=>S.rules.yokai&&S.yokai.owner===S.cur&&!S.yokai.good;
 const blessed=()=>S.rules.yokai&&S.yokai.owner===S.cur&&!!S.yokai.good;
-const yfM=()=>1+.15*(S.year-1); // mischief / blessing amounts: grow slower than the economy
+const yfM=()=>Math.pow(1.08,S.year-1); // mischief / blessing amounts: grow slower than the economy
 // 福だぬき: very rarely the tanuki reforms and only does good things for a few turns (more likely for players who are behind)
 function fukuChance(i){const nw=S.players.map((_,k)=>netWorth(k)),me=nw[i],rank=nw.filter(v=>v>me).length;return me<0||rank===nw.length-1?.045:rank>=nw.length/2?.025:.01}
 const FUKU_CARDS=["tokkyu","kyuko","chouhan","omamori","buttobi","rinji"];
@@ -2004,7 +2041,7 @@ const CARD_PRICE={chouhan:1500,kyuko:1000,tokkyu:3000,buttobi:2500,oharai:3000,a
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
 async function cardShop(p){Snd.sfx("card");
   const kinds=shuffle(Object.keys(CARD_PRICE).filter(k=>S.rules.yokai||!CARDS[k].yokai)).slice(0,4);
-  const offer=kinds.map(k=>({k,price:r100(CARD_PRICE[k]*yf()),got:false}));
+  const offer=kinds.map(k=>({k,price:CARD_PRICE[k],got:false}));
   if(p.cpu){const got=[];for(const o of offer){if(p.cards.length>=5)break;const want=CARDS[o.k].yokai?possessed():true;if(want&&p.money-o.price>=6000){p.money-=o.price;p.cards.push(o.k);got.push(CARDS[o.k].n)}}
     if(got.length){log(`${p.name}がカード売り場で${got.join("・")}を買った。`);render();await say(V(`カード売り場で、${p.name}が${got.join("・")}を買いましたよ。`,`カード売り場で、${p.name}が${got.join("・")}を購入しました。`),"shop")}
     else await say(V(`カード売り場に寄りましたが、${p.name}は何も買いませんでした。`,`カード売り場。${p.name}は何も購入しませんでした。`),"shop");return}
@@ -2096,7 +2133,7 @@ async function endTurn(){const p=cp();
   else if(possessed()){if(Math.random()<fukuChance(S.cur)){await fukuStart(p);await blessing(p);if(S.extraRoll){S.extraRoll=false;render();return startTurn()}}else await mischief(p)}
   if(p.money<0)await forceSell(p);
   S.cur=(S.cur+1)%S.players.length;
-  if(S.cur===0){S.month++;if(S.month===6)await settle(false);if(S.month>=12){await settle(true);S.month=0;S.year++;if(S.year>S.years){await checkTitles();return gameOver()}}await seasonTurn();await monthEvents();snapshot(`${S.year}年${MONTHS[S.month]}`)}
+  if(S.cur===0){S.month++;if(S.month===6)await settle(false);if(S.month>=12){await settle(true);S.month=0;S.year++;if(S.year>S.years){await checkTitles();return gameOver()}await eraTurn()}await seasonTurn();await monthEvents();snapshot(`${S.year}年${MONTHS[S.month]}`)}
   await checkTitles();startTurn()}
 
 /* ---------- title & setup ---------- */
@@ -2159,6 +2196,7 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場・夜の街・金融学術）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
   <h3>季節</h3><p>春（3〜5月）・夏（6〜8月）・秋（9〜11月）・冬（12〜2月）で、画面の色や絵、BGMが変わります。妖怪に取り憑かれているとき、フェリー航路の上、最終年にも専用の曲が流れます。CPUの番は控えめな演奏になります。季節の変わり目にはお知らせが出ます。</p>
   <h3>称号</h3><p>総資産が増えると称号が上がり、そのたびに昇格ボーナス（クイズ正解の賞金と同じくらい）がもらえます。CPUも同じです。駆け出し → 小金持ち（2億円）→ 資産家（4億円）→ 大地主（8億円）→ 大富豪（15億円）→ 億万長者（30億円）。一度上がった称号は、総資産が減っても下がりません。</p>
+  <h3>時代の大波</h3><p>5年以上のゲームでは、5年目以降に数年に一度、景気や社会を大きく揺さぶる出来事が起きます。好景気（バブル）とその崩壊、金融危機、台風・噴火・豪雪などの地域の災害と復興特需、感染症の流行、万博、IT革命、新幹線の開業などです。物件を多く持つオーナーほど大きく揺さぶられます。出来事はすべて架空です。</p>
   <h3>福だぬき</h3><p>ごくまれに、取り憑いている${YOKAI[0].n}が改心して「福だぬき」になります。総資産が下位のオーナーほど起きやすくなっています。福だぬきは3〜5回のあいだ、番の終わりに良いこと（良いカード・臨時収入・もう一度サイコロ）だけをしてくれて、満足すると山へ帰ります。このあいだ、ほかのオーナーは福だぬき付きのオーナーと同じマスにぴったり止まると、福だぬきを奪えます。</p>
   <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
   <p class="hint">物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>`,[["閉じる",0,"primary"]])}
