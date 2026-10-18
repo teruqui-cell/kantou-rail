@@ -56,6 +56,8 @@ body[data-map="east"] #mapWrap,body[data-map="east"] .fm-wrap{background:var(--s
 .mapframe{fill:none;stroke:var(--coast);opacity:.6}
 .compass{stroke:var(--coast);fill:none;stroke-width:2;opacity:.7}.compass .cf{fill:var(--coast);stroke:none}
 .sglyph{pointer-events:none}
+.trial{border:2px solid var(--card);background:color-mix(in srgb,var(--card) 12%,transparent);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:14px;line-height:1.6}
+.trial p{margin:4px 0}.trial-h{font-weight:700;color:var(--ink)}.trial-s{font-size:12px;color:var(--muted)}.trial .perks{margin:6px 0;padding-left:1.2em}.trial .perks li{margin:3px 0}
 .reward{border:2px solid var(--card);background:color-mix(in srgb,var(--card) 14%,transparent);border-radius:12px;padding:10px 12px 6px;margin:8px 0 12px;text-align:center}
 .reward .rw-h{display:inline-block;background:var(--card);color:#2B3540;font-weight:700;font-size:12px;border-radius:999px;padding:1px 10px;margin:0 0 4px}
 .reward .rw-n{font-weight:700;margin:0}.reward .big-money{margin:0}.reward .rw-s{font-size:13px;color:var(--muted);margin:0 0 4px}
@@ -400,6 +402,7 @@ body.dotfont .msgwin .scene-text{font-family:"DotGothic16",var(--f-body);font-we
       <button class="btn big t-cont" id="tCont">つづきから<small id="tContInfo"></small></button>
       <div class="t-row"><button class="btn" id="tLoad">セーブ</button><button class="btn" id="tRec">記録</button><button class="btn" id="tHow">遊び方</button><button class="btn" id="tSet">設定</button></div>
     </div>
+    <p class="t-note" id="tTrial" hidden>体験版：3年のゲームを遊べます。5・10・20年の長期戦はiPhoneアプリの製品版で。</p>
     <p class="t-note">ver 1.0　物件・イベント・キャラクター・クイズの内容はすべて架空またはゲーム用の創作で、実在の企業・店舗とは関係ありません。</p>
   </div>
 </div>
@@ -1138,6 +1141,11 @@ function log(t){S.log.unshift(t);S.log.length=Math.min(S.log.length,40);renderLo
 let toastT;function toast(t,ms=1800){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,ms)}
 /* message pacing: tap-to-advance or timed (slow / normal / fast) */
 const GP={speed:"normal"};
+// 製品版（5・10・20年）か体験版（3年のみ）か。ウェブ公開版とアプリの未購入状態は体験版。
+let FULL_ED=false;
+const isFull=()=>FULL_ED||!!GP.unlocked;
+const FULL_PERKS=`<ul class="perks"><li><b>5年・10年（標準）・20年</b>のじっくりした長期戦</li><li><b>時代の大波</b>：バブルとその崩壊、金融危機、台風・噴火・豪雪と復興特需、万博、新幹線の開業と<b>新幹線カード</b></li><li><b>福だぬき</b>：取り憑いた狸がまれに改心して、良いことだけをしてくれる</li><li><b>役（やく）</b>と<b>業界トップ</b>：物件の組み合わせをそろえて収益アップ、汐留ヘッドクォーター特区の本社物件</li><li>称号を<b>億万長者</b>まで駆け上がる、やり込みの実績集め</li></ul>`;
+const trialBox=(lead,head="体験版（3年）で遊んでいます")=>`<div class="trial"><p class="trial-h">${head}</p><p>${lead}</p>${FULL_PERKS}<p class="trial-s">製品版はiPhoneアプリ（買い切り500円）で遊べます。</p></div>`;
 try{Object.assign(GP,JSON.parse(localStorage.getItem("kks-game"))||{})}catch(e){}
 const saveGP=()=>{try{localStorage.setItem("kks-game",JSON.stringify(GP))}catch(e){}};
 const applyDotFont=()=>document.body.classList.toggle("dotfont",GP.dotFont!==false);applyDotFont();
@@ -1635,6 +1643,7 @@ async function gameOver(){S.year=S.years;S.month=11;S.phase="over";snapshot("終
     const pr=modal(`${sceneHTML(key)}<div class="cer-rank r${Math.min(x.rank,4)}">${first?"優勝":x.rank+"位"}</div><h2 class="cer-name"><span class="dot" style="background:${pcol(x.i)}"></span>${esc(x.p.name)}</h2><p style="text-align:center;margin:0">称号：<b>${TITLES[x.p.title||0].n}</b></p><div class="big-money ${x.nw<0?"neg":""}">${x.nw<0?"−":""}${yen(Math.abs(x.nw))}</div><p class="cer-line">${esc(ceremonyLine(x,first,last,order))}</p><div class="awards">${awards[x.i].map(a=>`<span class="award">${a}</span>`).join("")}</div>`,[[first?"表彰式を終える":"次の発表へ",1,"primary"]]);
     if(first)confetti(140);await pr}
   if(rec&&rec.newAch.length){Snd.sfx("card");confetti(50);await modal(`${sceneHTML("correct")}<h2>新しい実績を獲得！</h2>${rec.newAch.map(a=>`<div class="ach got"><b>${a.n}</b><small>${a.d}</small></div>`).join("")}`,[["つづける",1,"primary"]])}
+  if(!isFull())await modal(`<h2>体験版をお楽しみいただき、ありがとうございました</h2>${trialBox("3年間の旅、おつかれさまでした。長期戦の製品版では、さらにこんな楽しみが待っています。","製品版で待っている楽しみ")}`,[["つづける",1,"primary"]]);
   for(;;){const r=await modal(summaryHTML(order,rec,awards),[["成績を見る",2],["タイトルへ",0],["もう一度あそぶ",1,"primary"]]);
     if(r===2){await statsModal();continue}
     if(r===1)setup(S.mode);else showTitle();break}}
@@ -2140,7 +2149,7 @@ async function endTurn(){const p=cp();
 
 /* ---------- title & setup ---------- */
 const VERSION="ver 1.0";
-async function showTitle(){$("#title").hidden=false;applySeason();Snd.setTrack("title");setView();$("#tVisual").innerHTML=artHTML("title");
+async function showTitle(){$("#title").hidden=false;$("#tTrial").hidden=isFull();applySeason();Snd.setTrack("title");setView();$("#tVisual").innerHTML=artHTML("title");
   const saved=S&&S.phase!=="over"?S:await Store.get("auto");const ok=saved&&saved.phase!=="over"&&validState(saved);
   $("#tCont").disabled=!ok;$("#tContInfo").textContent=ok?`${MAPS[saved.map||"kanto"].name}・${saved.year}年目 ${MONTHS[saved.month]}`:"保存されたゲームはありません";
   $("#tSingle").focus()}
@@ -2157,7 +2166,7 @@ async function setup(mode){mode=mode==="single"?"single":"multi";hideTitle();
   const pr=modal(`<h2>${single?"ひとりで遊ぶ":"みんなで遊ぶ"}</h2><p>駅をサイコロで巡り、目的地への一番乗りと物件の独占で総資産トップを目指します。</p>
   <div class="field"><label for="fMap">遊ぶ地図</label><select id="fMap">${order.map(k=>`<option value="${k}" ${cur===k?"selected":""}>${MAPS[k].name}</option>`).join("")}</select><small class="hint" id="fMapDesc" style="margin:0">${MAPS[cur].desc}</small></div>
   ${seatsHTML}
-  <div class="field" style="margin-top:12px"><label for="fYears">プレイ年数</label><select id="fYears"><option value="1">1年</option><option value="3">3年（短期戦）</option><option value="5" selected>5年（標準）</option><option value="10">10年</option><option value="20">20年（大河戦）</option></select><small class="hint" style="margin:0">業界トップや役（やく）は、5年以上のゲームでじっくり狙う要素です。</small></div>
+  <div class="field" style="margin-top:12px"><label for="fYears">プレイ年数</label><select id="fYears">${isFull()?`<option value="3">3年（短期戦）</option><option value="5">5年</option><option value="10" selected>10年（標準）</option><option value="20">20年（大河戦）</option>`:`<option value="3" selected>3年（体験版）</option><option value="5" disabled>5年（製品版）</option><option value="10" disabled>10年・標準（製品版）</option><option value="20" disabled>20年（製品版）</option>`}</select><small class="hint" style="margin:0">${isFull()?"時代の大波は5年目から起きます。業界トップや役（やく）、福だぬきは、長いゲームほどじっくり楽しめます。":"体験版で遊べるのは3年のゲームです。"}</small>${isFull()?"":trialBox("3年のゲームは、すごろくと物件集めの基本を味わう入門編です。製品版では、長期戦ならではの楽しみとやり込み要素が加わります。")}</div>
   <div class="field"><label for="fSpeed">メッセージの速さ</label><select id="fSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
   <label class="check"><input type="checkbox" id="fSound" ${Snd.prefs.on?"checked":""}><span>音を出す（BGM・効果音）<small>オフにすると無音で遊べます。ゲーム中も画面上部の「音」ボタンで切り替えられます。</small></span></label>
   <h3>ルール</h3>
@@ -2180,7 +2189,7 @@ async function setup(mode){mode=mode==="single"?"single":"multi";hideTitle();
   if(single){const nm=$("#seatN0").value.trim()||"あなた";GP.name=nm;seats.push({name:nm,cpu:false,color:0});GP.cpuNames=[null,1,2,3].map(i=>i&&($("#cpuN"+i).value.trim()||CPU_NAMES[i]));for(let i=1;i<=+$("#fCpu").value;i++)seats.push({name:GP.cpuNames[i],cpu:true,color:i})}
   else DEFAULT_SEATS.forEach(([nm],i)=>{const t=$("#seatT"+i).value;if(t!=="none")seats.push({name:$("#seatN"+i).value.trim()||nm,cpu:t==="cpu",color:i})});
   GP.speed=$("#fSpeed").value;GP.map=$("#fMap").value;saveGP();
-  newGame(seats,+$("#fYears").value,$("#fAssist").checked,{exact:$("#fExact").checked,yokai:$("#fYokai").checked,quiz:$("#fQuiz").checked},GP.map,mode)}
+  newGame(seats,isFull()?+$("#fYears").value:3,$("#fAssist").checked,{exact:$("#fExact").checked,yokai:$("#fYokai").checked,quiz:$("#fQuiz").checked},GP.map,mode)}
 function resume(state){hideTitle();useMap(state.map||"kanto");S=state;if(!S.mode)S.mode=S.players.filter(q=>!q.cpu).length===1?"single":"multi";S.map=CUR_MAP;CAND=null;S.players.forEach(p=>{if(!N[p.pos])p.pos="東京"});if(!N[S.dest])S.dest="東京";
   if(!S.rules)S.rules={exact:false,yokai:false};if(S.rules.quiz==null)S.rules.quiz=true;if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
   if(!S.props){S.props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(DEFAULT_PROPS[s[0]])]))}
