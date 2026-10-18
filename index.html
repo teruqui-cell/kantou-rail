@@ -2194,8 +2194,6 @@ async function setup(mode){mode=mode==="single"?"single":"multi";hideTitle();
   <div class="field"><label for="fSpeed">メッセージの速さ</label><select id="fSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
   <label class="check"><input type="checkbox" id="fSound" ${Snd.prefs.on?"checked":""}><span>音を出す（BGM・効果音）<small>オフにすると無音で遊べます。ゲーム中も画面上部の「音」ボタンで切り替えられます。</small></span></label>
   <h3>ルール</h3>
-  <label class="check"><input type="checkbox" id="fExact" checked><span>ぴったり到着<small>目的地には、出た目とちょうど同じマス数で止まったときだけ到着できます。オフにすると通過する目でも到着できます。</small></span></label>
-  <label class="check"><input type="checkbox" id="fYokai" checked><span>妖怪「${YOKAI[0].n}」<small>誰かが目的地に着くたびに、いちばん遠いオーナーへ取り憑いて毎ターン悪さをします。ほかのオーナーのいるマスを通ると押し付けられます。</small></span></label>
   <label class="check"><input type="checkbox" id="fQuiz" checked><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。全ジャンル・難しめ。正解すると特典があります。出題は人間のプレイヤーだけです。</small></span></label>
   <label class="check"><input type="checkbox" id="fAssist"><span>追い上げサポート<small>総資産が最下位のオーナーは、大きい目が少し出やすくなります。CPUにも同じように働きます。</small></span></label>
   <p class="err" id="setupErr"></p>`,
@@ -2213,16 +2211,16 @@ async function setup(mode){mode=mode==="single"?"single":"multi";hideTitle();
   if(single){const nm=$("#seatN0").value.trim()||"あなた";GP.name=nm;seats.push({name:nm,cpu:false,color:0});GP.cpuNames=[null,1,2,3].map(i=>i&&($("#cpuN"+i).value.trim()||CPU_NAMES[i]));for(let i=1;i<=+$("#fCpu").value;i++)seats.push({name:GP.cpuNames[i],cpu:true,color:i})}
   else DEFAULT_SEATS.forEach(([nm],i)=>{const t=$("#seatT"+i).value;if(t!=="none")seats.push({name:$("#seatN"+i).value.trim()||nm,cpu:t==="cpu",color:i})});
   GP.speed=$("#fSpeed").value;GP.map=$("#fMap").value;saveGP();
-  newGame(seats,isFull()?+$("#fYears").value:3,$("#fAssist").checked,{exact:$("#fExact").checked,yokai:$("#fYokai").checked,quiz:$("#fQuiz").checked},GP.map,mode)}
+  newGame(seats,isFull()?+$("#fYears").value:3,$("#fAssist").checked,{exact:true,yokai:true,quiz:$("#fQuiz").checked},GP.map,mode)}
 function resume(state){hideTitle();useMap(state.map||"kanto");S=state;if(!S.mode)S.mode=S.players.filter(q=>!q.cpu).length===1?"single":"multi";S.map=CUR_MAP;CAND=null;S.players.forEach(p=>{if(!N[p.pos])p.pos="東京"});if(!N[S.dest])S.dest="東京";
-  if(!S.rules)S.rules={exact:false,yokai:false};if(S.rules.quiz==null)S.rules.quiz=true;if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
+  if(!S.rules)S.rules={};S.rules.exact=true;S.rules.yokai=true;if(S.rules.quiz==null)S.rules.quiz=true;if(!S.yokai)S.yokai={owner:null,form:0,turns:0};
   if(!S.props){S.props=Object.fromEntries(STATIONS.map(s=>[s[0],clone(DEFAULT_PROPS[s[0]])]))}
   if(!S.owners[HQ]){S.props[HQ]=clone(HQ_PROPS);S.owners[HQ]=HQ_PROPS.map(()=>null)}if(!S.yaku)S.yaku={};
   S.players.forEach((p,i)=>{p.idx=i;if(p.color==null)p.color=i;p.slow=p.slow||0;p.rest=p.rest||0;p.debt=p.debt||0;p.title=p.title||0;if(p.cpu&&!p.style)p.style=["aggressive","cautious","normal","normal"][(i+3)%4]});if(S.rate==null)S.rate=ECON.rateStart;if(S.season==null)S.season=seasonKey(S.month);
   buildTokens();render();startTurn()}
 async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>目的</h3><p>決められた年数のあいだ駅をめぐり、最後に総資産（お金＋物件の価値）がいちばん多いオーナーの勝ちです。</p>
-  <h3>進み方</h3><p>自分の番にサイコロを振り、地図で光るマスから止まる場所を選びます。目的地にぴったり止まると援助金がもらえ、ルーレットで次の目的地が決まります。</p>
+  <h3>進み方</h3><p>自分の番にサイコロを振り、地図で光るマスから止まる場所を選びます。目的地には、出た目とちょうど同じマス数で止まったときだけ到着できます（通り過ぎても到着にはなりません）。到着すると援助金がもらえ、ルーレットで次の目的地が決まります。</p>
   <h3>マス</h3><p><b style="color:var(--plus)">青</b>はお金が入り、<b style="color:var(--minus)">赤</b>は出費です。冬の北国では大雪で出費が増えます。<b style="color:var(--card)">黄</b>はカードがもらえますが、ときどき災難カード（鈍行・運休・罰金・紛失）を引きます。<b style="color:var(--shop)">ピンクのひし形</b>はカード売り場です。駅では物件を買えます。駅の物件をすべて持つと独占になり、決算での収益が1.3倍になります。</p>
   <h3>業界トップ</h3><p>物件は9つのカテゴリ（飲食・名産甘味・宿泊レジャー・工場醸造・伝統工芸・農園漁業・観光商業・夜の街娯楽・金融学術）に分かれています。決算のときに、あるカテゴリの物件をいちばん多く持ち、カテゴリ全体の3割以上を持っているオーナーは「業界トップ」となり、そのカテゴリの収益が1.6倍になります（同数で並んだときは該当なし）。独占と重なると約2.1倍です。メニューの「物件一覧」で、各カテゴリの状況を確かめられます。</p>
   <h3>汐留ヘッドクォーター特区と役</h3><p>一都三県（東京・神奈川・千葉・埼玉）の駅に止まると、「汐留ヘッドクォーター特区」で大企業の本社（人材派遣会社・広告代理店・旅行代理店・総合商社・物流会社）も買えます。本社は単体の利回りが低めですが、組み合わせると「役」が成立します。決算のときに役が成立していると、その業界の収益が1.6倍から2.0倍に上がります。はじめて成立したときは祝い金（2.5億円から。年を追うごとに増えます）ももらえます。本社は10億円以上の大物件なので、役は5年以上のゲームの後半に狙う大勝負です。役は「人手不足解消（人材派遣会社＋工場・醸造トップ）」「話題沸騰（広告代理店＋観光・商業トップ）」「旅行パッケージ（旅行代理店＋宿泊・レジャートップ）」「全国流通（総合商社＋名産・甘味トップ）」「産地直送（物流会社＋農園・漁業トップ）」「接待で一杯（広告代理店＋銀座のナイトクラブ）」、大役「三本の矢（人材派遣会社・広告代理店・総合商社）」の7つです。</p>
@@ -2358,8 +2356,6 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
   <label class="check"><input type="checkbox" id="sSe" ${Snd.prefs.se?"checked":""}><span>効果音<small>サイコロ、移動、マス、購入、到着、決算の音です。</small></span></label>
   <div class="vol"><label for="sVol">音量</label><input type="range" id="sVol" min="0" max="1" step="0.05" value="${Snd.prefs.vol}"></div>
   ${S&&S.phase!=="over"?`<h3>このゲームのルール</h3><label class="check"><input type="checkbox" id="sAssist" ${S.assist?"checked":""}><span>追い上げサポート<small>総資産が最下位のオーナーは、大きい目が少し出やすくなります。オフのときサイコロは完全にランダムです。</small></span></label>
-  <label class="check"><input type="checkbox" id="sExact" ${S.rules.exact?"checked":""}><span>ぴったり到着<small>目的地にはちょうどの目で止まったときだけ到着できます。</small></span></label>
-  <label class="check"><input type="checkbox" id="sYokai" ${S.rules.yokai?"checked":""}><span>妖怪「${YOKAI[0].n}」<small>オフにすると、取り憑いている妖怪もいなくなります。</small></span></label>
   <label class="check"><input type="checkbox" id="sQuiz" ${S.rules.quiz?"checked":""}><span>4択クイズ<small>駅に止まると3回に1回ほど出題されます。</small></span></label>`:""}`,[["閉じる",0,"primary"]]);
   body.onchange=body.oninput=e=>{const t=e.target;if(t.type==="checkbox"&&e.type!=="change")return;
     if(t.id==="sOn"){Snd.prefs.on=t.checked;Snd.armed=true}else if(t.id==="sBgm")Snd.prefs.bgm=t.checked;else if(t.id==="sSe"){Snd.prefs.se=t.checked;Snd.sfx("click")}else if(t.id==="sVol")Snd.prefs.vol=+t.value;
