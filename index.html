@@ -1150,10 +1150,10 @@ const trialBox=(lead,head="体験版（3年）で遊んでいます")=>`<div cla
 const IAP_ID="otonarail.full";
 const IAP=()=>{const C=window.Capacitor;return C&&C.isNativePlatform&&C.isNativePlatform()&&C.Plugins&&C.Plugins.NativePurchases||null};
 let IAP_PRICE="500円",IAP_BUSY=false;
-const buyHTML=()=>`<p style="text-align:center;margin:10px 0 2px"><button type="button" class="btn primary" data-buy>製品版を購入（買い切り ${esc(IAP_PRICE)}）</button></p><p class="trial-s" style="text-align:center">一度の購入で、ずっと製品版で遊べます。購入済みの方は「設定」の「購入を復元」へ。</p>`;
+const buyHTML=()=>`<p style="text-align:center;margin:10px 0 2px"><button type="button" class="btn primary" data-iapbuy>製品版を購入（買い切り ${esc(IAP_PRICE)}）</button></p><p class="trial-s" style="text-align:center">一度の購入で、ずっと製品版で遊べます。購入済みの方は「設定」の「購入を復元」へ。</p>`;
 const hasFull=list=>(list||[]).some(t=>t&&t.productIdentifier===IAP_ID);
 async function iapInit(){const P=IAP();if(!P)return;
-  try{const r=await P.getProduct({productIdentifier:IAP_ID,productType:"inapp"});if(r&&r.product&&r.product.priceString){IAP_PRICE=r.product.priceString;document.querySelectorAll("[data-buy]").forEach(b=>b.textContent=`製品版を購入（買い切り ${IAP_PRICE}）`)}}catch(e){}
+  try{const r=await P.getProduct({productIdentifier:IAP_ID,productType:"inapp"});if(r&&r.product&&r.product.priceString){IAP_PRICE=r.product.priceString;document.querySelectorAll("[data-iapbuy]").forEach(b=>b.textContent=`製品版を購入（買い切り ${IAP_PRICE}）`)}}catch(e){}
   if(!GP.unlocked)try{const r=await P.getPurchases({productType:"inapp",onlyCurrentEntitlements:true});if(hasFull(r&&r.purchases))unlockFull(false)}catch(e){}}
 function unlockFull(cheer){GP.unlocked=true;saveGP();$("#tTrial").hidden=true;
   const f=$("#fYears");if(f){f.innerHTML=`<option value="3">3年（短期戦）</option><option value="5">5年</option><option value="10" selected>10年（標準）</option><option value="20">20年（大河戦）</option>`;const h=f.parentNode.querySelector(".hint");if(h)h.textContent="時代の大波は5年目から起きます。業界トップや役（やく）、福だぬきは、長いゲームほどじっくり楽しめます。"}
@@ -1168,8 +1168,8 @@ async function restoreFull(){const P=IAP();if(!P||IAP_BUSY)return;IAP_BUSY=true;
     if(hasFull(r&&r.purchases))unlockFull(true);else toast("このApple Accountでの製品版の購入は見つかりませんでした")}
   catch(e){toast("購入の復元を完了できませんでした。通信状況を確かめて、もう一度お試しください")}
   finally{IAP_BUSY=false}}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-buy]");if(b){e.preventDefault();e.stopPropagation();buyFull();return}
-  if(e.target.closest("[data-restore]")){e.preventDefault();e.stopPropagation();restoreFull()}},true);
+document.addEventListener("click",e=>{const b=e.target.closest("[data-iapbuy]");if(b){e.preventDefault();e.stopPropagation();buyFull();return}
+  if(e.target.closest("[data-iaprestore]")){e.preventDefault();e.stopPropagation();restoreFull()}},true);
 try{Object.assign(GP,JSON.parse(localStorage.getItem("kks-game"))||{})}catch(e){}
 const saveGP=()=>{try{localStorage.setItem("kks-game",JSON.stringify(GP))}catch(e){}};
 const applyDotFont=()=>document.body.classList.toggle("dotfont",GP.dotFont!==false);applyDotFont();
@@ -2173,7 +2173,7 @@ async function endTurn(){const p=cp();
 
 /* ---------- title & setup ---------- */
 const VERSION="ver 1.0";
-async function showTitle(){$("#title").hidden=false;$("#tTrial").hidden=isFull();if(IAP())$("#tTrial").innerHTML=`体験版：3年のゲームを遊べます。5・10・20年の長期戦と、時代の大波・福だぬき・役などのやり込みは製品版で。<br><button type="button" class="btn primary" data-buy style="margin-top:6px">製品版を購入（買い切り ${esc(IAP_PRICE)}）</button>`;applySeason();Snd.setTrack("title");setView();$("#tVisual").innerHTML=artHTML("title");
+async function showTitle(){$("#title").hidden=false;$("#tTrial").hidden=isFull();if(IAP())$("#tTrial").innerHTML=`体験版：3年のゲームを遊べます。5・10・20年の長期戦と、時代の大波・福だぬき・役などのやり込みは製品版で。<br><button type="button" class="btn primary" data-iapbuy style="margin-top:6px">製品版を購入（買い切り ${esc(IAP_PRICE)}）</button>`;applySeason();Snd.setTrack("title");setView();$("#tVisual").innerHTML=artHTML("title");
   const saved=S&&S.phase!=="over"?S:await Store.get("auto");const ok=saved&&saved.phase!=="over"&&validState(saved);
   $("#tCont").disabled=!ok;$("#tContInfo").textContent=ok?`${MAPS[saved.map||"kanto"].name}・${saved.year}年目 ${MONTHS[saved.month]}`:"保存されたゲームはありません";
   $("#tSingle").focus()}
@@ -2351,7 +2351,7 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
   <div class="field"><label for="sSpeed">表示の速さ</label><select id="sSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
   <p class="hint">「タップで進む」にすると、CPUの番も含めてメッセージはタップするまで止まります。ほかの速さでは、メッセージは時間がたつと自動で進みます（タップでの早送りはしません）。</p>
   <label class="check"><input type="checkbox" id="sDot" ${GP.dotFont!==false?"checked":""}><span>メッセージ欄をドット風の文字にする<small>オフにすると、ふつうの文字に戻ります。</small></span></label>
-  ${IAP()?`<h3>製品版</h3>${isFull()?`<p class="hint">製品版をお買い上げいただき、ありがとうございます。5・10・20年のゲームが遊べます。</p>`:buyHTML()}<p><button type="button" class="btn" data-restore>購入を復元</button></p><p class="hint">機種変更やアプリの入れ直しのあとは、購入したときと同じApple Accountで「購入を復元」を押してください。</p>`:""}
+  ${IAP()?`<h3>製品版</h3>${isFull()?`<p class="hint">製品版をお買い上げいただき、ありがとうございます。5・10・20年のゲームが遊べます。</p>`:buyHTML()}<p><button type="button" class="btn" data-iaprestore>購入を復元</button></p><p class="hint">機種変更やアプリの入れ直しのあとは、購入したときと同じApple Accountで「購入を復元」を押してください。</p>`:""}
   <h3>サウンド</h3>
   <label class="check"><input type="checkbox" id="sOn" ${Snd.prefs.on?"checked":""}><span>音を出す<small>オフにするとBGMも効果音も止まります。iPhoneでは消音モードでも鳴るようにしています。</small></span></label>
   <label class="check"><input type="checkbox" id="sBgm" ${Snd.prefs.bgm?"checked":""}><span>BGM<small>ゲームのために作ったオリジナル曲です。</small></span></label>
