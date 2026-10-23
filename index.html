@@ -1559,10 +1559,9 @@ const SCENES={
 };
 function tree(x,y,c1,c2,s=1){return `<g transform="translate(${x} ${y}) scale(${s})"><rect x="-6" y="-40" width="12" height="44" fill="#7A5236"/><g fill="${c1}" stroke="${c2}" stroke-width="2"><circle cx="0" cy="-62" r="30"/><circle cx="-26" cy="-46" r="20"/><circle cx="26" cy="-46" r="20"/></g></g>`}
 function seasonOverlay(){const k=document.documentElement.dataset.season;if(!k)return "";let seed=SVGID*97+k.length;const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
-  if(k==="summer")return `<g fill="#fff" opacity=".55"><circle cx="18" cy="16" r="16"/><circle cx="40" cy="10" r="14"/><circle cx="300" cy="150" r="0"/></g>`;
-  const col={spring:"#F6B3C9",autumn:"#E9803A",winter:"#FFFFFF"}[k];
-  return `<g opacity=".85">${Array.from({length:k==="winter"?22:11},()=>{const x=(rr()*320).toFixed(0),y=(rr()*170).toFixed(0),r=(rr()*360).toFixed(0);
-    return k==="winter"?`<circle cx="${x}" cy="${y}" r="${(1.5+rr()*2.2).toFixed(1)}" fill="${col}" stroke="#B8CDE0" stroke-width=".6"/>`:k==="spring"?`<ellipse cx="${x}" cy="${y}" rx="3" ry="5" fill="${col}" transform="rotate(${r} ${x} ${y})"/>`:`<path d="M0 -6 L2 -2 L6 -3 L4 1 L6 3 L2 3 L2 6 L0 4 L-2 6 L-2 3 L-6 3 L-4 1 L-6 -3 L-2 -2Z" fill="${col}" transform="translate(${x} ${y}) rotate(${r})"/>`}).join("")}</g>`}
+  if(k==="summer")return `<g fill="#fff" opacity=".55"><circle cx="18" cy="16" r="16"/><circle cx="40" cy="10" r="14"/></g>`;
+  return `<g opacity=".95">${Array.from({length:k==="winter"?22:11},(_,i)=>{const x=+(rr()*320).toFixed(0),y=+(rr()*170).toFixed(0),r=+(rr()*360).toFixed(0);
+    return k==="winter"?`<circle cx="${x}" cy="${y}" r="${(1.5+rr()*2.2).toFixed(1)}" fill="#FFFFFF" stroke="#8FA5B8" stroke-width=".8"/>`:k==="spring"?gkPetal(x,y,.42,r,"#F7C6D4"):gkMomiji(x,y,.45,r,["#C3302A","#E0601F","#E0A01C"][i%3])}).join("")}</g>`}
 
 /* ---------- 劇画風（GEKIGA）：墨の太線・集中線・網点・描き文字 ---------- */
 const GK={ink:"#1B1915",cr:"#FFF4DC",rd:"#C3302A",bl:"#1D57A0",yl:"#E0A01C",gr:"#2C8448"};
@@ -1598,7 +1597,53 @@ const GK_ONOMA={roll:["コロコロ",14,40,26,-8,GK.yl],move:["ガタンゴト�
   warp:["ビューン",14,42,28,-8,GK.yl],rest:["シーン…",14,42,26,-6,"#C9C3E0"],settle:["ジャラジャラ",12,38,24,-8,GK.rd],promote:["昇格！",16,46,32,-8,GK.rd],news:["号外！",16,44,30,-8,GK.rd],
   season:["キラッ",14,42,28,-8,GK.rd],bank:["ズシッ",14,42,28,-8,GK.bl],ceremony:["ドドン",14,44,30,-8,GK.yl],lose:["トホホ…",14,44,28,-6,"#C9C3E0"],yaku:["キターッ",12,44,30,-8,GK.rd],
   fuku:["福！",18,48,34,-8,GK.rd],s_spring:["ポカポカ",14,40,28,-8,GK.rd],s_summer:["ジリジリ",14,40,28,-8,GK.rd],s_autumn:["ヒラヒラ",14,40,28,-8,GK.yl],s_winter:["シンシン",14,40,28,-8,GK.bl],chouhan:["どっちだ!?",12,42,26,-8,GK.yl],mono:["独占！",16,46,32,-8,GK.rd],arriveX:null};
+// 桜と紅葉（劇画風）
+function gkPetal(x,y,s,rot,fill){return `<path transform="translate(${x} ${y}) rotate(${rot}) scale(${s})" d="M0 0 C-9 -6 -10 -18 -4 -24 L0 -19 L4 -24 C10 -18 9 -6 0 0Z" fill="${fill}" stroke="#1B1915" stroke-width="${(1.6/s).toFixed(2)}" stroke-linejoin="round"/>`}
+function gkSakura(x,y,s,rot=0){let p="";for(let i=0;i<5;i++)p+=gkPetal(0,0,1,i*72,"#F7C6D4");
+  return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})">${p}<circle r="5" fill="#D9577A" stroke="#1B1915" stroke-width="1.4"/>${[0,1,2,3,4].map(i=>{const a=(i*72-90)*Math.PI/180;return `<circle cx="${(9*Math.cos(a)).toFixed(1)}" cy="${(9*Math.sin(a)).toFixed(1)}" r="1.6" fill="#E0A01C"/>`}).join("")}</g>`}
+function gkMomijiPath(){const L=[[-105,15],[-55,23],[0,27],[55,23],[105,15]];let d="";const P=(r,aa)=>`${(r*Math.cos(aa)).toFixed(1)} ${(r*Math.sin(aa)).toFixed(1)}`;
+  L.forEach(([deg,len],k)=>{const a=(deg-90)*Math.PI/180,w=.34,a0=a-w,a1=a+w;
+   d+=(k?" L":"M")+P(6,a0)+" L"+P(len*.45,a0-.05)+" L"+P(len*.55,a0+.1)+" L"+P(len*.78,a-.2)+" L"+P(len*.8,a-.1)+" L"+P(len,a)+" L"+P(len*.8,a+.1)+" L"+P(len*.78,a+.2)+" L"+P(len*.55,a1-.1)+" L"+P(len*.45,a1+.05)+" L"+P(6,a1)});
+  return d+" L"+P(5,Math.PI/2+.4)+" L"+P(5,Math.PI/2-.4)+"Z"}
+const GK_MOMIJI_D=gkMomijiPath();
+function gkMomiji(x,y,s,rot,fill){const sm=s<.5;return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><path d="M0 4 L1 15" stroke="#1B1915" stroke-width="${((sm?1:2)/s).toFixed(2)}"/><path d="${GK_MOMIJI_D}" fill="${fill}" stroke="#1B1915" stroke-width="${((sm?.9:1.8)/s).toFixed(2)}" stroke-linejoin="round"/>${sm?"":`<path d="M0 4 L0 -20 M0 4 L-15 -12 M0 4 L15 -12 M0 4 L-12 6 M0 4 L12 6" stroke="#1B1915" stroke-width="${(1/s).toFixed(2)}" opacity=".45"/>`}</g>`}
+const NEW_SPRING=()=>{let s=`${gkRays(250,40,18,"#F6CFDA","#FFF4DC")}${gkSpeed(250,40,40,60,"#1B1915",61,.12)}
+ <path d="M0 150 Q80 138 160 146 T320 140 V180 H0Z" fill="#9CC48A" stroke="#1B1915" stroke-width="3"/>
+ <g stroke="#1B1915" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M-10 30 Q60 40 120 34 Q170 30 230 50" fill="none" stroke-width="13"/><path d="M-10 30 Q60 40 120 34 Q170 30 230 50" fill="none" stroke="#5A3A26" stroke-width="8"/>
+ <path d="M90 37 Q110 60 104 84" fill="none" stroke-width="8"/><path d="M90 37 Q110 60 104 84" fill="none" stroke="#5A3A26" stroke-width="4"/>
+ <path d="M170 34 Q190 14 214 10" fill="none" stroke-width="8"/><path d="M170 34 Q190 14 214 10" fill="none" stroke="#5A3A26" stroke-width="4"/></g>`;
+ [[30,24,.8],[70,46,.85],[104,86,.9],[112,58,.7],[146,22,.85],[196,52,.9],[214,8,.8],[238,58,.75],[56,22,.6],[178,18,.6]].forEach(([x,y,k],i)=>s+=gkSakura(x,y,k,i*17));
+ [[250,90,25],[280,120,70],[230,130,-30],[150,110,40],[60,110,-60],[300,70,10],[190,150,80]].forEach(([x,y,r])=>s+=gkPetal(x,y,.55,r,"#F7C6D4"));
+ return s+gkOnoma(196,166,"ポカポカ",28,-6,"#C3302A")};
+const NEW_AUTUMN=()=>{let s=`${gkRays(70,40,18,"#F2B27A","#FFF4DC")}${gkSpeed(70,40,40,60,"#1B1915",71,.12)}
+ <path d="M0 152 Q90 140 180 150 T320 144 V180 H0Z" fill="#C9A066" stroke="#1B1915" stroke-width="3"/>
+ <g stroke-linecap="round" fill="none"><path d="M330 26 Q250 40 190 36 Q140 34 90 56" stroke="#1B1915" stroke-width="13"/><path d="M330 26 Q250 40 190 36 Q140 34 90 56" stroke="#4A2E1C" stroke-width="8"/>
+ <path d="M230 38 Q214 64 222 90" stroke="#1B1915" stroke-width="8"/><path d="M230 38 Q214 64 222 90" stroke="#4A2E1C" stroke-width="4"/></g>`;
+ const C=["#C3302A","#E0601F","#E0A01C","#C3302A","#E0601F"];
+ [[296,30,1.3],[252,44,1.2],[222,92,1.25],[196,30,1.15],[150,48,1.25],[104,58,1.1],[272,12,.9],[176,18,.9]].forEach(([x,y,k],i)=>s+=gkMomiji(x,y,k,i*23-30,C[i%5]));
+ [[60,100,20,"#E0601F"],[30,130,-40,"#C3302A"],[120,120,60,"#E0A01C"],[160,92,-20,"#C3302A"],[250,130,35,"#E0601F"],[290,110,-70,"#E0A01C"]].forEach(([x,y,r,c])=>s+=gkMomiji(x,y,.75,r,c));
+ return s+gkOnoma(14,168,"ヒラヒラ",28,-6,"#E0A01C")};
+
+const NEW_SUMMER=()=>{const I=GK.ink;let s=`${gkRays(262,34,18,"#BFE0F0","#FFF4DC")}${gkSpeed(262,34,30,50,I,81,.1)}
+ <g stroke="${I}" stroke-width="3.5" stroke-linejoin="round"><circle cx="262" cy="34" r="20" fill="${GK.rd}"/></g>
+ <g stroke="${I}" stroke-width="3.5" stroke-linejoin="round" fill="#FFFFFF"><path d="M40 112 Q30 86 56 80 Q58 52 88 56 Q100 30 130 42 Q150 24 172 44 Q200 40 200 66 Q222 72 214 96 Q226 112 206 116 L52 118 Q34 120 40 112Z"/></g>
+ <path d="M64 108 Q120 116 200 104 Q214 112 206 116 L52 118Z" fill="url(#ht##ID##)" opacity=".35"/><path d="M96 62 Q110 46 128 50" fill="none" stroke="#C9DCEA" stroke-width="5" stroke-linecap="round"/>
+ <rect y="120" width="320" height="60" fill="${GK.bl}"/><path d="M0 120 H320" stroke="${I}" stroke-width="3.5"/>
+ ${[134,150,166].map((y,k)=>`<path d="M${-20+k*14} ${y} q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="#FFF4DC" stroke-width="2.5" opacity="${.8-k*.2}"/>`).join("")}
+ <g transform="translate(250 104)" stroke="${I}" stroke-width="2.5" stroke-linejoin="round"><path d="M0 14 H36 L30 22 H6Z" fill="#FFF8E6"/><path d="M17 14 V-16" fill="none"/><path d="M19 -14 L36 10 H19Z" fill="${GK.rd}"/><path d="M15 -10 L2 10 H15Z" fill="#FFF8E6"/></g>`;
+ return s+gkOnoma(12,166,"ジリジリ",28,-6,GK.yl)};
+const NEW_WINTER=()=>{const I=GK.ink;let s=`${gkRays(160,40,18,"#D7E2EA","#F2F5F4")}${gkSpeed(160,40,30,60,I,91,.08)}
+ <g stroke="${I}" stroke-width="3.5" stroke-linejoin="round"><path d="M-10 150 L60 64 L104 112 L170 40 L240 116 L280 84 L330 130 V180 H-10Z" fill="#9FB4C4"/>
+ <path d="M48 79 L60 64 L76 82 L66 88 L58 80 L52 86Z" fill="#FFFFFF"/><path d="M152 60 L170 40 L190 62 L178 70 L170 60 L160 70Z" fill="#FFFFFF"/><path d="M270 96 L280 84 L292 98 L282 102Z" fill="#FFFFFF"/>
+ <path d="M-10 150 Q80 136 160 148 T330 140 V180 H-10Z" fill="#FFFFFF"/></g>
+ <path d="M170 40 L240 116 L280 84 L330 130 V150 L170 60Z" fill="url(#hs##ID##)" opacity=".18"/>
+ <g transform="translate(246 136)" stroke="${I}" stroke-width="3" stroke-linejoin="round"><circle r="20" fill="#FFFFFF"/><circle cy="-28" r="14" fill="#FFFFFF"/>
+  <path d="M-14 -36 L-12 -50 H12 L14 -36Z" fill="${GK.bl}"/><path d="M-14 -18 Q0 -12 14 -18 L16 -12 Q0 -6 -16 -12Z" fill="${GK.rd}"/><path d="M8 -16 L12 -2 L4 -2Z" fill="${GK.rd}"/>
+  <circle cx="-5" cy="-30" r="2" fill="${I}"/><circle cx="5" cy="-30" r="2" fill="${I}"/><path d="M0 -26 L8 -24 L0 -22Z" fill="${GK.yl}"/><circle cy="-4" r="2" fill="${I}"/><circle cy="6" r="2" fill="${I}"/></g>
+ ${[[30,30],[90,20],[130,90],[210,24],[300,40],[60,120],[190,100],[310,96],[110,50],[240,70]].map(([x,y])=>`<g transform="translate(${x} ${y})" stroke="${I}" stroke-width="1.2" fill="#FFFFFF"><circle r="3.5"/></g>`).join("")}`;
+ return s+gkOnoma(12,166,"シンシン",28,-6,GK.bl)};
 const GK_SCENES={
+ s_spring:()=>NEW_SPRING(),s_summer:()=>NEW_SUMMER(),s_autumn:()=>NEW_AUTUMN(),s_winter:()=>NEW_WINTER(),
  title:()=>`<rect width="320" height="180" fill="${GK.cr}"/>${gkSpeed(160,98,90,30,GK.ink,11)}
 <path d="M0 150 H320 V180 H0Z" fill="${GK.ink}"/><path d="M110 180 L150 112 L170 112 L210 180Z" fill="#6E5D44" stroke="${GK.ink}" stroke-width="3"/>
 <g stroke="${GK.ink}" stroke-width="4" stroke-linejoin="round"><path d="M92 150 L106 54 Q160 30 214 54 L228 150Z" fill="${GK.gr}"/>
