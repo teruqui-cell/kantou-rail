@@ -395,6 +395,29 @@ body{background:var(--bg)}
 .t-visual{border-radius:6px!important;border:3px solid var(--edge)!important;box-shadow:4px 4px 0 var(--shadow)}
 .msgwin{border-radius:6px!important;border-color:#FFF4DC!important;outline:2px solid var(--edge)!important;box-shadow:4px 4px 0 var(--shadow)}
 .tokc{stroke:#1B1915;stroke-width:3}.tokout{fill:#FFF8E6}
+/* 見せ場の大きな表示（GP.bigFx） */
+#bigVeil{position:fixed;inset:0;z-index:38;background:color-mix(in srgb,#14110C 62%,transparent);pointer-events:none;animation:veilIn .25s ease both}
+#bigCut{position:fixed;left:50%;top:50%;z-index:40;width:min(560px,calc(100vw - 16px));max-height:calc(100dvh - 24px);overflow:auto;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:10px;animation:bigIn .34s cubic-bezier(.2,1.25,.4,1) both;cursor:default}
+#bigCut.tap{cursor:pointer}
+#bigCut .scene{display:block;width:100%;aspect-ratio:16/9;border:3px solid var(--edge)!important;border-radius:6px!important;box-shadow:6px 6px 0 var(--shadow)}
+#bigCut .msgwin{grid-template-columns:48px minmax(0,1fr)!important;gap:10px!important;padding:12px 14px 10px!important;border-width:3px!important}
+#bigCut .conductor svg{width:48px!important;height:48px!important}
+#bigCut .msg-name{display:block!important}
+#bigCut .scene-text{font-size:20px!important;line-height:1.6!important;min-height:3.2em!important}
+#bigCut.leave{animation:bigOut .24s ease-in both}
+#bigVeil.leave{animation:veilOut .24s ease-in both}
+@keyframes bigIn{from{opacity:0;transform:translate(-50%,-44%) scale(.84) rotate(-1.5deg)}}
+@keyframes bigOut{to{opacity:0;transform:translate(-50%,-52%) scale(.72)}}
+@keyframes veilIn{from{opacity:0}}@keyframes veilOut{to{opacity:0}}
+#modal.pic{padding:8px}
+.sheet.pic{width:min(560px,100%);animation:sheetIn .34s cubic-bezier(.2,1.25,.4,1) both}
+.sheet.pic>#modalBody>.scene-pic:first-child{margin:-20px -20px 16px;width:calc(100% + 40px);max-width:none;max-height:none;border-width:0 0 2px!important;border-radius:0!important}
+.sheet.pic.leave{animation:sheetOut .2s ease-in both}
+@keyframes sheetIn{from{opacity:0;transform:translateY(24px) scale(.88) rotate(-1deg)}}
+@keyframes sheetOut{to{opacity:0;transform:scale(.8)}}
+#bigCut .scene{max-height:calc(100dvh - 240px);width:auto;margin:0 auto}
+@media (min-width:821px){#bigCut{width:min(760px,70vw)}.sheet.pic{width:min(680px,100%)}}
+@media (prefers-reduced-motion:reduce){#bigCut,#bigVeil,.sheet.pic{animation:none!important}}
 </style>
 
 </head>
@@ -445,6 +468,7 @@ body{background:var(--bg)}
 </div>
 <div id="modal" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"><div id="modalBody"></div><div class="btns" id="modalBtns"></div></div></div>
 <div id="msgLayer" hidden></div>
+<div id="bigVeil" hidden></div><div id="bigCut" hidden aria-live="polite"><div class="scene" id="bigPic"></div></div>
 <div id="toast" hidden></div>
 
 <script>
@@ -1243,12 +1267,17 @@ function typeText(text){const el=$("#sceneText");if(typing)typing.finish();el.in
   const tick=()=>{let k=0;while(ni<nodes.length&&k<1){const[n,t]=nodes[ni];ci++;n.nodeValue=t.slice(0,ci);if(ci>=t.length){ni++;ci=0}k++}if(ni>=nodes.length)finish()};
   const iv=setInterval(tick,ms);const finish=()=>{clearInterval(iv);nodes.forEach(([n,t])=>n.nodeValue=t);if(typing===me)typing=null};const me={finish};typing=me;return total*ms}
 function setScene(key,text,mode){if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}if(text!=null){msgMode(mode);typeText(text)}}
-function say(text,key,mode){return new Promise(res=>{if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}msgMode(mode);const typeMs=typeText(text);document.body.dataset.wait="1";const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
-  const done=()=>{clearTimeout(t);delete document.body.dataset.wait;box.classList.remove("active");h.textContent="";h.className="scene-hint";layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",kd);res()};
+const BIG_SAY=new Set(["yokai","mischief","bigyokai","pass","oharai","bad","attack","guard","warp","fuku","mono"]);
+const bigOn=()=>GP.bigFx!==false;
+function bigOpen(key){const cut=$("#bigCut"),veil=$("#bigVeil"),box=$("#log");box.style.minHeight=box.offsetHeight+"px";$("#bigPic").innerHTML=artHTML(key);cut.appendChild($("#msgWin"));cut.classList.remove("leave","tap");veil.classList.remove("leave");veil.hidden=false;cut.hidden=false}
+function bigClose(){return new Promise(r=>{const cut=$("#bigCut"),veil=$("#bigVeil");const fin=()=>{const box=$("#log");box.insertBefore($("#msgWin"),box.querySelector(".loglabel"));box.style.minHeight="";cut.hidden=true;veil.hidden=true;cut.classList.remove("leave","tap");veil.classList.remove("leave");cut.onclick=null;r()};
+  if(window.__FAST||reduce)return fin();cut.classList.add("leave");veil.classList.add("leave");setTimeout(fin,230)})}
+function say(text,key,mode){return new Promise(res=>{if(key&&key!==curScene){curScene=key;$("#scene").innerHTML=artHTML(key)}const big=!!key&&BIG_SAY.has(key)&&bigOn();if(big)bigOpen(key);msgMode(mode);const typeMs=typeText(text);document.body.dataset.wait="1";const box=$("#log"),layer=$("#msgLayer"),h=$("#sceneHint");box.classList.add("active");let t=null;
+  const done=()=>{clearTimeout(t);delete document.body.dataset.wait;box.classList.remove("active");h.textContent="";h.className="scene-hint";layer.hidden=true;box.onclick=null;layer.onclick=null;removeEventListener("keydown",kd);if(big)bigClose().then(res);else res()};
   const adv=()=>{if(typing){typing.finish();return}done()};
   const kd=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();adv()}};
-  if(GP.speed==="tap"){addEventListener("keydown",kd);box.onclick=adv;h.textContent="タップで次へ";h.className="scene-hint tap";layer.hidden=false;layer.onclick=adv}
-  else{const sp=SPEEDS[GP.speed]||SPEEDS.normal;t=setTimeout(done,Math.max(sp.base+sp.per*text.length,typeMs+sp.base))}})}
+  if(GP.speed==="tap"){addEventListener("keydown",kd);box.onclick=adv;h.textContent="タップで次へ";h.className="scene-hint tap";layer.hidden=false;layer.onclick=adv;if(big){const cut=$("#bigCut");cut.classList.add("tap");cut.onclick=adv}}
+  else{const sp=SPEEDS[GP.speed]||SPEEDS.normal;t=setTimeout(done,Math.max(sp.base+sp.per*text.length,typeMs+sp.base)+(big&&!window.__FAST?700:0))}})}
 
 /* ---------- storage: browser + (signed-in) account ---------- */
 const Store={cloud:null,q:Promise.resolve(),
@@ -2047,10 +2076,10 @@ function showDice(v){S.lastDice=v;const d=$("#dice");if(d)d.outerHTML=diceHTML(v
 
 /* ---------- modal ---------- */
 function modal(html,buttons,wide){return new Promise(res=>{const m=$("#modal"),body=$("#modalBody");
-  body.onclick=null;body.oninput=null;body.onchange=null;$("#sheet").className="sheet"+(wide?" wide":"");
+  body.onclick=null;body.oninput=null;body.onchange=null;const pic=bigOn()&&html.startsWith('<div class="scene-pic">');$("#sheet").className="sheet"+(wide?" wide":"")+(pic?" pic":"");m.classList.toggle("pic",pic);
   body.innerHTML=html;const bb=$("#modalBtns");bb.innerHTML="";bb.hidden=false;
   buttons.forEach(([label,val,cls,before])=>{const b=document.createElement("button");b.textContent=label;b.className="btn "+(cls||"");
-    b.onclick=async()=>{if(before&&(await before())===false)return;m.hidden=true;res(val)};bb.appendChild(b)});
+    b.onclick=async()=>{if(before&&(await before())===false)return;if(pic&&!window.__FAST&&!reduce){$("#sheet").classList.add("leave");await new Promise(r=>setTimeout(r,190))}m.hidden=true;$("#sheet").classList.remove("leave");res(val)};bb.appendChild(b)});
   m.hidden=false;$("#sheet").scrollTop=0;bb.lastChild&&bb.lastChild.focus({preventScroll:true})})}
 const modalOpen=()=>!$("#modal").hidden;
 
@@ -2506,6 +2535,7 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
   <div class="field"><label for="sSpeed">表示の速さ</label><select id="sSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
   <p class="hint">「タップで進む」にすると、CPUの番も含めてメッセージはタップするまで止まります。ほかの速さでは、メッセージは時間がたつと自動で進みます（タップでの早送りはしません）。</p>
   <label class="check"><input type="checkbox" id="sDot" ${GP.dotFont!==false?"checked":""}><span>メッセージ欄をドット風の文字にする<small>オフにすると、ふつうの文字に戻ります。</small></span></label>
+  <label class="check"><input type="checkbox" id="sBig" ${bigOn()?"checked":""}><span>見せ場の絵を大きく表示する<small>たかり狸、災難、ワープ、時代の大波、決算などの場面で、絵とメッセージを画面いっぱいに出します。オフにすると、以前の控えめな表示に戻ります。</small></span></label>
   ${IAP()?`<h3>製品版</h3>${isFull()?`<p class="hint">製品版をお買い上げいただき、ありがとうございます。5・10・20年のゲームが遊べます。</p>`:buyHTML()}<p><button type="button" class="btn" data-iaprestore>購入を復元</button></p><p class="hint">機種変更やアプリの入れ直しのあとは、購入したときと同じApple Accountで「購入を復元」を押してください。</p>`:""}
   <h3>サウンド</h3>
   <label class="check"><input type="checkbox" id="sOn" ${Snd.prefs.on?"checked":""}><span>音を出す<small>オフにするとBGMも効果音も止まります。iPhoneでは消音モードでも鳴るようにしています。</small></span></label>
@@ -2520,6 +2550,7 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
     else if(t.id==="sExact"&&e.type==="change"){S.rules.exact=t.checked;log(`ぴったり到着を${t.checked?"オン":"オフ"}にしました。`);render();autosave()}
     else if(t.id==="sSpeed"){GP.speed=t.value;saveGP()}
     else if(t.id==="sDot"&&e.type==="change"){GP.dotFont=t.checked;saveGP();applyDotFont()}
+    else if(t.id==="sBig"&&e.type==="change"){GP.bigFx=t.checked;saveGP()}
     else if(t.id==="sQuiz"&&e.type==="change"){S.rules.quiz=t.checked;log(`クイズを${t.checked?"オン":"オフ"}にしました。`);autosave()}
     else if(t.id==="sYokai"&&e.type==="change"){S.rules.yokai=t.checked;if(!t.checked)S.yokai={owner:null,form:0,turns:0};log(`妖怪を${t.checked?"オン":"オフ"}にしました。`);render();autosave()}
     Snd.savePrefs();Snd.apply();updSndBtn()};
