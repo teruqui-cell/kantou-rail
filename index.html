@@ -2535,7 +2535,7 @@ async function openSettings(){Snd.unlock();const body=$("#modalBody");
   <div class="field"><label for="sSpeed">表示の速さ</label><select id="sSpeed">${Object.entries(SPEEDS).map(([k,v])=>`<option value="${k}" ${GP.speed===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
   <p class="hint">「タップで進む」にすると、CPUの番も含めてメッセージはタップするまで止まります。ほかの速さでは、メッセージは時間がたつと自動で進みます（タップでの早送りはしません）。</p>
   <label class="check"><input type="checkbox" id="sDot" ${GP.dotFont!==false?"checked":""}><span>メッセージ欄をドット風の文字にする<small>オフにすると、ふつうの文字に戻ります。</small></span></label>
-  <label class="check"><input type="checkbox" id="sBig" ${bigOn()?"checked":""}><span>見せ場の絵を大きく表示する<small>たかり狸、災難、ワープ、時代の大波、決算などの場面で、絵とメッセージを画面いっぱいに出します。オフにすると、以前の控えめな表示に戻ります。</small></span></label>
+  <label class="check"><input type="checkbox" id="sBig" ${bigOn()?"checked":""}><span>見せ場の絵を大きく表示する<small>たかり狸、災難、ワープ、時代の大波、決算などの場面で、絵とメッセージを大きく表示します。表示が正しくされない場合は、こちらをオフにしてください。</small></span></label>
   ${IAP()?`<h3>製品版</h3>${isFull()?`<p class="hint">製品版をお買い上げいただき、ありがとうございます。5・10・20年のゲームが遊べます。</p>`:buyHTML()}<p><button type="button" class="btn" data-iaprestore>購入を復元</button></p><p class="hint">機種変更やアプリの入れ直しのあとは、購入したときと同じApple Accountで「購入を復元」を押してください。</p>`:""}
   <h3>サウンド</h3>
   <label class="check"><input type="checkbox" id="sOn" ${Snd.prefs.on?"checked":""}><span>音を出す<small>オフにするとBGMも効果音も止まります。iPhoneでは消音モードでも鳴るようにしています。</small></span></label>
