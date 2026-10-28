@@ -415,7 +415,7 @@ body{background:var(--bg)}
 .sheet.pic.leave{animation:sheetOut .2s ease-in both}
 @keyframes sheetIn{from{opacity:0;transform:translateY(24px) scale(.88) rotate(-1deg)}}
 @keyframes sheetOut{to{opacity:0;transform:scale(.8)}}
-#bigCut .scene{max-height:calc(100dvh - 240px);width:auto;margin:0 auto}
+#bigCut .scene{width:100%;max-width:calc((100dvh - 250px) * 16 / 9);margin:0 auto}
 @media (min-width:821px){#bigCut{width:min(760px,70vw)}.sheet.pic{width:min(680px,100%)}}
 @media (prefers-reduced-motion:reduce){#bigCut,#bigVeil,.sheet.pic{animation:none!important}}
 </style>
@@ -1212,6 +1212,12 @@ const webStoreHTML=()=>APPSTORE_LIVE?`<p style="text-align:center;margin:10px 0 
 const trialBox=(lead,head="無料版（3年）で遊んでいます")=>`<div class="trial"><p class="trial-h">${head}</p><p>${lead}</p>${FULL_PERKS}${IAP()?buyHTML():webStoreHTML()}</div>`;
 /* ---------- 製品版の購入（iPhoneアプリのみ。App Storeのアプリ内課金・買い切り） ---------- */
 const IAP_ID="otonarail.full";
+/* App Storeの評価ダイアログ（アプリのみ。表示するかどうかはAppleが最終判断） */
+const REVIEW=()=>{const C=window.Capacitor;return C&&C.isNativePlatform&&C.isNativePlatform()&&C.Plugins&&C.Plugins.InAppReview||null};
+function askReview(order){GP.done=(GP.done||0)+1;saveGP();const R=REVIEW();if(!R)return;
+  const good=order.some(x=>!x.p.cpu&&x.rank<=2),now=Date.now();
+  if(!(good||GP.done>=2))return;if(GP.revAt&&now-GP.revAt<90*864e5)return;
+  GP.revAt=now;saveGP();setTimeout(()=>{try{R.requestReview().catch(()=>{})}catch(e){}},1500)}
 const IAP=()=>{const C=window.Capacitor;return C&&C.isNativePlatform&&C.isNativePlatform()&&C.Plugins&&C.Plugins.NativePurchases||null};
 let IAP_PRICE="500円",IAP_BUSY=false;
 const buyHTML=()=>`<p style="text-align:center;margin:10px 0 2px"><button type="button" class="btn primary" data-iapbuy>製品版を購入（買い切り ${esc(IAP_PRICE)}）</button></p><p class="trial-s" style="text-align:center">一度の購入で、ずっと製品版で遊べます。購入済みの方は「設定」の「購入を復元」へ。</p>`;
@@ -1854,6 +1860,7 @@ async function gameOver(){S.year=S.years;S.month=11;S.phase="over";snapshot("終
     if(first)confetti(140);await pr}
   if(rec&&rec.newAch.length){Snd.sfx("card");confetti(50);await modal(`${sceneHTML("correct")}<h2>新しい実績を獲得！</h2>${rec.newAch.map(a=>`<div class="ach got"><b>${a.n}</b><small>${a.d}</small></div>`).join("")}`,[["つづける",1,"primary"]])}
   if(!isFull())await modal(`<h2>無料版をお楽しみいただき、ありがとうございました</h2>${trialBox("3年間の旅、おつかれさまでした。長期戦の製品版では、さらにこんな楽しみが待っています。","製品版で待っている楽しみ")}`,[["つづける",1,"primary"]]);
+  askReview(order);
   for(;;){const r=await modal(summaryHTML(order,rec,awards),[["成績を見る",2],["タイトルへ",0],["もう一度あそぶ",1,"primary"]]);
     if(r===2){await statsModal();continue}
     if(r===1)setup(S.mode);else showTitle();break}}
