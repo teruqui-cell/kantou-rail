@@ -415,9 +415,16 @@ body{background:var(--bg)}
 .sheet.pic.leave{animation:sheetOut .2s ease-in both}
 @keyframes sheetIn{from{opacity:0;transform:translateY(24px) scale(.88) rotate(-1deg)}}
 @keyframes sheetOut{to{opacity:0;transform:scale(.8)}}
-#bigCut .scene{width:100%;max-width:calc((100dvh - 250px) * 16 / 9);margin:0 auto}
+#bigCut .scene{width:100%;max-width:calc((100dvh - 250px) * 16 / 9);max-height:none!important;margin:0 auto}
 @media (min-width:821px){#bigCut{width:min(760px,70vw)}.sheet.pic{width:min(680px,100%)}}
 @media (prefers-reduced-motion:reduce){#bigCut,#bigVeil,.sheet.pic{animation:none!important}}
+.stl{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.stl-row{border:2px solid var(--edge);border-radius:6px;padding:8px 10px;background:var(--bg)}
+.stl-head{display:flex;align-items:center;gap:6px}.stl-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stl-net{font-size:17px;white-space:nowrap}
+.stl-sub{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;flex-wrap:wrap;column-gap:12px}
+.stl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;align-items:center}.stl-lb{font-size:11.5px;color:var(--muted);margin-right:2px;white-space:nowrap}
+.stl-tag{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap}
+.stl-tag.mono{color:var(--muted)}.stl-tag.top{color:var(--card)}.stl-tag.yaku{color:var(--goal)}
 </style>
 
 </head>
@@ -1789,7 +1796,7 @@ async function settle(yearEnd){render();
   rows.forEach(r=>r.myTops.forEach(c=>log(`${r.p.name}が${CAT_NAME[c]}の業界トップ（${tops[c].cnt[r.p.idx]}件）。収益1.6倍。`)));
   const label=yearEnd?`${S.year}年目 本決算（3月）`:`${S.year}年目 中間決算（9月）`;
   log(`${label}が終わりました。`);setScene("settle",label,"board");render();Snd.sfx("settle");
-  await modal(`${sceneHTML("settle")}<h2>${label}</h2><p>物件の収益が入り、借入の利息${yearEnd?"と固定資産税（物件評価額の1.4%）":""}を支払いました。駅の独占は収益1.3倍、業界トップのカテゴリは収益1.6倍です。</p><div style="overflow-x:auto"><table class="settle"><tr><th>オーナー</th><th>収益</th><th>利息</th>${yearEnd?"<th>税金</th>":""}<th>差引</th></tr>${rows.map(r=>`<tr><td>${esc(r.p.name)}${r.mono?`<br><small style="color:var(--muted)">独占${r.mono}駅</small>`:""}${r.myTops.length?`<br><small style="color:var(--card);font-weight:700">業界トップ：${r.myTops.map(c=>CAT_NAME[c]).join("・")}</small>`:""}${r.yk.length?`<br><small style="color:var(--goal);font-weight:700">役：${r.yk.map(y=>y.n).join("・")}</small>`:""}</td><td>＋${yen(r.inc)}</td><td>${r.interest?"−"+yen(r.interest):"—"}</td>${yearEnd?`<td>${r.tax?"−"+yen(r.tax):"—"}</td>`:""}<td style="color:${r.net<0?"var(--minus)":"var(--accent)"}"><b>${r.net<0?"−":"＋"}${yen(Math.abs(r.net))}</b></td></tr>`).join("")}</table></div>`,[["つづける",1,"primary"]]);
+  await modal(`${sceneHTML("settle")}<h2>${label}</h2><p>物件の収益が入り、借入の利息${yearEnd?"と固定資産税（物件評価額の1.4%）":""}を支払いました。駅の独占は収益1.3倍、業界トップのカテゴリは収益1.6倍です。</p><div class="stl">${rows.map(r=>`<div class="stl-row"><div class="stl-head"><span class="dot" style="background:${pcol(r.p.idx)}"></span><b class="stl-name">${esc(r.p.name)}</b><b class="stl-net" style="color:${r.net<0?"var(--minus)":"var(--accent)"}">${r.net<0?"−":"＋"}${yen(Math.abs(r.net))}</b></div><div class="stl-sub"><span>収益 ＋${yen(r.inc)}</span><span>利息 ${r.interest?"−"+yen(r.interest):"なし"}</span>${yearEnd?`<span>税金 ${r.tax?"−"+yen(r.tax):"なし"}</span>`:""}</div>${r.mono?`<div class="stl-tags"><span class="stl-lb">独占</span><span class="stl-tag mono">${r.mono}駅</span></div>`:""}${r.myTops.length?`<div class="stl-tags"><span class="stl-lb">業界トップ</span>${r.myTops.map(c=>`<span class="stl-tag top">${CAT_NAME[c]}</span>`).join("")}</div>`:""}${r.yk.length?`<div class="stl-tags"><span class="stl-lb">役</span>${r.yk.map(y=>`<span class="stl-tag yaku">${y.n}</span>`).join("")}</div>`:""}</div>`).join("")}</div>`,[["つづける",1,"primary"]]);
   for(const {p,y} of newYaku)await yakuFanfare(p,y);
   for(const p of S.players)if(p.money<0)await forceSellOf(p)}
 async function yakuFanfare(p,y){const amt=r100((y.big?50000:y.small?15000:25000)*yf());p.money+=amt;gain(p,amt);log(`${p.name}が役「${y.n}」を成立させた！祝い金${yen(amt)}。`);render();
