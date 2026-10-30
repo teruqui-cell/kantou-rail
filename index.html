@@ -425,6 +425,14 @@ body{background:var(--bg)}
 .stl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;align-items:center}.stl-lb{font-size:11.5px;color:var(--muted);margin-right:2px;white-space:nowrap}
 .stl-tag{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap}
 .stl-tag.mono{color:var(--muted)}.stl-tag.top{color:var(--card)}.stl-tag.yaku{color:var(--goal)}
+.sheet.wide .btns{z-index:3}
+.stl-ttl{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.stat{border-collapse:separate;border-spacing:0}
+.stat th[scope=row]{position:sticky;left:0;z-index:1;background:var(--panel);text-align:left;font-weight:400;white-space:normal;min-width:6em;max-width:7em;font-size:12px;padding:7px 4px 7px 0;line-height:1.35}
+.stat tr:first-child th{vertical-align:bottom;white-space:normal;font-size:12px;max-width:6.5em;text-align:right;padding:4px 3px}
+.stat tr:first-child th:first-child{position:sticky;left:0;background:var(--panel);z-index:1}
+.stat .dot{display:inline-block;margin-bottom:2px}.stat-nm{display:block;overflow:hidden;text-overflow:ellipsis}
+.stat td{text-align:right;font-variant-numeric:tabular-nums;padding:7px 3px;font-size:12.5px}
 </style>
 
 </head>
@@ -1895,12 +1903,13 @@ function bindChart(){const svg=$("#chart svg"),hit=$("#chHit");if(!svg||!hit)ret
     const tip=$("#chTip");tip.hidden=false;tip.innerHTML=`<b>${esc(H[i].l)}</b>`+S.players.map((p,pi)=>`<div><span class="dot" style="background:${pcol(pi)};display:inline-block;margin-right:4px"></span>${esc(p.name)}　${yen(H[i].v[pi])}</div>`).join("");
     const px=cx/W*r.width;tip.style.left=Math.min(r.width-tip.offsetWidth-4,Math.max(4,px+10))+"px"};
   hit.addEventListener("pointermove",move);hit.addEventListener("pointerdown",move);hit.addEventListener("pointerleave",()=>{$("#chTip").hidden=true;$("#chX").setAttribute("visibility","hidden")})}
+const yenS=v=>Math.abs(v)>=10000?(v<0?"−":"")+(Math.abs(v)/10000).toFixed(1).replace(/\.0$/,"")+"億円":yen(v);
 async function statsModal(){
-  const rows=[["称号",i=>TITLES[S.players[i].title||0].n],["役（成立したもの）",i=>{const y=(ST(S.players[i]).yakus||[]).map(id=>YAKU.find(z=>z.id===id).n);return y.length?y.join("・"):"—"}],["業界トップ（直近の決算）",i=>{const c=CAT_KEYS.filter(c=>S.tops&&S.tops[c]===i);return c.length?c.map(x=>CAT_NAME[x]).join("・"):"—"}],["総資産",i=>yen(netWorth(i))],["現金",i=>yen(S.players[i].money)],["物件の評価額",i=>yen(assets(i))],["借入残高",i=>yen(debtOf(S.players[i]))],["物件の数",i=>ownedList(i).length+"件"],["独占した駅",i=>monoCount(i)+"駅"],
+  const rows=[["称号",i=>TITLES[S.players[i].title||0].n],["役（成立したもの）",i=>{const y=(ST(S.players[i]).yakus||[]).map(id=>YAKU.find(z=>z.id===id).n);return y.length?y.join("・"):"—"}],["業界トップ（直近の決算）",i=>{const c=CAT_KEYS.filter(c=>S.tops&&S.tops[c]===i);return c.length?c.map(x=>CAT_NAME[x]).join("・"):"—"}],["総資産",i=>yenS(netWorth(i))],["現金",i=>yenS(S.players[i].money)],["物件の評価額",i=>yenS(assets(i))],["借入残高",i=>yenS(debtOf(S.players[i]))],["物件の数",i=>ownedList(i).length+"件"],["独占した駅",i=>monoCount(i)+"駅"],
     ["目的地への一番乗り",i=>ST(S.players[i]).arrivals+"回"],["進んだマス",i=>ST(S.players[i]).steps+"マス"],["立ち寄った駅",i=>ST(S.players[i]).stations.length+"駅"],["航路を進んだマス",i=>ST(S.players[i]).sea+"マス"],
     ["青マス",i=>ST(S.players[i]).plus+"回"],["赤マス",i=>ST(S.players[i]).minus+"回"],["災難カード",i=>ST(S.players[i]).bad+"回"],["使ったカード",i=>ST(S.players[i]).cardsUsed+"枚"],["邪魔カードを使った",i=>ST(S.players[i]).attacks+"回"],
-    ["クイズ",i=>S.players[i].cpu?"—":`${ST(S.players[i]).quizOk}/${ST(S.players[i]).quizN}問正解`],["妖怪に取り憑かれた",i=>ST(S.players[i]).yokaiTurns+"回"],["1回の最大収入",i=>yen(ST(S.players[i]).maxGain)],["1回の最大損失",i=>yen(ST(S.players[i]).maxLoss)],["最大借入額",i=>yen(ST(S.players[i]).maxDebt)]];
-  const pr=modal(`<h2>${S.phase==="over"?"成績":"途中経過"}</h2><h3>総資産の推移</h3>${chartSVG()||`<p class="hint">グラフは1か月が過ぎると表示されます。</p>`}<p class="hint">グラフをなぞると、その時点の総資産が見られます。</p><h3>詳しい成績</h3><div class="stat-wrap"><table class="stat"><tr><th></th>${S.players.map((p,i)=>`<th><span class="dot" style="background:${pcol(i)};display:inline-block;margin-right:4px"></span>${esc(p.name)}</th>`).join("")}</tr>${rows.map(([n,f])=>`<tr><td>${n}</td>${S.players.map((_,i)=>`<td>${f(i)}</td>`).join("")}</tr>`).join("")}</table></div>`,[["閉じる",0,"primary"]],true);
+    ["クイズ",i=>S.players[i].cpu?"—":`${ST(S.players[i]).quizOk}/${ST(S.players[i]).quizN}問正解`],["妖怪に取り憑かれた",i=>ST(S.players[i]).yokaiTurns+"回"],["1回の最大収入",i=>yenS(ST(S.players[i]).maxGain)],["1回の最大損失",i=>yenS(ST(S.players[i]).maxLoss)],["最大借入額",i=>yenS(ST(S.players[i]).maxDebt)]];
+  const pr=modal(`<h2>${S.phase==="over"?"成績":"途中経過"}</h2><h3>総資産の推移</h3>${chartSVG()||`<p class="hint">グラフは1か月が過ぎると表示されます。</p>`}<p class="hint">グラフをなぞると、その時点の総資産が見られます。</p><h3>称号・役・業界トップ</h3><div class="stl">${S.players.map((p,i)=>{const y=(ST(p).yakus||[]).map(id=>YAKU.find(z=>z.id===id).n),c=CAT_KEYS.filter(c=>S.tops&&S.tops[c]===i);return `<div class="stl-row"><div class="stl-head"><span class="dot" style="background:${pcol(i)}"></span><b class="stl-name">${esc(p.name)}</b><b class="stl-ttl">${TITLES[p.title||0].n}</b></div>${c.length?`<div class="stl-tags"><span class="stl-lb">業界トップ</span>${c.map(x=>`<span class="stl-tag top">${CAT_NAME[x]}</span>`).join("")}</div>`:""}${y.length?`<div class="stl-tags"><span class="stl-lb">役</span>${y.map(n=>`<span class="stl-tag yaku">${n}</span>`).join("")}</div>`:""}${!c.length&&!y.length?`<div class="stl-sub">業界トップ・役はありません</div>`:""}</div>`}).join("")}</div><h3>詳しい成績</h3><div class="stat-wrap"><table class="stat"><tr><th></th>${S.players.map((p,i)=>`<th><span class="dot" style="background:${pcol(i)}"></span><span class="stat-nm">${esc(p.name)}</span></th>`).join("")}</tr>${rows.slice(3).map(([n,f])=>`<tr><th scope="row">${n}</th>${S.players.map((_,i)=>`<td>${f(i)}</td>`).join("")}</tr>`).join("")}</table></div>`,[["閉じる",0,"primary"]],true);
   bindChart();await pr}
 
 /* ---------- music selection ---------- */
