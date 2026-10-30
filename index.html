@@ -1214,7 +1214,7 @@ let FULL_ED=false;
 const isFull=()=>FULL_ED||!!GP.unlocked;
 const FULL_PERKS=`<ul class="perks"><li><b>5年・10年（標準）・20年</b>のじっくりした長期戦</li><li><b>時代の大波</b>：バブルとその崩壊、金融危機、台風・噴火・豪雪と復興特需、万博、新幹線の開業と<b>新幹線カード</b></li><li><b>福だぬき</b>：取り憑いた狸がまれに改心して、良いことだけをしてくれる</li><li><b>役（やく）</b>と<b>業界トップ</b>：物件の組み合わせをそろえて収益アップ、汐留ヘッドクォーター特区の本社物件</li><li>称号を<b>億万長者</b>まで駆け上がる、やり込みの実績集め</li></ul>`;
 // ウェブ版：App Storeのページへ（公開後に APPSTORE_LIVE を true にする）
-const APPSTORE_URL="https://apps.apple.com/jp/app/id6824518603",APPSTORE_LIVE=true;
+const APPSTORE_URL="https://apps.apple.com/app/apple-store/id6824518603?pt=129637870&ct=web&mt=8",APPSTORE_LIVE=true;
 const webStoreHTML=()=>APPSTORE_LIVE?`<p style="text-align:center;margin:10px 0 2px"><a class="btn primary" href="${APPSTORE_URL}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none">App Storeで製品版を見る</a></p><p class="trial-s" style="text-align:center">iPhoneアプリ（無料）をダウンロードし、アプリ内で製品版（買い切り500円）を購入できます。</p>`:`<p class="trial-s">製品版はiPhoneアプリ（買い切り500円）で遊べます。</p>`;
 const trialBox=(lead,head="無料版（3年）で遊んでいます")=>`<div class="trial"><p class="trial-h">${head}</p><p>${lead}</p>${FULL_PERKS}${IAP()?buyHTML():webStoreHTML()}</div>`;
 /* ---------- 製品版の購入（iPhoneアプリのみ。App Storeのアプリ内課金・買い切り） ---------- */
