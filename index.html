@@ -188,6 +188,7 @@ body[data-wait] #action button,body[data-wait] #action .cardbtn{pointer-events:n
 .cer-rank.arr{font-size:26px}
 .tag.ttl{background:color-mix(in srgb,var(--card) 22%,transparent);border-color:var(--card);color:var(--ink)}
 .tag.ttl.t5,.tag.ttl.t6,.tag.ttl.t7{background:var(--card);color:#2B3540}
+.achfull{display:inline-block;margin-left:6px;padding:0 7px;border-radius:999px;background:var(--card);color:#2B3540;font-style:normal;font-size:11px;font-weight:700;vertical-align:1px}
 .tag.ttl.t8,.tag.ttl.t9{background:var(--goal);border-color:var(--goal);color:#fff}
 .ladder{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;margin:10px 0 4px;font-size:13px}
 .ladder span{border:1.5px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
@@ -434,6 +435,36 @@ body{background:var(--bg)}
 .stat tr:first-child th:first-child{position:sticky;left:0;background:var(--panel);z-index:1}
 .stat .dot{display:inline-block;margin-bottom:2px}.stat-nm{display:block;overflow:hidden;text-overflow:ellipsis}
 .stat td{text-align:right;font-variant-numeric:tabular-nums;padding:7px 3px;font-size:12.5px}
+/* 景気の札・背景・値段の矢印 */
+.econ{display:inline-flex;align-items:center;gap:2px;padding:3px 9px;border-radius:6px;font-family:var(--f-body);font-weight:700;font-size:12.5px;border:2px solid #2B3540;box-shadow:2px 2px 0 #2B3540;cursor:pointer;line-height:1.2;white-space:nowrap}
+.econ[hidden]{display:none}
+.econ small{font-size:10px;font-weight:700;margin-left:4px;opacity:.9}
+.econ.e-boom{background:#E2A72E;color:#2B3540}.econ.e-slump{background:#C3302A;color:#fff}.econ.e-stop{background:#5E6670;color:#fff}.econ.e-up{background:#2C6BE0;color:#fff}
+.paper{background:#F3EEDF;color:#1E1C19;border:1px solid #BDB4A2;box-shadow:inset 0 0 40px rgba(120,100,60,.12);padding:14px 16px 12px;margin:-4px -2px 4px;font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif}
+.paper .mast{display:flex;align-items:baseline;justify-content:center;gap:8px;border-bottom:4px double #1E1C19;padding-bottom:6px}
+.paper .mast-ttl{font-size:21px;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+.paper .mast-sub{font-size:10.5px;font-weight:700;border:1px solid #1E1C19;padding:0 4px;white-space:nowrap}
+.paper .dateline{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;border-bottom:1px solid #1E1C19;padding:4px 0;margin-bottom:10px}
+.paper .stamp{color:#B3261E;border:1.5px solid #B3261E;font-weight:800;padding:0 6px;letter-spacing:.1em}
+.paper .hl{font-size:23px;font-weight:800;line-height:1.3;margin:2px 0 6px;color:#1E1C19;font-family:inherit}
+.paper .sub{font-size:14px;font-weight:700;border-left:4px solid #1E1C19;padding-left:8px;margin:0 0 8px}
+.paper .body{font-size:13.5px;line-height:1.75;margin:0 0 6px;text-align:justify}
+.paper .brief{border-top:1px solid #8C8270;padding-top:8px;margin-top:8px}
+.paper .brief b{display:block;font-size:16px;line-height:1.35}
+.paper .brief .bsub{display:block;font-size:12.5px;font-weight:700;margin:2px 0 4px}
+.paper .brief p{font-size:12.5px;line-height:1.65;margin:0}
+.paper .pfoot{font-size:11px;color:#5E574B;border-top:1px solid #8C8270;margin:10px 0 0;padding-top:6px}
+.econ-row .econ{box-shadow:none;border-width:1.5px;font-size:11.5px;padding:1px 7px;margin-right:6px;cursor:default}
+html[data-econ="boom"] #map{filter:sepia(.22) saturate(1.3) brightness(1.02)}
+html[data-econ="boom"] #mapWrap{background:color-mix(in srgb,var(--land) 80%,#F2C14E)}
+html[data-econ="slump"] #map{filter:grayscale(.5) brightness(.97)}
+html[data-econ="slump"] #mapWrap{background:color-mix(in srgb,var(--land) 78%,#7C8796)}
+#map{transition:filter .8s}
+.dice-cmp{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:6px 0}
+.dice-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.dice-avg{font-family:var(--f-display);font-size:22px;font-weight:800;margin:2px 0;font-variant-numeric:tabular-nums}.dice-avg small{font-size:11px;font-weight:600;color:var(--muted);margin-left:6px}
+.dbars{display:block;max-width:100%;height:auto}.dice-total{margin:6px 0}
+.pchg{font-style:normal;font-size:11px;font-weight:800;margin-left:3px}.pchg.up{color:#2C6BE0}.pchg.dn{color:#C3302A}
 </style>
 
 </head>
@@ -441,6 +472,7 @@ body{background:var(--bg)}
 <header>
   <h1>大人の鉄道すごろく 東日本編</h1>
   <span class="when" id="when">1年目 4月</span>
+  <button class="econ" id="econ" type="button" hidden aria-label="いまの景気"></button>
   <span class="goal" id="goalChip">目的地 <b id="goalName">—</b></span>
   <span class="spacer"></span>
   <div class="hbtns">
@@ -591,13 +623,13 @@ const EAST_PROPS={
 };
 // [駅A, 駅B, 種類(0=鉄道 1=短い航路 2=長距離フェリー 3=海底トンネル), 経由点(経度・緯度)]
 const EAST_EDGES=[
-["函館","長万部"],["長万部","東室蘭"],["東室蘭","苫小牧"],["苫小牧","札幌"],["札幌","小樽"],["小樽","長万部"],["札幌","旭川"],["旭川","富良野"],["富良野","帯広"],["苫小牧","帯広"],["帯広","釧路"],
+["函館","長万部",0,[[140.173,42.348]]],["長万部","東室蘭",0,[[140.429,42.566],[140.468,42.583],[140.516,42.594],[140.638,42.6],[140.702,42.584],[140.767,42.553],[140.831,42.506]]],["東室蘭","苫小牧",0,[[141.535,42.687]]],["苫小牧","札幌"],["札幌","小樽",0,[[140.951,43.165]]],["小樽","長万部"],["札幌","旭川"],["旭川","富良野"],["富良野","帯広"],["苫小牧","帯広"],["帯広","釧路"],
 ["青森","函館",3],
 ["青森","弘前"],["弘前","大館"],["大館","秋田"],["青森","八戸"],["八戸","盛岡"],["盛岡","宮古"],["盛岡","角館"],["角館","秋田"],["盛岡","花巻"],["花巻","一ノ関"],["一ノ関","気仙沼"],["気仙沼","石巻"],
-["一ノ関","仙台"],["仙台","石巻"],["仙台","山形"],["山形","新庄"],["新庄","酒田"],["新庄","秋田"],["秋田","酒田"],["酒田","新潟"],["山形","米沢"],["米沢","福島"],["仙台","福島"],["福島","郡山"],
+["一ノ関","仙台"],["仙台","石巻",0,[[141.222,38.478]]],["仙台","山形"],["山形","新庄"],["新庄","酒田"],["新庄","秋田"],["秋田","酒田"],["酒田","新潟",0,[[139.524,38.104],[139.059,37.896]]],["山形","米沢"],["米沢","福島"],["仙台","福島"],["福島","郡山"],
 ["郡山","会津若松"],["会津若松","新潟"],["郡山","いわき"],["いわき","日立"],["日立","水戸"],["水戸","大洗"],["郡山","那須塩原"],["那須塩原","宇都宮"],["宇都宮","日光"],["宇都宮","大宮"],["水戸","東京"],
 ["大宮","東京"],["東京","横浜"],["東京","千葉"],["千葉","銚子"],["大宮","高崎"],["高崎","草津"],["高崎","軽井沢"],["軽井沢","長野"],["高崎","越後湯沢"],["越後湯沢","長岡"],["長岡","新潟"],["長岡","直江津"],
-["新潟","佐渡",1],["直江津","長野"],["長野","松本"],["松本","甲府"],["甲府","八王子"],["八王子","東京"],["横浜","小田原"],["小田原","熱海"],["熱海","静岡"],["静岡","浜松"],["甲府","静岡"],
+["新潟","佐渡",1],["直江津","長野"],["長野","松本"],["松本","甲府"],["甲府","八王子"],["八王子","東京"],["横浜","小田原"],["小田原","熱海"],["熱海","静岡",0,[[138.893,35.085],[138.844,35.117],[138.797,35.14],[138.751,35.153],[138.641,35.158],[138.599,35.153],[138.581,35.143],[138.474,35.03]]],["静岡","浜松"],["甲府","静岡"],
 ["直江津","糸魚川"],["糸魚川","富山"],["富山","金沢"],["金沢","福井"],["松本","糸魚川"],
 ["大洗","苫小牧",2,[[141.5,36.45],[142.4,37.9],[142.8,39.5],[142.6,41.2],[142.0,42.3]],{name:"大洗―苫小牧フェリー航路",sub:"（物件なし・赤マス多め）"}],
 ["新潟","小樽",2,[[138.9,38.7],[139.3,39.9],[139.4,41.3],[139.7,42.5],[140.3,43.45]],{name:"新潟―小樽フェリー航路",sub:"（物件なし・冬は大しけ）",winter:1}]
@@ -1263,21 +1295,22 @@ const DEFAULT_PROPS=Object.fromEntries(ALL_ST.map(s=>[s[0],s[4]]));
 let MAP=null,CUR_MAP=null,STATIONS=[],N={},ADJ={},RAILS=[],distCache={};
 function addNode(id,o){N[id]=o;ADJ[id]=[]}
 function link(a,b){ADJ[a].push(b);ADJ[b].push(a)}
-function addChain(a,b,poly,k,ei,kind,srand,meta){
+function addChain(a,b,poly,k,ei,kind,srand,meta,curve){
   const seg=[];let tot=0;for(let i=1;i<poly.length;i++){const l=Math.hypot(poly[i][0]-poly[i-1][0],poly[i][1]-poly[i-1][1]);seg.push(l);tot+=l}
   const at=t=>{let d=t*tot;for(let i=0;i<seg.length;i++){if(d<=seg[i]){const f=seg[i]?d/seg[i]:0;return[poly[i][0]+(poly[i+1][0]-poly[i][0])*f,poly[i][1]+(poly[i+1][1]-poly[i][1])*f]}d-=seg[i]}return poly.at(-1)};
   let prev=a;const pts=[a];
   for(let i=1;i<=k;i++){const r=srand(),id="m"+ei+"_"+i,[x,y]=at(i/(k+1));
     const type=kind===1?(r<.5?"plus":"card"):kind===2?(r<.6?"minus":r<.8?"card":"plus"):(r<.5?"plus":r<.78?"minus":"card");
     addNode(id,{id,type,x,y,sea:kind===2?(meta&&meta.winter?"js":"pac"):null});link(prev,id);prev=id;pts.push(id)}
-  link(prev,b);pts.push(b);RAILS.push({pts,kind,meta});
+  link(prev,b);pts.push(b);RAILS.push({pts,kind,meta,poly,curve});
 }
 function buildGraph(id){CUR_MAP=id;MAP=MAPS[id];STATIONS=MAP.stations;VW=MAP.w;VH=MAP.h;
   N={};ADJ={};RAILS=[];distCache={};let seed=20261010;const srand=()=>(seed=(seed*16807)%2147483647)/2147483647;
   STATIONS.forEach(([n,x,y,lp])=>addNode(n,{id:n,type:"st",x,y,lp}));
   const later=[];
-  MAP.edges.forEach((e,ei)=>{const[a,b,kind=0]=e;if(kind===2){later.push([e,ei]);return}
-    const A=N[a],B=N[b],d=Math.hypot(A.x-B.x,A.y-B.y);addChain(a,b,[[A.x,A.y],[B.x,B.y]],Math.max(1,Math.round(d/66)),ei,kind,srand)});
+  MAP.edges.forEach((e,ei)=>{const[a,b,kind=0,via]=e;if(kind===2){later.push([e,ei]);return}
+    // via: 海にはみ出さないための経由点（経度・緯度）。マスの数は直線の長さのまま
+    const A=N[a],B=N[b],d=Math.hypot(A.x-B.x,A.y-B.y);addChain(a,b,[[A.x,A.y],...(via||[]).map(([lo,la])=>LL(lo,la)),[B.x,B.y]],Math.max(1,Math.round(d/66)),ei,kind,srand,null,!!via)});
   // long ferry: about 75% of the land route's squares, mostly red
   const lands=later.map(([[a,b]])=>bfs(a)[b]||20);
   later.forEach(([[a,b,kind,wp,meta],ei],li)=>{const pts=[[N[a].x,N[a].y],...(wp||[]).map(([lo,la])=>LL(lo,la)),[N[b].x,N[b].y]];
@@ -1551,7 +1584,7 @@ function initMap(){
   drawMapBg(svg);
   const gP=el("g",{},svg);MAP.prefs.forEach(([n,x,y])=>el("text",{x,y,class:"pref","text-anchor":"middle","font-size":MAP.prefSize},gP,n));
   const gR=el("g",{},svg);
-  RAILS.forEach(r=>{const d="M"+r.pts.map(id=>N[id].x+" "+N[id].y).join(" L");el("path",{d,class:["rail","ferry","ferry long","tunnel"][r.kind]},gR);
+  RAILS.forEach(r=>{const d="M"+(r.curve?r.poly.map(q=>q[0]+" "+q[1]):r.pts.map(id=>N[id].x+" "+N[id].y)).join(" L");el("path",{d,class:["rail","ferry","ferry long","tunnel"][r.kind]},gR);
     if(r.kind>=2){const m=N[r.pts[Math.floor(r.pts.length/2)]];if(r.kind===2&&r.meta){el("text",{x:m.x-22,y:m.y-8,class:"note","text-anchor":"end"},gR,r.meta.name);el("text",{x:m.x-22,y:m.y+16,class:"note","text-anchor":"end"},gR,r.meta.sub)}else if(r.kind===3)el("text",{x:m.x+18,y:m.y-18,class:"note"},gR,"青函トンネル")}});
   const gS=el("g",{},svg);
   Object.values(N).forEach(n=>{if(n.type==="shop")el("rect",{x:n.x-11,y:n.y-11,width:22,height:22,rx:3,transform:`rotate(45 ${n.x} ${n.y})`,class:"sqo sq-shop"},gS);else if(n.type!=="st")el("circle",{cx:n.x,cy:n.y,r:11,class:"sqo sq-"+n.type},gS)});
@@ -1624,7 +1657,7 @@ function applyZoom(){const svg=$("#map"),W=Math.max(baseW(),VW*scale);svg.style.
 function focus(id,smooth=true){const w=$("#mapWrap"),sc=$("#map").clientWidth/VW,n=N[id];if(!n)return;w.scrollTo({left:n.x*sc-w.clientWidth/2,top:n.y*sc-w.clientHeight/2,behavior:smooth&&!reduce?"smooth":"auto"})}
 
 /* ---------- scene illustrations (placeholders; img/<key>.png or .webp on the site replaces them) ---------- */
-const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",era:"時代の大波",mono:"駅の独占",chouhan:"丁半カード",fuku:"福だぬき",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
+const SCENE_KEYS={roll:"サイコロを振る",move:"移動中",cpu:"CPUの番",plus:"青マス（収入）",minus:"赤マス（出費）",snow:"赤マス・冬（大雪）",sea:"航路の赤マス・海",card:"カードマス",bad:"災難カード",shop:"カード売り場",buy:"物件購入",roulette:"目的地ルーレット",arrive:"目的地到着",quiz:"クイズ出題",correct:"クイズ正解",yokai:"たかり狸が取り憑く",mischief:"たかり狸の悪さ",bigyokai:"大だぬきに化ける",pass:"妖怪の押し付け",oharai:"お祓い成功",attack:"邪魔カードの攻撃",guard:"お守りで防御",warp:"ぶっとび（ワープ）",rest:"運休（1回休み）",settle:"決算",promote:"称号の昇格",era:"時代の大波",crash:"時代の大波（暴落）",mono:"駅の独占",chouhan:"丁半カード",fuku:"福だぬき",yaku:"役の成立",news:"経済ニュース",season:"季節のイベント",bank:"銀行",ceremony:"結果発表",rank2:"表彰（2位）",rank3:"表彰（3位）",rank4:"表彰（4位）",lose:"最下位",win:"ゲーム終了（優勝）",title:"タイトル画面",s_spring:"季節の変わり目（春）",s_summer:"季節の変わり目（夏）",s_autumn:"季節の変わり目（秋）",s_winter:"季節の変わり目（冬）"};
 const SCENE_IMG={};let CER_N=4;
 let SVGID=0;
 const BG={sky:["#8CCDF0","#E6F5FD","#7CC26B"],sea:["#9BD3F2","#E3F3FC","#2F7FB8"],night:["#1B2440","#3B3F70","#283055"],snow:["#C9DDEA","#F2F8FB","#FFFFFF"],
@@ -1805,11 +1838,17 @@ const GK_SCENES={
 <circle cx="122" cy="122" r="9" fill="#FFF7B0"/><circle cx="198" cy="122" r="9" fill="#FFF7B0"/><rect x="146" y="116" width="28" height="10" fill="${GK.rd}"/>
 <path d="M92 150 L228 150 L234 160 L86 160Z" fill="${GK.ink}"/></g><path d="M112 62 Q160 44 208 62 L205 80 L115 80Z" fill="url(#ht##ID##)" opacity=".45"/>
 <path d="M190 66 L200 64 L196 96 L188 96Z" fill="#fff" opacity=".8"/>${gkOnoma(14,58,"ゴオッ",40,-12,GK.yl)}${gkOnoma(236,40,"!!",34,10,GK.rd)}`,
+ crash:()=>{const P="M10 128 L44 104 L74 116 L108 70 L136 84 L170 30 L196 70 L214 60 L262 146";return `<rect width="320" height="180" fill="${GK.cr}"/>${gkSpeed(160,90,70,60,GK.ink,29)}<rect width="320" height="180" fill="url(#ht##ID##)" opacity=".14"/>
+<path d="M170 30 L178 52 L170 60 L180 80" fill="none" stroke="${GK.ink}" stroke-width="2.5" stroke-linecap="round" opacity=".55"/>
+<path d="${P}" fill="none" stroke="${GK.ink}" stroke-width="13" stroke-linejoin="round"/>
+<path d="${P}" fill="none" stroke="${GK.rd}" stroke-width="7" stroke-linejoin="round"/>
+<path d="M246 155 L278 137 L276 172Z" fill="${GK.rd}" stroke="${GK.ink}" stroke-width="3" stroke-linejoin="round"/>
+${gkOnoma(18,40,"暴落",34,-8,GK.rd)}${gkOnoma(64,172,"ガラガラ",30,-4,GK.bl)}`},
  era:()=>`<rect width="320" height="180" fill="${GK.cr}"/>${gkSpeed(160,90,70,60,GK.ink,23)}<rect width="320" height="180" fill="url(#ht##ID##)" opacity=".1"/>
 <path d="M14 140 L60 110 L96 124 L136 64 L170 136 L206 112 L244 132 L284 40" fill="none" stroke="${GK.ink}" stroke-width="13" stroke-linejoin="round"/>
-<path d="M14 140 L60 110 L96 124 L136 64 L170 136 L206 112 L244 132 L284 40" fill="none" stroke="${GK.rd}" stroke-width="7" stroke-linejoin="round"/>
-<path d="M268 38 L296 26 L292 56Z" fill="${GK.rd}" stroke="${GK.ink}" stroke-width="3" stroke-linejoin="round"/>
-${gkOnoma(18,40,"激動",34,-8,GK.yl)}${gkOnoma(150,172,"ドドドド",30,-4,GK.bl)}`,
+<path d="M14 140 L60 110 L96 124 L136 64 L170 136 L206 112 L244 132 L284 40" fill="none" stroke="${GK.yl}" stroke-width="7" stroke-linejoin="round"/>
+<path d="M268 38 L296 26 L292 56Z" fill="${GK.yl}" stroke="${GK.ink}" stroke-width="3" stroke-linejoin="round"/>
+${gkOnoma(18,40,"激動",34,-8,GK.rd)}${gkOnoma(150,172,"ドドドド",30,-4,GK.bl)}`,
  win:()=>`${gkRays(160,90,18,GK.yl,GK.cr)}${gkSpeed(160,90,60,70,GK.ink,31)}
 <g stroke="${GK.ink}" stroke-width="4" stroke-linejoin="round"><path d="M126 40 L194 40 Q196 92 160 104 Q124 92 126 40Z" fill="${GK.yl}"/>
 <path d="M126 48 Q100 48 104 66 Q108 82 132 84" fill="none"/><path d="M194 48 Q220 48 216 66 Q212 82 188 84" fill="none"/>
@@ -1939,8 +1978,13 @@ const styleOf=p=>STYLE[p.style]||STYLE.normal;
 function cpuRepay(p){const st=styleOf(p),d=debtOf(p);if(d<=0||p.money<=st.repayAbove)return;const v=Math.min(d,Math.floor((p.money-st.repayAbove*.6)/1000)*1000);if(v>0){p.debt=d-v;p.money-=v;log(`${p.name}が銀行に${yen(v)}を返した。`)}}
 
 /* ---------- per-game stats ---------- */
-const newSt=()=>({steps:0,stations:[],arrivals:0,bought:0,boughtValue:0,boughtList:[],plus:0,minus:0,bad:0,cardsUsed:0,cardKinds:[],quizN:0,quizOk:0,yokaiTurns:0,fuku:0,maxGain:0,maxLoss:0,sea:0,attacks:0,maxDebt:0,wasLast:false,maxTops:0,yakus:[]});
+const newSt=()=>({steps:0,stations:[],arrivals:0,bought:0,boughtValue:0,boughtList:[],plus:0,minus:0,bad:0,cardsUsed:0,cardKinds:[],quizN:0,quizOk:0,yokaiTurns:0,fuku:0,maxGain:0,maxLoss:0,sea:0,attacks:0,maxDebt:0,wasLast:false,maxTops:0,yakus:[],dice:[0,0,0,0,0,0]});
 const ST=p=>p.st||(p.st=newSt());
+/* サイコロの出目の記録（丁半カードと追い上げサポートで振った目は数えない） */
+const diceOf=p=>{const s=ST(p);return s.dice||(s.dice=[0,0,0,0,0,0])};
+const diceSum=d=>d.reduce((a,b)=>a+b,0),diceAvg=d=>{const n=diceSum(d);return n?d.reduce((a,c,k)=>a+c*(k+1),0)/n:null};
+function diceBars(d,w=126,h=46,col="var(--ink)"){const mx=Math.max(1,...d),bw=w/6;
+  return `<svg class="dbars" viewBox="0 0 ${w} ${h+14}" width="${w}" height="${h+14}" role="img" aria-label="出目の内訳 ${d.map((c,k)=>`${k+1}が${c}回`).join("、")}">${d.map((c,k)=>{const bh=Math.round((h-12)*c/mx),x=k*bw+3;return `<rect x="${x}" y="${h-bh}" width="${bw-6}" height="${bh}" rx="2" fill="${col}" opacity=".85"/><text x="${x+(bw-6)/2}" y="${h-bh-3}" text-anchor="middle" font-size="9.5" fill="var(--muted)">${c}</text><text x="${x+(bw-6)/2}" y="${h+11}" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ink)">${k+1}</text>`}).join("")}</svg>`}
 function gain(p,a){const s=ST(p);if(a>s.maxGain)s.maxGain=a;if(-a>s.maxLoss)s.maxLoss=-a}
 function useKind(p,c){const s=ST(p);s.cardsUsed++;if(!s.cardKinds.includes(c))s.cardKinds.push(c)}
 function snapshot(label){S.hist=S.hist||[];const nw=S.players.map((_,i)=>netWorth(i));S.hist.push({l:label,v:nw});const mn=Math.min(...nw);
@@ -1994,6 +2038,9 @@ function chartSVG(){const H=S.hist||[];if(H.length<2)return "";const W=640,Ht=28
   const X=i=>ml+(W-ml-mr)*i/(H.length-1),Y=v=>mt+(Ht-mt-mb)*(1-(v-mn)/(mx-mn));
   let g="";for(let v=mn;v<=mx+1;v+=st)g+=`<line x1="${ml}" x2="${W-mr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="${v===0?1.5:1}"/><text x="${ml-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${yShort(v)}</text>`;
   H.forEach((h,i)=>{if(i===0||i===H.length-1||/年4月$/.test(h.l))g+=`<text x="${X(i)}" y="${Ht-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${i===0?"開始":i===H.length-1?(S.phase==="over"?"終了":"現在"):h.l.replace("4月","")}</text>`});
+  const M=S.eraMarks||[],xi=i=>X(Math.max(0,Math.min(H.length-1,i)));
+  M.forEach((m,k)=>{if(m.k==="bubble"){const end=M.slice(k+1).find(z=>z.k==="crash"),x1=xi(m.i-.5),x2=end?xi(end.i-.5):X(H.length-1);g+=`<rect x="${x1}" y="${mt}" width="${Math.max(2,x2-x1)}" height="${Ht-mt-mb}" fill="#E2A72E" opacity=".18"/><text x="${x1+4}" y="${mt+12}" font-size="10.5" font-weight="700" fill="#A8761A">バブル</text>`}
+    else if(m.k==="crisis"||m.k==="crash"){const x=xi(m.i-.5);g+=`<line x1="${x}" x2="${x}" y1="${mt}" y2="${Ht-mb}" stroke="#C3302A" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${x+3}" y="${Ht-mb-6}" font-size="10.5" font-weight="700" fill="#C3302A">${m.k==="crisis"?"金融危機":"崩壊"}</text>`}});
   const ends=S.players.map((p,pi)=>({pi,y:Y(H.at(-1).v[pi])})).sort((a,b)=>a.y-b.y);for(let k=1;k<ends.length;k++)if(ends[k].y-ends[k-1].y<15)ends[k].y=ends[k-1].y+15;
   const lines=S.players.map((p,pi)=>{const c=pcol(pi),d="M"+H.map((h,i)=>`${X(i).toFixed(1)} ${Y(h.v[pi]).toFixed(1)}`).join(" L");const ly=ends.find(e=>e.pi===pi).y;
     return `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="${DASH[pi%4]}"/>${marker(X(H.length-1),Y(H.at(-1).v[pi]),pi%4,c)}<text x="${W-mr+10}" y="${ly+4}" font-size="12" font-weight="700" fill="var(--ink)">${esc(p.name.slice(0,6))}</text>`}).join("");
@@ -2010,7 +2057,7 @@ async function statsModal(){
     ["目的地への一番乗り",i=>ST(S.players[i]).arrivals+"回"],["進んだマス",i=>ST(S.players[i]).steps+"マス"],["立ち寄った駅",i=>ST(S.players[i]).stations.length+"駅"],["航路を進んだマス",i=>ST(S.players[i]).sea+"マス"],
     ["青マス",i=>ST(S.players[i]).plus+"回"],["赤マス",i=>ST(S.players[i]).minus+"回"],["災難カード",i=>ST(S.players[i]).bad+"回"],["使ったカード",i=>ST(S.players[i]).cardsUsed+"枚"],["邪魔カードを使った",i=>ST(S.players[i]).attacks+"回"],
     ["クイズ",i=>S.players[i].cpu?"—":`${ST(S.players[i]).quizOk}/${ST(S.players[i]).quizN}問正解`],["妖怪に取り憑かれた",i=>ST(S.players[i]).yokaiTurns+"回"],["1回の最大収入",i=>yenS(ST(S.players[i]).maxGain)],["1回の最大損失",i=>yenS(ST(S.players[i]).maxLoss)],["最大借入額",i=>yenS(ST(S.players[i]).maxDebt)]];
-  const pr=modal(`<h2>${S.phase==="over"?"成績":"途中経過"}</h2><h3>総資産の推移</h3>${chartSVG()||`<p class="hint">グラフは1か月が過ぎると表示されます。</p>`}<p class="hint">グラフをなぞると、その時点の総資産が見られます。</p><h3>称号・役・業界トップ</h3><div class="stl">${S.players.map((p,i)=>{const y=(ST(p).yakus||[]).map(id=>YAKU.find(z=>z.id===id).n),c=CAT_KEYS.filter(c=>S.tops&&S.tops[c]===i);return `<div class="stl-row"><div class="stl-head"><span class="dot" style="background:${pcol(i)}"></span><b class="stl-name">${esc(p.name)}</b><b class="stl-ttl">${TITLES[p.title||0].n}</b></div>${c.length?`<div class="stl-tags"><span class="stl-lb">業界トップ</span>${c.map(x=>`<span class="stl-tag top">${CAT_NAME[x]}</span>`).join("")}</div>`:""}${y.length?`<div class="stl-tags"><span class="stl-lb">役</span>${y.map(n=>`<span class="stl-tag yaku">${n}</span>`).join("")}</div>`:""}${!c.length&&!y.length?`<div class="stl-sub">業界トップ・役はありません</div>`:""}</div>`}).join("")}</div><h3>詳しい成績</h3><div class="stat-wrap"><table class="stat"><tr><th></th>${S.players.map((p,i)=>`<th><span class="dot" style="background:${pcol(i)}"></span><span class="stat-nm">${esc(p.name)}</span></th>`).join("")}</tr>${rows.slice(3).map(([n,f])=>`<tr><th scope="row">${n}</th>${S.players.map((_,i)=>`<td>${f(i)}</td>`).join("")}</tr>`).join("")}</table></div>`,[["閉じる",0,"primary"]],true);
+  const pr=modal(`<h2>${S.phase==="over"?"成績":"途中経過"}</h2><h3>総資産の推移</h3>${chartSVG()||`<p class="hint">グラフは1か月が過ぎると表示されます。</p>`}<p class="hint">グラフをなぞると、その時点の総資産が見られます。</p><h3>称号・役・業界トップ</h3><div class="stl">${S.players.map((p,i)=>{const y=(ST(p).yakus||[]).map(id=>YAKU.find(z=>z.id===id).n),c=CAT_KEYS.filter(c=>S.tops&&S.tops[c]===i);return `<div class="stl-row"><div class="stl-head"><span class="dot" style="background:${pcol(i)}"></span><b class="stl-name">${esc(p.name)}</b><b class="stl-ttl">${TITLES[p.title||0].n}</b></div>${c.length?`<div class="stl-tags"><span class="stl-lb">業界トップ</span>${c.map(x=>`<span class="stl-tag top">${CAT_NAME[x]}</span>`).join("")}</div>`:""}${y.length?`<div class="stl-tags"><span class="stl-lb">役</span>${y.map(n=>`<span class="stl-tag yaku">${n}</span>`).join("")}</div>`:""}${!c.length&&!y.length?`<div class="stl-sub">業界トップ・役はありません</div>`:""}</div>`}).join("")}</div><h3>詳しい成績</h3><div class="stat-wrap"><table class="stat"><tr><th></th>${S.players.map((p,i)=>`<th><span class="dot" style="background:${pcol(i)}"></span><span class="stat-nm">${esc(p.name)}</span></th>`).join("")}</tr>${rows.slice(3).map(([n,f])=>`<tr><th scope="row">${n}</th>${S.players.map((_,i)=>`<td>${f(i)}</td>`).join("")}</tr>`).join("")}</table></div><h3>サイコロの出目</h3><div class="dice-cmp">${S.players.map((p,i)=>{const d=diceOf(p),n=diceSum(d),a=diceAvg(d);return `<div class="dice-card"><div class="stl-head"><span class="dot" style="background:${pcol(i)}"></span><b class="stl-name">${esc(p.name)}</b></div><div class="dice-avg">${a==null?"—":a.toFixed(2)}<small>平均・${n}回</small></div>${n?diceBars(d,126,46,pcol(i)):""}</div>`}).join("")}</div><p class="hint">サイコロの目の期待値は3.5です。数十回ほどでは、平均が3.2や3.8になるのは普通のことです。丁半カードと追い上げサポートで振った目は数えていません。</p>`,[["閉じる",0,"primary"]],true);
   bindChart();await pr}
 
 /* ---------- music selection ---------- */
@@ -2023,8 +2070,8 @@ function regionAround(){const c=STATIONS[rnd(0,STATIONS.length-1)],R=CUR_MAP==="
 function scalePrices(sts,f){sts.forEach(st=>(P(st)||[]).forEach(pp=>pp[1]=Math.max(100,r100(pp[1]*f))))}
 const allSts=()=>[...STATIONS.map(x=>x[0]),HQ];
 const ERA_EVENTS=[
- {id:"bubble",w:3,t:"空前の好景気（バブル）到来！",d:"土地も株も右肩上がり。すべての物件の評価額が3割上がりました。ただし、宴はいつか終わるもの……。",fx:()=>{scalePrices(allSts(),1.3);S.bubble=S.year+rnd(2,3)}},
- {id:"crisis",w:2,t:"金融危機が発生！",d:"大手金融機関の破たんで市場が大混乱。物件の評価額が2割下がり、金利が3%上がりました。",fx:()=>{scalePrices(allSts(),.8);S.rate=Math.min(12,S.rate+3)}},
+ {id:"bubble",w:3,t:"空前の好景気（バブル）到来！",d:"土地も株も右肩上がり。すべての物件の評価額が3割上がりました。ただし、宴はいつか終わるもの……。",fx:()=>{scalePrices(allSts(),1.3);S.bubble=S.year+rnd(2,3);eraMark("bubble")}},
+ {id:"crisis",w:2,t:"金融危機が発生！",d:"大手金融機関の破たんで市場が大混乱。物件の評価額が2割下がり、金利が3%上がりました。",fx:()=>{scalePrices(allSts(),.8);S.rate=Math.min(12,S.rate+3);S.slump={until:absM()+12,t:"金融危機",hl:"金融危機、不況続く",d:"物件の評価額が2割下がりました。"};eraMark("crisis")}},
  {id:"typhoon",w:2,t:"大型台風が直撃",d:"周辺の駅の物件は、次の1年間収益が出ず、評価額の2割の修繕費がかかります。翌年は復興特需で収益1.5倍。",region:1,kind:"台風"},
  {id:"volcano",w:1,t:"火山が噴火",d:"周辺の駅の物件は、次の1年間収益が出ず、評価額の2割の修繕費がかかります。翌年は復興特需で収益1.5倍。",region:1,kind:"噴火"},
  {id:"snow",w:1,t:"記録的な豪雪",d:"周辺の駅の物件は、次の1年間収益が出ず、評価額の2割の修繕費がかかります。翌年は復興特需で収益1.5倍。",region:1,kind:"豪雪"},
@@ -2035,18 +2082,18 @@ const ERA_EVENTS=[
 function eraMult(st,cat){let m=1;const d=S.eraDmg;if(d&&d.sts.includes(st)){if(S.year===d.stop)m=0;else if(S.year===d.boom)m*=1.5}
   const c=S.eraCat;if(c&&c.cats.includes(cat)){if(S.year===c.stop)m=0;else if(S.year===c.boom)m*=1.5}return m}
 async function eraTurn(){if(S.year<5||S.years<5)return;
-  if(S.bubble&&S.year>=S.bubble){S.bubble=0;S.eraN=(S.eraN||0)+1;scalePrices(allSts(),.6);log("バブル崩壊！物件の評価額が4割下がった。");
-    Snd.sfx("sad");setScene("era","バブル崩壊",'board');await modal(`${sceneHTML("era")}<div class="cer-rank r4 arr">時代の大波</div><h2 class="cer-name">バブル崩壊</h2><p>宴は終わりました。すべての物件の評価額が4割下がりました。物件を多く持つオーナーほど痛手です。</p>`,[["つづける",1,"primary"]]);S.lastEra=S.year;return}
+  if(S.bubble&&S.year>=S.bubble){S.bubble=0;S.slump={until:absM()+12,t:"バブル崩壊後の不況",hl:"バブル崩壊、景気冷え込む",d:"好景気で上がった物件の評価額が、大きく下がりました。"};eraMark("crash");S.eraN=(S.eraN||0)+1;scalePrices(allSts(),.6);log("バブル崩壊！物件の評価額が4割下がった。");
+    Snd.sfx("sad");setScene("crash","バブル崩壊",'board');await modal(`${sceneHTML("crash")}<div class="cer-rank r4 arr">時代の大波</div><h2 class="cer-name">バブル崩壊</h2><p>宴は終わりました。すべての物件の評価額が4割下がりました。物件を多く持つオーナーほど痛手です。</p>`,[["つづける",1,"primary"]]);S.lastEra=S.year;return}
   if(S.lastEra&&S.year-S.lastEra<3)return;if(Math.random()>.32)return;
   const pool=ERA_EVENTS.filter(e=>!(e.id==="bubble"&&S.bubble));let r=Math.random()*pool.reduce((a,e)=>a+e.w,0),ev=pool[0];for(const e of pool){r-=e.w;if(r<0){ev=e;break}}
   let extra="";
   if(ev.region){const g=regionAround();
     if(ev.boomPrice){scalePrices(g.sts,1.4);extra=`対象：${g.center}駅の周辺（${g.sts.join("・")}）`;if(ev.id==="shinkansen"){S.shin=1;extra+="<br>この先、カードマスやカード売り場に「新幹線カード」（サイコロ2個の目の倍だけ進む）が登場します。"}}
-    else{S.eraDmg={sts:g.sts,stop:S.year,boom:S.year+1};extra=`対象：${g.center}駅の周辺（${g.sts.join("・")}）`;
+    else{S.eraDmg={sts:g.sts,center:g.center,ev:ev.id,stop:S.year,boom:S.year+1};extra=`対象：${g.center}駅の周辺（${g.sts.join("・")}）`;
       for(const pl of S.players){let cost=0;g.sts.forEach(st=>S.owners[st].forEach((o,k)=>{if(o===pl.idx)cost+=P(st)[k][1]*.2}));cost=r100(cost);if(cost>0){pl.money-=cost;gain(pl,-cost);extra+=`<br>${esc(pl.name)}：修繕費 −${yen(cost)}`}}}}
   else ev.fx();
-  S.lastEra=S.year;S.eraN=(S.eraN||0)+1;log(`時代の大波：${ev.t}`);render();Snd.sfx(["typhoon","volcano","snow","crisis","epidemic"].includes(ev.id)?"minus":"over");setScene("era",ev.t,"board");
-  await modal(`${sceneHTML("era")}<div class="cer-rank r1 arr">時代の大波</div><h2 class="cer-name">${esc(ev.t)}</h2><p>${esc(ev.d)}</p>${extra?`<p class="hint">${extra}</p>`:""}`,[["つづける",1,"primary"]]);
+  S.lastEra=S.year;S.eraN=(S.eraN||0)+1;log(`時代の大波：${ev.t}`);render();Snd.sfx(["typhoon","volcano","snow","crisis","epidemic"].includes(ev.id)?"minus":"over");const eraK=ev.id==="crisis"?"crash":"era";setScene(eraK,ev.t,"board");
+  await modal(`${sceneHTML(eraK)}<div class="cer-rank r1 arr">時代の大波</div><h2 class="cer-name">${esc(ev.t)}</h2><p>${esc(ev.d)}</p>${extra?`<p class="hint">${extra}</p>`:""}`,[["つづける",1,"primary"]]);
   for(const pl of S.players)if(pl.money<0)await forceSellOf(pl)}
 /* ---------- seasons ---------- */
 const SEASON_N={spring:"春",summer:"夏",autumn:"秋",winter:"冬"};
@@ -2059,7 +2106,7 @@ async function seasonTurn(){const k=seasonKey(S.month);if(S.season===k)return;co
   await modal(`${sceneHTML("s_"+k)}<div class="sea-kanji">${SEASON_N[k]}</div><h2 style="text-align:center">${SEASON_N[k]}が来ました</h2><p style="text-align:center">${SEASON_MSG[k]}</p>`,[["つづける",1,"primary"]])}
 
 /* ---------- titles (promotion by net worth) ---------- */
-const TITLES=[{n:"駆け出し",min:-Infinity},{n:"小金持ち",min:20000},{n:"資産家",min:40000},{n:"大地主",min:70000},{n:"実業家",min:100000},{n:"大富豪",min:150000},{n:"億万長者",min:300000},{n:"財界の大物",min:600000},{n:"不動産王",min:1000000},{n:"伝説のオーナー",min:2000000}];
+const TITLES=[{n:"駆け出し",min:-Infinity},{n:"小金持ち",min:20000},{n:"資産家",min:40000},{n:"大地主",min:70000},{n:"実業家",min:100000},{n:"大富豪",min:150000},{n:"億万長者",min:300000},{n:"財界の大物",min:600000},{n:"大資本家",min:1000000},{n:"伝説のオーナー",min:2000000}];
 // 1.0.4までの6段階の番号 → 今の10段階の番号（大富豪・億万長者は同じ称号のまま引き継ぐ）
 const TITLE_V=2,OLD_TITLE=[0,1,2,3,5,6];
 const migTitle=t=>OLD_TITLE[t]??t;
@@ -2079,7 +2126,7 @@ async function checkTitles(){for(const p of S.players){const old=p.title||0,t=ti
 
 /* ---------- lifetime records (single-player mode only) ---------- */
 const HOK=["函館","長万部","東室蘭","苫小牧","札幌","小樽","旭川","富良野","帯広","釧路"];
-const REC_NEW=()=>({v:1,games:0,wins:0,bestNW:null,bestTitle:0,tv:TITLE_V,steps:0,bought:0,monos:0,arrivals:0,quizOk:0,quizN:0,sea:0,cardKinds:[],visited:{},props:{},ach:{},recent:[]});
+const REC_NEW=()=>({v:1,games:0,wins:0,bestNW:null,bestTitle:0,tv:TITLE_V,steps:0,bought:0,monos:0,arrivals:0,quizOk:0,quizN:0,sea:0,cardKinds:[],visited:{},props:{},ach:{},recent:[],dice:[0,0,0,0,0,0]});
 let REC=REC_NEW();
 const migRec=o=>{if(o&&o.tv!==TITLE_V){o.bestTitle=migTitle(o.bestTitle||0);o.tv=TITLE_V}return o};
 async function loadRec(){try{const o=(await Store.get("records"))||null;REC=Object.assign(REC_NEW(),o?migRec(o):{})}catch(e){REC=REC_NEW()}}
@@ -2095,7 +2142,7 @@ const ACH=[
  {id:"nw100",n:"百億長者",d:"1回のゲームで総資産100億円を超える",t:(R,g)=>g.nw>=1000000},
  {id:"ttl3",n:"大地主の仲間入り",d:"称号「大地主」に昇格する",t:(R,g)=>g.title>=3},
  {id:"ttl5",n:"億万長者",d:"称号「億万長者」（総資産30億円）に昇格する",t:(R,g)=>g.title>=6},
- {id:"ttl8",n:"不動産王",d:"称号「不動産王」（総資産100億円）に昇格する",t:(R,g)=>g.title>=8},
+ {id:"ttl8",n:"大資本家",d:"称号「大資本家」（総資産100億円）に昇格する",t:(R,g)=>g.title>=8},
  {id:"ttl9",n:"伝説のオーナー",d:"称号の頂点「伝説のオーナー」（総資産200億円）に昇格する",t:(R,g)=>g.title>=9},
  {id:"top1",n:"業界の顔",d:"決算で業界トップになる",t:(R,g)=>g.tops>=1},
  {id:"top3",n:"コングロマリット",d:"1回の決算で3つの業界のトップを同時に取る",t:(R,g)=>g.tops>=3},
@@ -2103,9 +2150,9 @@ const ACH=[
  {id:"sanbon",n:"三本の矢",d:"大役「三本の矢」を成立させる",t:(R,g)=>g.sanbon},
  {id:"fuku",n:"福の神",d:"福だぬきに出会う",t:(R,g)=>g.fuku>=1},
  {id:"comeback",n:"大逆転",d:"一度は最下位になりながら優勝する",t:(R,g)=>g.won&&g.wasLast},
- {id:"nodebt",n:"無借金経営",d:"一度も借入をせずに優勝する",t:(R,g)=>g.won&&g.maxDebt===0},
+ {id:"nodebt",n:"無借金経営",d:"10年以上のゲームで、一度も借入をせずに優勝する",full:10,t:(R,g)=>g.won&&g.maxDebt===0&&g.years>=10},
  {id:"leverage",n:"借金も実力のうち",d:"借入10億円以上を経験して優勝する",t:(R,g)=>g.won&&g.maxDebt>=100000},
- {id:"yokaifree",n:"狸知らず",d:"妖怪に一度も取り憑かれずに優勝する",t:(R,g)=>g.won&&g.yokai===0},
+ {id:"yokaifree",n:"狸知らず",d:"5年以上のゲームで、妖怪に一度も取り憑かれずに優勝する",full:5,t:(R,g)=>g.won&&g.yokai===0&&g.years>=5},
  {id:"tanuki",n:"狸の大親友",d:"1回のゲームで妖怪に12回以上悪さをされる",t:(R,g)=>g.yokai>=12},
  {id:"mono1",n:"はじめての独占",d:"駅を1つ独占したままゲームを終える",t:(R,g)=>g.monos>=1},
  {id:"mono5",n:"独占企業",d:"1回のゲームで5駅以上を独占したまま終える",t:(R,g)=>g.monos>=5},
@@ -2124,13 +2171,13 @@ const ACH=[
  {id:"quizperfect",n:"満点のオーナー",d:"1回のゲームでクイズに5問以上出題され、全問正解する",t:(R,g)=>g.quizN>=5&&g.quizOk===g.quizN},
  {id:"sailor",n:"海の男",d:"フェリー航路を通算100マス進む",t:R=>R.sea>=100},
  {id:"allcards",n:"カードの達人",d:"すべての種類のカードを使う（通算）",t:R=>Object.keys(CARDS).every(k=>R.cardKinds.includes(k))},
- {id:"years10",n:"10年オーナー",d:"10年のゲームを遊び終える",t:(R,g)=>g.years>=10},
- {id:"years20",n:"20年の大河ドラマ",d:"20年のゲームを遊び終える",t:(R,g)=>g.years>=20},
+ {id:"years10",n:"10年オーナー",d:"10年のゲームを遊び終える",full:10,t:(R,g)=>g.years>=10},
+ {id:"years20",n:"20年の大河ドラマ",d:"20年のゲームを遊び終える",full:20,t:(R,g)=>g.years>=20},
  {id:"unlucky",n:"災難の主人公",d:"1回のゲームで災難カードを5回引く",t:(R,g)=>g.bad>=5},
  {id:"broke",n:"どん底からの出直し",d:"総資産マイナスでゲームを終える",t:(R,g)=>g.nw<0}];
 function updateRecords(order){const me=order.find(x=>!x.p.cpu);if(!me)return null;const p=me.p,s=ST(p),i=me.i;
   REC.games++;if(me.rank===1)REC.wins++;const bestUp=REC.bestNW==null||me.nw>REC.bestNW;if(bestUp)REC.bestNW=me.nw;REC.bestTitle=Math.max(REC.bestTitle||0,p.title||0);
-  const monos=monoCount(i);REC.steps+=s.steps;REC.bought+=s.bought;REC.monos+=monos;REC.arrivals+=s.arrivals;REC.quizOk+=s.quizOk;REC.quizN+=s.quizN;REC.sea+=s.sea;
+  const monos=monoCount(i);REC.steps+=s.steps;REC.bought+=s.bought;REC.monos+=monos;REC.arrivals+=s.arrivals;REC.quizOk+=s.quizOk;REC.quizN+=s.quizN;REC.sea+=s.sea;REC.dice=REC.dice||[0,0,0,0,0,0];diceOf(p).forEach((c,k)=>REC.dice[k]+=c);
   s.cardKinds.forEach(k=>{if(!REC.cardKinds.includes(k))REC.cardKinds.push(k)});
   const vis=REC.visited[S.map]||(REC.visited[S.map]=[]);s.stations.forEach(st=>{if(!vis.includes(st))vis.push(st)});
   s.boughtList.forEach(k=>REC.props[k]=1);
@@ -2144,10 +2191,11 @@ async function recordsModal(){await loadRec();const body=$("#modalBody");let tab
   const draw=()=>{const tabs=[["total","通算成績"],["ach","実績"],["st","駅図鑑"],["prop","物件図鑑"],["io","引き継ぎ"]];
     let h=`<h2>記録</h2><p class="hint">「ひとりで遊ぶ」モードの成績だけが、この端末に記録されます。</p><div class="tabs" role="tablist">${tabs.map(([k,n])=>`<button class="tab ${tab===k?"on":""}" data-tab="${k}" role="tab" aria-selected="${tab===k}">${n}</button>`).join("")}</div>`;
     const R=REC,got=Object.keys(R.ach).length;
-    if(tab==="total"){const rows=[["遊んだ回数",R.games+"回"],["優勝",`${R.wins}回${R.games?`（勝率${Math.round(R.wins/R.games*100)}%）`:""}`],["最高の総資産",R.bestNW==null?"—":yen(R.bestNW)],["最高の称号",R.games?TITLES[R.bestTitle||0].n:"—"],["進んだマス",R.steps.toLocaleString()+"マス"],["買った物件",R.bought+"件"],["独占した駅",R.monos+"駅"],["目的地への一番乗り",R.arrivals+"回"],["クイズ",`${R.quizOk}/${R.quizN}問正解`],["航路を進んだマス",R.sea+"マス"],["実績",`${got}/${ACH.length}`]];
+    if(tab==="total"){const rows=[["遊んだ回数",R.games+"回"],["優勝",`${R.wins}回${R.games?`（勝率${Math.round(R.wins/R.games*100)}%）`:""}`],["最高の総資産",R.bestNW==null?"—":yen(R.bestNW)],["最高の称号",R.games?TITLES[R.bestTitle||0].n:"—"],["進んだマス",R.steps.toLocaleString()+"マス"],["買った物件",R.bought+"件"],["独占した駅",R.monos+"駅"],["目的地への一番乗り",R.arrivals+"回"],["クイズ",`${R.quizOk}/${R.quizN}問正解`],["航路を進んだマス",R.sea+"マス"],["サイコロを振った回数",diceSum(R.dice||[0,0,0,0,0,0])+"回"],["出目の平均",diceAvg(R.dice||[])==null?"—":`${diceAvg(R.dice).toFixed(2)}（期待値3.5）`],["実績",`${got}/${ACH.length}`]];
       h+=rows.map(([a,b])=>`<div class="row"><span class="pn">${a}</span><span></span><b>${b}</b></div>`).join("");
+      if(diceSum(R.dice||[])){const d=R.dice,n=diceSum(d);h+=`<h3>通算の出目</h3><div class="dice-total">${diceBars(d,252,70)}<p class="hint">${d.map((c,k)=>`${k+1}：${Math.round(c/n*1000)/10}%`).join("　")}<br>どの目も約16.7%（6分の1）になるのが、偏りのないサイコロです。</p></div>`}
       h+=`<h3>最近の成績</h3>${R.recent.length?R.recent.map(r=>`<div class="row"><span class="pn">${new Date(r.t).toLocaleDateString("ja-JP")}・${MAPS[r.map]?MAPS[r.map].name:""}・${r.years}年<br><small style="font-weight:400;color:var(--muted)">${r.n}人中</small></span><span></span><b>${r.rank===1?"優勝":r.rank+"位"}　${r.nw<0?"−":""}${yen(Math.abs(r.nw))}</b></div>`).join(""):`<p class="hint">まだ記録がありません。「ひとりで遊ぶ」で1回遊び終えると、ここに成績が並びます。</p>`}`}
-    else if(tab==="ach")h+=`<p>${got}/${ACH.length}個を達成</p>`+ACH.map(a=>R.ach[a.id]?`<div class="ach got"><b>${a.n}</b><small>${a.d}・${new Date(R.ach[a.id]).toLocaleDateString("ja-JP")}達成</small></div>`:`<div class="ach"><b>？？？</b><small>${a.d}</small></div>`).join("");
+    else if(tab==="ach")h+=`<p>${got}/${ACH.length}個を達成</p>`+ACH.map(a=>R.ach[a.id]?`<div class="ach got"><b>${a.n}</b><small>${a.d}・${new Date(R.ach[a.id]).toLocaleDateString("ja-JP")}達成</small></div>`:`<div class="ach"><b>？？？${a.full&&!isFull()?`<em class="achfull">製品版・${a.full}年${a.full<20?"以上":""}</em>`:""}</b><small>${a.d}</small></div>`).join("");
     else if(tab==="st")h+=["east","kanto"].map(m=>{const v=R.visited[m]||[];return `<h3>${MAPS[m].name}　${v.length}/${MAPS[m].stations.length}駅</h3><div class="dex">${MAPS[m].stations.map(s=>`<span class="dexst ${v.includes(s[0])?"on":""}">${s[0]}</span>`).join("")}</div>`}).join("")+`<p class="hint">駅に止まったり通過したりすると、色がつきます。</p>`;
     else if(tab==="prop"){const m=dexKeys(),have=[...m.keys()].filter(k=>R.props[k]).length;const by={};m.forEach(([st,n],k)=>{(by[st]=by[st]||[]).push([n,!!R.props[k]])});
       h+=`<p>${have}/${m.size}件を購入済み</p><div class="dexprop">${Object.entries(by).map(([st,l])=>`<div class="dexrow"><b>${st}</b><span>${l.map(([n,g])=>g?`<span class="dp on">${esc(n)}</span>`:`<span class="dp">？？？</span>`).join("")}</span></div>`).join("")}</div>`}
@@ -2174,7 +2222,31 @@ function humanStatus(){const hs=S.players.filter(p=>!p.cpu),d=distTo(S.dest),one
   return hs.map(p=>{const i=p.idx;return `<div class="hs ${i===S.cur&&!one?"on":""}"><span class="dot" style="background:${pcol(i)}"></span><b class="hs-nm">${esc(p.name)}</b>${ttlTag(p)}<span class="sb-money ${p.money<0?"neg":""}">${yen(p.money)}</span><span class="sb-dist">総資産${yen(netWorth(i))}・${esc(S.dest)}まで${d[p.pos]}マス・カード${p.cards.length}枚</span>${statusTags(p)}</div>`}).join("")}
 function statusTags(p){const t=[];if(p.slow>0)t.push(`<span class="tag bad">鈍行 残り${p.slow}回</span>`);if(p.rest>0)t.push(`<span class="tag bad">運休</span>`);
   if(S.rules.yokai&&S.yokai.owner===p.idx)t.push(S.yokai.good?`<span class="tag fk">福だぬき 残り${S.yokai.good}回</span>`:`<span class="tag yk">${YOKAI[S.yokai.form].n}</span>`);if(p.cards.includes("omamori"))t.push(`<span class="tag">お守り</span>`);if(debtOf(p)>0)t.push(`<span class="tag">借入${yen(debtOf(p))}</span>`);return t.join("")}
-function render(){if(!S)return;applySeason();pickBgm();
+/* ---------- 景気の表示（時代の大波のあとの状態を、札と背景で示す） ---------- */
+const absM=()=>S.year*12+S.month;
+function eraMark(k){(S.eraMarks=S.eraMarks||[]).push({k,i:(S.hist||[]).length})}
+function econNow(){if(!S)return[];const a=[],cn=c=>c.map(x=>CAT_NAME[x]).join("・");
+  if(S.bubble)a.push({k:"boom",n:"好景気",t:"バブル景気",hl:"空前の好景気、バブル到来",sub:"物件の評価額が3割上昇",d:"どの駅の物件も値上がりしています。ただし、宴はいつか終わるもの……。"});
+  if(S.slump&&absM()<S.slump.until)a.push({k:"slump",n:"不況",t:S.slump.t,hl:S.slump.hl||S.slump.t,sub:`借入の年利は${S.rate}%`,d:S.slump.d+`景気が戻るまで、借入の利息にご用心。`});
+  const c=S.eraCat;if(c&&c.cats){if(S.year===c.stop)a.push({k:"stop",n:"休業",t:"感染症の流行",hl:"感染症が流行、客足遠のく",sub:`${cn(c.cats)}が休業`,d:`${cn(c.cats)}の物件は、この1年間収益が出ません。`});
+    else if(S.year===c.boom){const ex=c.stop<0;a.push({k:"up",n:"特需",t:ex?"万博の開催":"感染症明けの特需",hl:ex?"万博開幕、観光に追い風":"客足戻り、特需に沸く",sub:`${cn(c.cats)}の収益が1.5倍`,d:`${cn(c.cats)}の物件は、この1年間収益が1.5倍です。`})}}
+  const d=S.eraDmg;if(d&&d.sts){const ctr=d.center||d.sts[0],list=d.sts.join("・"),nm={typhoon:"大型台風",volcano:"噴火",snow:"記録的な豪雪"}[d.ev];
+    if(S.year===d.stop)a.push({k:"stop",n:"休業",t:nm?`${nm}の影響`:"修繕のため休業",hl:nm?`${nm}の影響続く`:"修繕のため休業続く",sub:`${ctr}駅周辺の${d.sts.length}駅で収益止まる`,d:`対象は${list}の各駅。この1年間、物件の収益が出ません。`});
+    else if(S.year===d.boom)a.push({k:"up",n:"特需",t:"復興特需",hl:"復興特需に沸く",sub:`${ctr}駅周辺の${d.sts.length}駅で収益1.5倍`,d:`対象は${list}の各駅。この1年間、物件の収益が1.5倍です。`})}
+  return a}
+const econArrow=k=>k==="boom"||k==="up"?"▲":"▼";
+function renderEcon(){const el=$("#econ");if(!el)return;const a=econNow();const main=a.find(x=>x.k==="boom")||a.find(x=>x.k==="slump")||a[0];
+  document.documentElement.dataset.econ=a.some(x=>x.k==="boom")?"boom":a.some(x=>x.k==="slump")?"slump":"";
+  if(!main){el.hidden=true;return}el.hidden=false;el.className="econ e-"+main.k;el.innerHTML=`${econArrow(main.k)}${main.n}${a.length>1?`<small>ほか${a.length-1}</small>`:""}`;
+  el.onclick=()=>{if($("#modal").hidden)econModal()}}
+function econModal(){const a=econNow();if(!a.length)return;
+  const main=a.find(x=>x.k==="boom")||a.find(x=>x.k==="slump")||a[0],rest=a.filter(x=>x!==main);
+  modal(`<div class="paper"><div class="mast"><span class="mast-ttl">すごろく経済新聞</span><span class="mast-sub">東日本版</span></div>
+    <div class="dateline"><span>${S.year}年目 ${MONTHS[S.month]}</span><span class="stamp">速報</span></div>
+    <h3 class="hl">${esc(main.hl)}</h3><p class="sub">${esc(main.sub)}</p><p class="body">${esc(main.d)}</p>
+    ${rest.map(x=>`<div class="brief"><b>${esc(x.hl)}</b><span class="bsub">${esc(x.sub)}</span><p>${esc(x.d)}</p></div>`).join("")}</div>`,[["閉じる",1,"primary"]])}
+function priceChg(st,i,v){const b=(st===HQ?HQ_PROPS:master(st)||[])[i];if(!b||!b[1])return"";const r=v/b[1]-1;if(Math.abs(r)<.05)return"";return `<em class="pchg ${r>0?"up":"dn"}">${r>0?"▲":"▼"}${Math.round(Math.abs(r)*100)}%</em>`}
+function render(){if(!S)return;applySeason();pickBgm();renderEcon();
   $("#when").textContent=`${S.year}年目 ${MONTHS[S.month]}　(全${S.years}年)`;
   $("#goalName").textContent=S.dest;
   const p=cp(),d=distTo(S.dest)[p.pos];
@@ -2256,6 +2328,7 @@ async function rollDice(){const p=cp(),n=S.dice,boost=S.cur===lastPlace();let v;
   const face=()=>S.parity&&n===1?(S.parity==="even"?[2,4,6]:[1,3,5])[rnd(0,2)]:rnd(1,6);
   for(let i=0;i<9;i++){v=Array.from({length:n},()=>rnd(1,6));showDice(v);Snd.sfx("dice");await sleep(55)}
   if(S.parity&&n===1)v=[face()];else if(boost)v=v.map(x=>Math.random()<.5?Math.max(x,rnd(1,6)):x);
+  if(!(S.parity&&n===1)&&!boost){const dd=diceOf(p);v.forEach(x=>dd[x-1]++)}
   if(S.parity){log(`${p.name}の目は${v[0]}（${v[0]%2?"半":"丁"}）。`);S.parity=null}
   showDice(v);let t=v.reduce((a,b)=>a+b,0);
   if(S.dbl){log(`新幹線！ ${t}の倍で${t*2}マス。`);t*=2;S.dbl=false}
@@ -2381,7 +2454,7 @@ function shopModal(p,st){return new Promise(res=>{const body=$("#modalBody"),min
   const draw=()=>{const own=S.owners[st];body.innerHTML=`${sceneHTML("buy")}<h2>${hq?HQ_NAME:esc(st)+"駅の物件"}</h2>${hq?`<p class="hint" style="margin-bottom:6px">大企業の本社です。単体の利回りは低めですが、業界トップなどと組み合わせると「役」が成立し、祝い金と高い倍率がつきます。</p>`:""}<p>所持金 <b>${yen(p.money)}</b></p>`+P(st).map((pr,i)=>{const o=own[i];
     const right=o==null?`<button class="btn primary" data-buy="${i}" ${p.money<pr[1]?"disabled":""}>買う</button>`:mine.has(i)?`<button class="btn danger" data-undo="${i}">取り消す</button>`:`<span class="own" style="background:${pcol(o)}">${esc(S.players[o].name)}</span>`;
     const c=propCat(pr[0],st),mineC=hq?0:ownedList(p.idx).filter(([s2,k2])=>propCat(P(s2)[k2][0],s2)===c).length,yk=YAKU.filter(y=>y.hq.includes(pr[0])||(y.prop&&y.prop[0]===st&&y.prop[1]===pr[0])).map(y=>y.n);
-    return `<div class="row"><span class="pn">${esc(pr[0])}<small class="pdesc"><span class="catchip c-${c}">${CAT_NAME[c]}</span>${esc(propDesc(pr[0],st))}${mineC?`（${CAT_NAME[c]}を${mineC}件所有）`:""}${yk.length?`<br><b style="color:var(--goal)">役の札：${yk.join("・")}</b>`:""}</small></span><span class="pp">${yen(pr[1])}・${pr[2]}%</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">駅の物件をすべて持つと独占（収益1.3倍）。同じカテゴリの物件を一番多く持つと業界トップ（収益1.6倍）。この画面にいる間は、買った物件を取り消して代金を戻せます。</p>`;renderPlayers();renderDyn()};
+    return `<div class="row"><span class="pn">${esc(pr[0])}<small class="pdesc"><span class="catchip c-${c}">${CAT_NAME[c]}</span>${esc(propDesc(pr[0],st))}${mineC?`（${CAT_NAME[c]}を${mineC}件所有）`:""}${yk.length?`<br><b style="color:var(--goal)">役の札：${yk.join("・")}</b>`:""}</small></span><span class="pp">${yen(pr[1])}${priceChg(st,i,pr[1])}・${pr[2]}%</span>${right}</div>`}).join("")+`<p class="hint" style="margin-top:10px">駅の物件をすべて持つと独占（収益1.3倍）。同じカテゴリの物件を一番多く持つと業界トップ（収益1.6倍）。この画面にいる間は、買った物件を取り消して代金を戻せます。</p>`;renderPlayers();renderDyn()};
   modal("",[["購入を終える",1,"primary"]]).then(()=>{body.onclick=null;res()});
   draw();body.onclick=e=>{const b=e.target.closest("[data-buy]"),u=e.target.closest("[data-undo]");
     if(b){const i=+b.dataset.buy;if(buy(p,st,i)){mine.add(i);Snd.sfx("buy")}}
@@ -2552,7 +2625,7 @@ async function howTo(){await modal(`<h2>遊び方</h2>
   <h3>妖怪とクイズ</h3><p>誰かが目的地に着くと、いちばん遠いオーナーに妖怪「${YOKAI[0].n}」が取り憑きます。ほかのオーナーのいるマスを通れば押し付けられます。駅ではときどき4択クイズが出て、正解すると特典があります。</p>
   <h3>お金と物件</h3><p>決算は9月（中間）と3月（本決算）の年2回で、物件の収益が入ります。3月には物件評価額の1.4%の固定資産税がかかります。毎月ときどき経済ニュースが流れ、持っている物件の種類（飲食・宿泊・工場・農園漁業・観光・スキー場・夜の街・金融学術）によって臨時収入や損失が出ます。夏・秋・冬には季節のボーナスもあります。銀行では物件評価額の半分までお金を借りられますが、決算ごとに利息がかかります。総資産は「現金＋物件の評価額−借入残高」です。</p>
   <h3>季節</h3><p>春（3〜5月）・夏（6〜8月）・秋（9〜11月）・冬（12〜2月）で、画面の色や絵、BGMが変わります。妖怪に取り憑かれているとき、フェリー航路の上、最終年にも専用の曲が流れます。CPUの番は控えめな演奏になります。季節の変わり目にはお知らせが出ます。</p>
-  <h3>称号</h3><p>総資産が増えると称号が上がり、そのたびに昇格ボーナス（クイズ正解の賞金と同じくらい）がもらえます。CPUも同じです。駆け出し → 小金持ち（2億円）→ 資産家（4億円）→ 大地主（7億円）→ 実業家（10億円）→ 大富豪（15億円）→ 億万長者（30億円）→ 財界の大物（60億円）→ 不動産王（100億円）→ 伝説のオーナー（200億円）。一度上がった称号は、総資産が減っても下がりません。</p>
+  <h3>称号</h3><p>総資産が増えると称号が上がり、そのたびに昇格ボーナス（クイズ正解の賞金と同じくらい）がもらえます。CPUも同じです。駆け出し → 小金持ち（2億円）→ 資産家（4億円）→ 大地主（7億円）→ 実業家（10億円）→ 大富豪（15億円）→ 億万長者（30億円）→ 財界の大物（60億円）→ 大資本家（100億円）→ 伝説のオーナー（200億円）。一度上がった称号は、総資産が減っても下がりません。</p>
   <h3>時代の大波</h3><p>5年以上のゲームでは、5年目以降に数年に一度、景気や社会を大きく揺さぶる出来事が起きます。好景気（バブル）とその崩壊、金融危機、台風・噴火・豪雪などの地域の災害と復興特需、感染症の流行、万博、IT革命、新幹線の開業などです。新幹線が開業すると、それ以降は「新幹線カード」（サイコロ2個の目の倍だけ進む）が手に入るようになります。物件を多く持つオーナーほど大きく揺さぶられます。出来事はすべて架空です。</p>
   <h3>福だぬき</h3><p>ごくまれに、取り憑いている${YOKAI[0].n}が改心して「福だぬき」になります。総資産が下位のオーナーほど起きやすくなっています。福だぬきは3〜5回のあいだ、番の終わりに良いこと（良いカード・臨時収入・もう一度サイコロ）だけをしてくれて、満足すると山へ帰ります。このあいだ、ほかのオーナーは福だぬき付きのオーナーと同じマスにぴったり止まると、福だぬきを奪えます。</p>
   <h3>航路とトンネル</h3><p>東日本編には、大洗―苫小牧と新潟―小樽のフェリー航路があります。陸路より少し近いかわりに物件がなく、赤マスが多めです。冬の日本海航路は荒れて出費が増えます。</p>
@@ -2560,7 +2633,7 @@ async function howTo(){await modal(`<h2>遊び方</h2>
 function openMenu(){modal(`<h2>メニュー</h2><div class="menu">
   <button class="btn" data-m="map">全体マップ・駅の物件</button><button class="btn" data-m="players">オーナー一覧</button><button class="btn" data-m="save">セーブとロード</button><button class="btn" data-m="edit">物件一覧</button><button class="btn" data-m="set">設定・音</button><button class="btn" data-m="rec">記録</button><button class="btn" data-m="how">遊び方</button><button class="btn" data-m="title">タイトルへ</button></div>`,[["閉じる",0]]);
   $("#modalBody").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;const m=b.dataset.m;
-    if((m==="save"||m==="title"||m==="map"||m==="stats")&&busy()){toast("手番が終わるまでお待ちください");return}
+    if((m==="save"||m==="title"||m==="map"||m==="stats")&&busy()){toast(waitMsg());return}
     $("#modal").hidden=true;$("#modalBody").onclick=null;
     ({stats:statsModal,map:fullMap,players:showPlayers,save:openSaves,edit:propList,set:openSettings,rec:recordsModal,how:howTo,title:showTitle})[m]()}}
 async function propList(){if(!S)return;const body=$("#modalBody");let cat="all",owner="all",sort="yield";
@@ -2586,7 +2659,7 @@ async function propList(){if(!S)return;const body=$("#modalBody");let cat="all",
   body.onclick=e=>{if(e.target.closest("[data-close]")){$("#modalBtns button").click();return}const t=e.target.closest("[data-cat]");if(t){cat=cat===t.dataset.cat?"all":t.dataset.cat;draw();return}
     const it=e.target.closest("[data-st]");if(it){body.onclick=body.onchange=null;$("#modal").hidden=true;const st=it.dataset.st===HQ?"東京":it.dataset.st;setTimeout(()=>fullMap(st),0)}};
   await pr;body.onclick=body.onchange=null}
-async function fullMap(start){if(!S)return;if(busy()){toast("手番が終わるまでお待ちください");return}
+async function fullMap(start){if(!S)return;if(busy()){toast(waitMsg());return}
   let sel=start||cp().pos,z=1;if(!STATIONS.some(s=>s[0]===sel))sel=S.dest;
   const pr=modal(`<h2>全体マップ</h2><p class="hint" style="margin-bottom:6px">駅をタップすると、その駅の物件が見られます。</p>
     <div class="fm-tools"><select id="fmSel" aria-label="駅を選ぶ">${STATIONS.map(s=>`<option ${s[0]===sel?"selected":""}>${s[0]}</option>`).join("")}</select><button class="btn sm" id="fmOut" aria-label="縮小">－</button><button class="btn sm" id="fmIn" aria-label="拡大">＋</button></div>
@@ -2611,6 +2684,7 @@ async function showPlayers(){await modal(`<h2>オーナー一覧</h2>${playersHT
 
 /* ---------- save slots ---------- */
 const busy=()=>S&&S.phase==="busy";
+const waitMsg=()=>S&&cp()&&!cp().cpu?"駒が止まるまでお待ちください":"手番までお待ちください";
 async function openSaves(){
   const canSave=S&&$("#title").hidden&&S.phase==="roll"&&!cp().cpu;
   const p=modal(`<h2>セーブとロード</h2><p class="hint">読み込み中…</p>`,[["閉じる",0]]);
@@ -2705,7 +2779,7 @@ $("#action").addEventListener("click",async e=>{if(!S||document.body.dataset.wai
   else if(c&&S.phase==="roll"&&!usingCard){usingCard=true;const res=await useCard(p,+c.dataset.card);usingCard=false;if(res==="warp"){S.phase="busy";render();await land();await endTurn()}else render()}
   else if(g)choose(g.dataset.go)});
 let usingCard=false;
-const guard=fn=>()=>{if(modalOpen())return;if(busy()){toast("手番が終わるまでお待ちください");return}fn()};
+const guard=fn=>()=>{if(modalOpen())return;if(busy()){toast(waitMsg());return}fn()};
 $("#newBtn").onclick=guard(showTitle);
 $("#saveBtn").onclick=guard(openSaves);
 $("#mapBtn").onclick=guard(()=>fullMap());
